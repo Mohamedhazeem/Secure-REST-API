@@ -177,7 +177,3 @@ git clone https://github.com/mohamedhazeem/secure-rest-api.git
 `npm run dev`
 
 6️⃣ Use postman colletion to test API
-
-```
-
-```
