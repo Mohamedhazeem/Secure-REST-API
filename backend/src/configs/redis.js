@@ -6,7 +6,7 @@ dotenv.config();
 export const redisClient = new Redis(process.env.REDIS_DB_URI, {
     retryStrategy(times) {
         const delay = Math.min(times * 100, 3000);
-        console.log(`🔁 Redis reconnect attempt #${times}`);
+        console.log(`Redis reconnect attempt #${times}`);
         return delay;
     },
     maxRetriesPerRequest: null,

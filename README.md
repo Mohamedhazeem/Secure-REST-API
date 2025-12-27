@@ -8,6 +8,8 @@
 
 🔐 JWT Authentication (stored in HTTP-only cookies)
 
+📝 Rate limiting using Redis
+
 👤 User & Post relationship using MongoDB references
 
 🛡️ Authorization & Ownership checks
@@ -20,17 +22,19 @@
 
 🧪 Ready for Swagger / Postman documentation
 
-🛠️ -- Tech Stack
+## 🛠️ Tech Stack
 
-Backend: Node.js, Express.js
+**Backend:** Node.js, Express.js
 
-Database: MongoDB, Mongoose
+**Database:** MongoDB (with Mongoose ORM), Redis (for caching & rate-limiting)
 
-Authentication: JWT, HTTP-only Cookies
+**Authentication & Security:** JWT-based authentication, HTTP-only cookies, middleware route protection
 
-Security: Middleware-based route protection
+**Rate Limiting:** Express Rate Limit with Redis store
 
-Tools: Postman / Swagger (optional)
+**Tools & Testing:** Postman, VS Code
+
+**Deployment / Environment:** Node.js environment variables, dotenv
 
 ## 📂 Folder Structure
 
@@ -49,10 +53,14 @@ src/
 │   └── postRoutes.js
 │
 ├── middlewares/
-│   └── authMiddleware.js
+│   └── authLimiter.js
+|   └── authMiddleware.js
+|   └── rateLimiter.js
 │
 ├── config/
 │   └── constant.js
+|   └── database.js
+|   └── redis.js
 │
 |postmon/
 │   └── Auth_collection.json
@@ -107,6 +115,25 @@ author: ObjectId (ref: "User")
 
 Each post belongs to exactly one user.
 
+##🔒 Rate Limiting
+
+To prevent abuse and protect the API, rate limiting has been implemented using **Express Rate Limit** with **Redis** as a store:
+
+- **Global API Limiter**:  
+  Limits all authenticated API requests to **50 requests per 15 minutes** per user.
+- **Login Endpoint Limiter**:  
+  Protects authentication routes with a stricter limit: **15 requests per 15 minutes** per IP address.
+
+- **Key Features**:
+
+  - Works per **user ID** (for authenticated requests) or **IP** (for public endpoints).
+  - Returns **HTTP 429 - Too Many Requests** when the limit is exceeded.
+  - Automatically resets counts after the defined `windowMs`.
+  - Backed by **Redis**, ensuring consistent limits across multiple servers in a distributed setup.
+
+- **Middleware Integration**:  
+  Both global and login-specific limiters are applied as **Express middleware** before route handlers.
+
 ## 🔑 Authorization Logic
 
 Only authenticated users can create posts
@@ -160,7 +187,7 @@ git clone https://github.com/mohamedhazeem/secure-rest-api.git
 
 3️⃣ Create .env File
 
-`PORT=5000`
+`PORT=1430`
 
 `MONGO_URI=your_mongodb_connection`
 
