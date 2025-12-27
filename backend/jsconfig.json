@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "checkJs": false
+  },
+  "exclude": ["node_modules"]
+}
