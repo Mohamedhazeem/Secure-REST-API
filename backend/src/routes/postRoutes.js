@@ -1,14 +1,13 @@
 import { Router } from "express";
 import { createPost,getPosts,deletePost, updatePost, getAllPosts } from "../controller/postController.js";
-import { authMiddleWare } from "../middleware/authMiddleware.js";
 
 export const postRouter = Router();
 
-postRouter.post("/", authMiddleWare, createPost);    
+postRouter.post("/", createPost);    
 
-postRouter.get("/", authMiddleWare, getAllPosts);
-postRouter.get("/me", authMiddleWare, getPosts);  
+postRouter.get("/", getAllPosts);
+postRouter.get("/me", getPosts);  
 
-postRouter.patch("/:id", authMiddleWare, updatePost); 
+postRouter.patch("/:id", updatePost); 
 
-postRouter.delete("/:id", authMiddleWare, deletePost);
+postRouter.delete("/:id", deletePost);
