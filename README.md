@@ -202,6 +202,10 @@ PATCH /api/v1/posts/:id (Update own post)
 
 DELETE /api/v1/posts/:id (Delete own post)
 
+**Movie Routes (Pagenation sample)**
+
+GET /api/v1/shows/movies?page=1&limit=20 (Get logged-in user posts)
+
 ## How to Run Locally
 
 1️⃣ Clone Repository
