@@ -1,0 +1,43 @@
+{
+	"info": {
+		"_postman_id": "e1fb9419-42dc-42ed-acd7-e606a6269962",
+		"name": "Shows",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "51054906",
+		"_collection_link": "https://insteadbusiness-6908131.postman.co/workspace/mohamed-hazeem's-Workspace~514bc3e6-283b-4266-89df-970735ba5ac7/collection/51054906-e1fb9419-42dc-42ed-acd7-e606a6269962?action=share&source=collection_link&creator=51054906"
+	},
+	"item": [
+		{
+			"name": "movie",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1430/api/v1/shows/movies?page=1&limit=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1430",
+					"path": [
+						"api",
+						"v1",
+						"shows",
+						"movies"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

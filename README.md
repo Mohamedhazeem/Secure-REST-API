@@ -1,26 +1,52 @@
 # 🚀 Secure REST API – Node.js, Express & MongoDB
 
-## A secure, production-style REST API built with Node.js, Express, MongoDB, and JWT authentication. This project demonstrates authentication, authorization, ownership-based access control, and clean backend architecture.
+## A secure, production-style REST API built with Node.js, Express, MongoDB, and JWT authentication. This project demonstrates authentication, authorization, ownership-based access control, rate limiting, pagenation and clean backend architecture.
 
 ⚠️ This is a backend-only project. No UI is included by design.
 
-📌 -- Features
+## 📌 Features
 
-🔐 JWT Authentication (stored in HTTP-only cookies)
+## 🔐 Authentication & Security
 
-📝 Rate limiting using Redis
+JWT Authentication (stored in HTTP-only cookies)
 
-👤 User & Post relationship using MongoDB references
+Secure login & logout
 
-🛡️ Authorization & Ownership checks
+Protected routes using middleware
 
-🧾 CRUD operations for posts
+Ownership-based authorization
 
-🔄 Populate user data safely (excluding passwords)
+Passwords hashed before storage
 
-🧱 Clean & scalable folder structure
+## 🛡️ Rate Limiting
 
-🧪 Ready for Swagger / Postman documentation
+Global API rate limiting using Redis
+
+Login-specific rate limiter to prevent brute-force attacks
+
+Distributed-safe rate limiting (Redis-backed)
+
+## 🧩 Database & Architecture
+
+MongoDB with Mongoose for application data
+
+Native MongoDB driver for external/sample databases
+
+Multiple database access from the same MongoDB cluster
+
+Clean separation of concerns (controllers, middleware)
+
+## 📄 Data Management
+
+User ↔ Post relationship using MongoDB references
+
+CRUD operations with authorization checks
+
+Safe `populate()` usage (excluding sensitive fields)
+
+Pagination support for large datasets
+
+Read-only access to MongoDB `sample_mflix` database
 
 ## 🛠️ Tech Stack
 
@@ -65,7 +91,7 @@ src/
 |postmon/
 │   └── Auth_collection.json
 |   └── Posts_collection.json
-|
+|   └── Shows_collection.json
 ├── app.js
 └── server.js
 ```
