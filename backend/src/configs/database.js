@@ -10,3 +10,6 @@ export const connectDB = async() => {
     process.exit(1);
     }
 }
+
+export const testDb = mongoose.connection.useDb("test");
+export const sampleDb = mongoose.connection.useDb("sample_mflix");

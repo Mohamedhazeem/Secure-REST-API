@@ -1,5 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 import User from "../models/userModel.js"
+import { testDb } from "../configs/database.js";
 const postSchema = new Schema(
    {
     name:{
@@ -28,4 +29,4 @@ const postSchema = new Schema(
    }
 );
 
-export default mongoose.model("Post", postSchema);
+export default testDb.model("Post", postSchema);
