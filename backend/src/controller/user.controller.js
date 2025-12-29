@@ -1,5 +1,5 @@
-import { AUTH_TOKEN } from "../configs/constants.js";
-import User from "../models/userModel.js"
+import { ACCESS_TOKEN } from "../configs/constants.js";
+import User from "../models/user.model.js"
 import { generateToken } from "../utils/generateToken.js";
 
 export const loginUser = async(req,res)=>{
@@ -25,8 +25,9 @@ export const loginUser = async(req,res)=>{
 }
 export const logoutUser = async(req,res)=>{
     try {
-        res.cookie(AUTH_TOKEN, "",{
-            httpOnly:true, expires: new Date(0)
+        res.clearCookie(ACCESS_TOKEN,{
+            httpOnly:true,
+            sameSite: "strict",
         });
 
         return res.status(200).json({message:"user loged out"})
@@ -65,7 +66,7 @@ export const registerUser = async(req, res) =>{
 export const deleteUser = async(req,res)=>{
     try {
         const user = await User.findByIdAndDelete(req.user._id);
-        res.cookie(AUTH_TOKEN, "", {
+        res.cookie(ACCESS_TOKEN, "", {
             httpOnly: true,
             expires: new Date(0)
         });

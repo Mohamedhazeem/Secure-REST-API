@@ -1,5 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-import User from "../models/userModel.js"
+import User from "./user.model.js"
 import { testDb } from "../configs/database.js";
 const postSchema = new Schema(
    {

@@ -1,10 +1,10 @@
 import express from "express";
-import { userRouter } from "./routes/userRoutes.js";
-import {postRouter} from "./routes/postRoutes.js";
+import { userRouter } from "./routes/user.routes.js";
+import {postRouter} from "./routes/post.routes.js";
 import cookieParser  from "cookie-parser";
-import { apiLimiter } from "./middleware/rateLimiter.js";
-import { authMiddleWare } from "./middleware/authMiddleware.js";
-import { movieRouter } from "./routes/movieRoutes.js";
+import { apiLimiter } from "./middleware/ratelimiter.middleware.js";
+import { authMiddleWare } from "./middleware/auth.middleware.js";
+import { movieRouter } from "./routes/movie.routes.js";
 
 export const app = express();
 

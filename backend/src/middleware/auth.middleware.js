@@ -1,11 +1,11 @@
-import { AUTH_TOKEN } from "../configs/constants.js"
-import User from "../models/userModel.js"
+import { ACCESS_TOKEN } from "../configs/constants.js"
+import User from "../models/user.model.js"
 import jwt from "jsonwebtoken";
 
 export const authMiddleWare = async(req,res,next) =>{
 
     try {
-        const token = req.cookies[AUTH_TOKEN];
+        const token = req.cookies[ACCESS_TOKEN];
 
     if (!token) {
         return res.status(401).json({ message: "Not authorized, no token" });
