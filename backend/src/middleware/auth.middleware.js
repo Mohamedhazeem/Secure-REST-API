@@ -11,7 +11,7 @@ export const authMiddleWare = async(req,res,next) =>{
         return res.status(401).json({ message: "Not authorized, no token" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_AUTH_KEY);
 
     req.user =  await User.findById(decoded.userId).select("-password"); // here i exclude password
     // to include add keys like .select(_id name email) with spaces

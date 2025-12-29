@@ -1,6 +1,6 @@
 import { ACCESS_TOKEN } from "../configs/constants.js";
 import User from "../models/user.model.js"
-import { generateToken } from "../utils/generateToken.js";
+import { generateAccessToken } from "../utils/generateToken.js";
 
 export const loginUser = async(req,res)=>{
     try {
@@ -13,7 +13,7 @@ export const loginUser = async(req,res)=>{
         const isPasswordMatch = await user.comparePassword(password);
         if(!isPasswordMatch)  return res.status(400).json({message: "invalid credentials!"});
 
-        generateToken(res, user._id);
+        generateAccessToken(res, user._id);
         return res.status(200).json({message:"user loged in successfully", user:{
             id: user._id,
             email: user.email,
@@ -57,7 +57,7 @@ export const registerUser = async(req, res) =>{
             email: email.toLowerCase(),
             password
         })
-        generateToken(res, user._id);
+        generateAccessToken(res, user._id);
         return res.status(201).json({message: "user created",user: {id: user.id, username, email}});
     } catch (error) {
         res.status(500).json({message: error.message});
