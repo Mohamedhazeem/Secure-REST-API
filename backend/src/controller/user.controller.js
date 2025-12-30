@@ -1,7 +1,9 @@
-import { ACCESS_TOKEN } from "../configs/constants.js";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../configs/constants.js";
+import { redisClient } from "../configs/redis.js";
 import User from "../models/user.model.js"
+import { createAuthSession } from "../service/auth.service.js";
 import { generateAccessToken } from "../utils/generateToken.js";
-
+import jwt from "jsonwebtoken";
 export const loginUser = async(req,res)=>{
     try {
         const{email,password} = req.body;
@@ -13,7 +15,8 @@ export const loginUser = async(req,res)=>{
         const isPasswordMatch = await user.comparePassword(password);
         if(!isPasswordMatch)  return res.status(400).json({message: "invalid credentials!"});
 
-        generateAccessToken(res, user._id);
+        await createAuthSession(res,user);
+
         return res.status(200).json({message:"user loged in successfully", user:{
             id: user._id,
             email: user.email,
@@ -23,18 +26,30 @@ export const loginUser = async(req,res)=>{
         res.status(500).json({message: `internal server error ${error.message || error}`});
     }   
 }
-export const logoutUser = async(req,res)=>{
-    try {
-        res.clearCookie(ACCESS_TOKEN,{
-            httpOnly:true,
-            sameSite: "strict",
-        });
+export const logoutUser = async (req, res) => {
+    const token = req.cookies[ACCESS_TOKEN];
+    if (token) {
+        const decoded = jwt.decode(token);
+        const ttl = decoded.exp - Math.floor(Date.now() / 1000);
 
-        return res.status(200).json({message:"user loged out"})
-    } catch (error) {
-        res.status(500).json({message: `internal server error ${error.message || error}`});
-    }   
-}
+        await redisClient.set(
+        `auth:blacklist:${token}`,
+        "true",
+        "EX",
+        ttl
+        );
+    }
+
+    const refresh = req.cookies.refreshToken;
+    if (refresh) {
+        const decoded = jwt.decode(refresh);
+        await redis.del(`auth:refresh:${decoded.sub}`);
+    }
+
+    res .clearCookie(ACCESS_TOKEN)
+        .clearCookie(REFRESH_TOKEN)
+        .json({ message: "Logged out" });
+};
 export const registerUser = async(req, res) =>{
     try {
         const {username, email,password} = req.body;
@@ -57,7 +72,7 @@ export const registerUser = async(req, res) =>{
             email: email.toLowerCase(),
             password
         })
-        generateAccessToken(res, user._id);
+        await createAuthSession({ res,user });
         return res.status(201).json({message: "user created",user: {id: user.id, username, email}});
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -66,10 +81,9 @@ export const registerUser = async(req, res) =>{
 export const deleteUser = async(req,res)=>{
     try {
         const user = await User.findByIdAndDelete(req.user._id);
-        res.cookie(ACCESS_TOKEN, "", {
-            httpOnly: true,
-            expires: new Date(0)
-        });
+        res .clearCookie(ACCESS_TOKEN)
+            .clearCookie(REFRESH_TOKEN)
+            .json({ message: "Deleted" });
         return res.status(200).json({message: "deleted succesful"});
 
     } catch (error) {

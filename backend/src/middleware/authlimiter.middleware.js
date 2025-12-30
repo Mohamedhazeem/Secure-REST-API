@@ -3,7 +3,7 @@ import RedisStore from "rate-limit-redis";
 import {redisClient} from "../configs/redis.js";
 import { LOGIN_API_REQUEST_LIMIT } from "../configs/constants.js";
 
-export const loginLimiter = rateLimit({
+export const authLimiter = rateLimit({
   keyGenerator: (req)=> `ip:${ipKeyGenerator(req.ip)}`,
   store: new RedisStore({
     sendCommand: (...args) => redisClient.call(...args),
