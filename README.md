@@ -223,20 +223,24 @@ git clone https://github.com/mohamedhazeem/secure-rest-api.git
 
 3️⃣ Create .env File
 
+`MONGODB_URI="magodb_cloud uri"`
+
+`REDIS_DB_URI="redis_cloud uri"`
+
 `PORT=1430`
 
-`MONGO_URI=your_mongodb_connection`
+`NODE_ENV=production`
 
-`JWT_SECRET_KEY=your_secret_key`
+`JWT_AUTH_KEY="auth_key"`
 
-`JWT_EXPIRES_IN=token expire time (i set 3 minutes (3m))`
+`JWT_REFRESH_KEY="refresh_key"`
 
-4️⃣ Create constant.js
+`JWT_REFRESH_EXPIRES_IN=15m`
 
-`export const AUTH_TOKEN = "Your token name"`
+`JWT_ACCESS_EXPIRES_IN=5m`
 
-5️⃣ Start Server
+4️⃣ Start Server
 
 `npm run dev`
 
-6️⃣ Use postman colletion to test API
+5️⃣ Use postman colletion from folder to test API
