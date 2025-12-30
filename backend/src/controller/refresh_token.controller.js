@@ -12,7 +12,7 @@ export const refreshTokenController = async (req, res) => {
     const stored = await redisClient.get(
       `auth:refresh:${payload.sub}`
     );
-
+    if(stored == null) return res.sendStatus(401);
     if (stored !== token) {
       await redisClient.del(`auth:refresh:${payload.sub}`);
       console.log("1");
