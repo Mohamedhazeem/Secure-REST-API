@@ -1,159 +1,161 @@
 {
-	"info": {
-		"_postman_id": "e4da44e4-fc3c-4658-bcf3-e777e7d3a741",
-		"name": "Auth",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "51054906",
-		"_collection_link": "https://insteadbusiness-6908131.postman.co/workspace/mohamed-hazeem's-Workspace~514bc3e6-283b-4266-89df-970735ba5ac7/collection/51054906-e4da44e4-fc3c-4658-bcf3-e777e7d3a741?action=share&source=collection_link&creator=51054906"
-	},
-	"item": [
-		{
-			"name": "Register",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"jhon whick\",\r\n    \"email\": \"sample@gmail.com\",\r\n    \"password\": \"12345789\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/users/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"users",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"sample@gmail.com\",\r\n    \"password\": \"12345789\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/users/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Logout",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/users/logout",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/users/me",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"me"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "e4da44e4-fc3c-4658-bcf3-e777e7d3a741",
+    "name": "Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51054906",
+    "_collection_link": "https://insteadbusiness-6908131.postman.co/workspace/mohamed-hazeem's-Workspace~514bc3e6-283b-4266-89df-970735ba5ac7/collection/51054906-e4da44e4-fc3c-4658-bcf3-e777e7d3a741?action=share&source=collection_link&creator=51054906"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"jhon whick\",\r\n    \"email\": \"sample@gmail.com\",\r\n    \"password\": \"12345789\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:1430/api/v1/auth/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"sample@gmail.com\",\r\n    \"password\": \"12345789\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:1430/api/v1/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:1430/api/v1/auth/logout",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "logout"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:1430/api/v1/auth/me",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "me"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Refresh",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:1430/api/v1/auth/refresh",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "refresh"]
+        }
+      },
+      "response": []
+    }
+  ]
 }

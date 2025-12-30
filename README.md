@@ -1,6 +1,6 @@
 # 🚀 Secure REST API – Node.js, Express & MongoDB
 
-## A secure, production-style REST API built with Node.js, Express, MongoDB, and JWT authentication. This project demonstrates authentication, authorization, ownership-based access control, rate limiting, pagenation and clean backend architecture.
+## A secure, production-style REST API built with Node.js, Express, MongoDB, and JWT authentication. This project demonstrates authentication, authorization, ownership-based access control, rate limiting, jwt token rotation, pagenation and clean backend architecture.
 
 ⚠️ This is a backend-only project. No UI is included by design.
 
@@ -9,6 +9,8 @@
 ## 🔐 Authentication & Security
 
 JWT Authentication (stored in HTTP-only cookies)
+
+JWT Token Refresh
 
 Secure login & logout
 
@@ -67,21 +69,23 @@ Read-only access to MongoDB `sample_mflix` database
 ```text
 src/
 ├── controllers/
-│   ├── authController.js
-│   └── postController.js
+│   ├── auth.controller.js
+│   └── post.controller.js
 │
 ├── models/
-│   ├── userModel.js
-│   └── postModel.js
+│   ├── user.model.js
+│   └── post.model.js
 │
 ├── routes/
-│   ├── authRoutes.js
-│   └── postRoutes.js
+│   ├── auth.routes.js
+│   └── post.routes.js
 │
+├── service
+|    ├── auth.service.js
 ├── middlewares/
-│   └── authLimiter.js
-|   └── authMiddleware.js
-|   └── rateLimiter.js
+│   └── authlimiter.middleware.js
+|   └── auth.middleware.js
+|   └── ratelimiter.middleware.js
 │
 ├── config/
 │   └── constant.js
@@ -106,9 +110,11 @@ JWT stored in HTTP-only cookie
 
 Cookie sent automatically with requests
 
+JWT refresh when invalid
+
 Middleware:
 
-Verifies JWT
+Verifies JWT and backlist
 
 Fetches user from database
 
@@ -172,21 +178,21 @@ Update only their own posts
 
 Delete only their own posts
 
-Admin logic can be added easily later
-
 ## 📡 API Endpoints
 
 **Auth Routes**
 
 Method Endpoint & Description
 
-POST /api/v1/users/ (Register new user)
+POST /api/v1/auth/ (Register new user)
 
-POST /api/v1/users/login (Login user)
+POST /api/v1/auth/login (Login user)
 
-POST /api/v1/users/logout (Logout user)
+POST /api/v1/auth/logout (Logout user)
 
-DELETE /api/v1/users/me (Delete user itself if they want)
+POST /api/v1/auth/refresh (refresh jwt token)
+
+DELETE /api/v1/auth/me (Delete user itself if they want)
 
 **Post Routes (Protected)**
 
