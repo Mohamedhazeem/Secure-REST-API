@@ -1,18 +1,32 @@
 import Redis from "ioredis";
 
-export const redisClient = new Redis(process.env.REDIS_DB_URI, {
-    retryStrategy(times) {
-        const delay = Math.min(times * 100, 3000);
-        console.log(`Redis reconnect attempt #${times}`);
-        return delay;
-    },
-    maxRetriesPerRequest: null,
-    enableReadyCheck: true,
-});
+const isTest = process.env.NODE_ENV === "test";
 
-redisClient.on("connect", () => console.log("Connected"));
-redisClient.on("ready", () => console.log("Ready to use"));
-redisClient.on("reconnecting", () => console.log("Reconnecting..."));
-redisClient.on("close", () => console.log("Connection closed"));
-redisClient.on("end", () => console.log("Connection ended"));
-redisClient.on("error", (error)=>{console.log(error)});
+function createRedisClient() {
+    const client = new Redis(process.env.REDIS_DB_URI, {
+        retryStrategy(times) {
+            const delay = Math.min(times * 100, 3000);
+            console.log(`Redis reconnect attempt #${times}`);
+            return delay;
+        },
+        maxRetriesPerRequest: null,
+        enableReadyCheck: true,
+    });
+
+    client.on("connect", () => console.log("Connected"));
+    client.on("ready", () => console.log("Ready to use"));
+    client.on("reconnecting", () => console.log("Reconnecting..."));
+    client.on("close", () => console.log("Connection closed"));
+    client.on("end", () => console.log("Connection ended"));
+    client.on("error", (error)=>{console.log(error)});
+
+    return client;
+}
+
+export const redisClient = isTest
+    ? {
+        call: () => Promise.reject(
+            new Error("Redis is disabled in test mode; rate limiting uses MemoryStore")
+        ),
+    }
+    : createRedisClient();

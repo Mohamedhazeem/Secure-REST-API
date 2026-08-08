@@ -1,7 +1,13 @@
-import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import rateLimit, { MemoryStore, ipKeyGenerator } from "express-rate-limit";
 import RedisStore  from "rate-limit-redis";
 import {redisClient} from "../configs/redis.js";
 import { API_REQUEST_LIMIT } from "../configs/constants.js";
+
+const store = process.env.NODE_ENV === "test"
+    ? new MemoryStore()
+    : new RedisStore ({
+        sendCommand: (...args)=> redisClient.call(...args)
+    });
 
 export const apiLimiter = rateLimit({
     keyGenerator: (req)=> {
@@ -13,8 +19,6 @@ export const apiLimiter = rateLimit({
     windowMs: API_REQUEST_LIMIT,
     limit: 5,
     standardHeaders: true,    
-    store: new RedisStore ({
-        sendCommand: (...args)=> redisClient.call(...args)
-    }),
+    store,
     message: "Too many requests. Please try again later."
 })

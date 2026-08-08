@@ -100,6 +100,24 @@ src/
 └── server.js
 ```
 
+## 📜 License
+
+> ⚠️ **Portfolio Project — Read & Study Only**
+
+This project is a **portfolio showcase** created by **Mohamed Hazeem**.
+
+- **Author:** Mohamed Hazeem
+- **Email:** a.mohamedhazeem@gmail.com
+- **GitHub:** [@mohamedhazeem](https://github.com/mohamedhazeem)
+
+This work is protected. You may **read and study** the code for learning purposes, but **you may not**:
+- Copy, reuse, or redistribute the code
+- Use it as a template for your own projects
+- Claim it as your own work
+- Use it in production
+
+See the full [license.md](./license.md) for details.
+
 ## 🔐 Authentication Flow (JWT + Cookies)
 
 User logs in
