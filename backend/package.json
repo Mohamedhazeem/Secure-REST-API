@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r dotenv/config src/index.js",
-    "dev": "nodemon -r dotenv/config src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon --watch src src/index.js",
+    "dev-watch": "node --watch src/index.js"
   },
   "keywords": [],
   "author": "",

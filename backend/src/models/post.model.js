@@ -1,4 +1,5 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose from "mongoose";
+const { Schema, model } = mongoose;
 import User from "./user.model.js"
 import { testDb } from "../configs/database.js";
 const postSchema = new Schema(
@@ -6,7 +7,7 @@ const postSchema = new Schema(
     name:{
         type: String,
         trim:true,
-        required:true
+        required:true,
     },
     description:{
         type: String,
