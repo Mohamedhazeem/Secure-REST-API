@@ -7,7 +7,6 @@ import jwt from "jsonwebtoken";
 export const loginUser = async(req,res)=>{
     try {
         const{email,password} = req.body;
-        if(!email || !password) return res.status(400).json({message: "email or password not entered"});
 
         const user = await User.findOne({email});
         if(!user) return res.status(400).json({message: "user not found"});
@@ -24,7 +23,7 @@ export const loginUser = async(req,res)=>{
         }})
     } catch (error) {
         res.status(500).json({message: `internal server error ${error.message || error}`});
-    }   
+    }
 }
 export const logoutUser = async (req, res) => {
     const token = req.cookies[ACCESS_TOKEN];
@@ -54,9 +53,6 @@ export const registerUser = async(req, res) =>{
     try {
         const {username, email,password} = req.body;
 
-        if(username == null || email == null || password == null){
-            return res.status(400).json({message: "All field are needed"});
-        }
        const emailExists = await User.findOne({ email: email.toLowerCase() });
         if (emailExists) {
         return res.status(400).json({ message: "Email already exists" });
@@ -87,6 +83,6 @@ export const deleteUser = async(req,res)=>{
         return res.status(200).json({message: "deleted succesful"});
 
     } catch (error) {
-        res.status(500).json({message: {error}});        
+        res.status(500).json({message: {error}});
     }
 }
