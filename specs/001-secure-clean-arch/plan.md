@@ -1,8 +1,8 @@
 # Implementation Plan: Secure Clean Architecture Refactor
 
-**Branch**: `002-secure-clean-arch` | **Date**: 2026-08-08 | **Spec**: [spec.md](./spec.md)
+**Branch**: `001-secure-clean-arch` | **Date**: 2026-08-08 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `/specs/002-secure-clean-arch/spec.md`
+**Input**: Feature specification from `/specs/001-secure-clean-arch/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command; its definition describes the execution workflow.
 
@@ -32,25 +32,25 @@ Refactor the existing Express/Mongoose backend into a clean layered architecture
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Clean Architecture | PASS | Plan introduces repository interfaces, moves Mongoose/Redis/Express coupling to infrastructure layer, and keeps controllers thin. |
-| II. SOLID | PASS | Controllers delegate to services; repositories abstract persistence; new resources follow extension pattern; dependencies injected via configs. |
-| III. Performance & Big-O | PASS | Pagination already present; rate limiting already Redis-backed; plan adds complexity documentation and eliminates N+1 via populated/batched queries. |
-| IV. Multi-App Consumability | PASS | OpenAPI spec added; CORS support added; JSON envelope standardized; versioning preserved under `/api/v1`. |
-| V. Swappable Persistence | PASS | Repository interfaces introduced; business logic imports only interfaces; swapping to in-memory fakes for tests requires only test configuration changes. |
-| VI. Testability & Multi-Level Testing | PASS | Vitest + supertest + mongodb-memory-server established; unit, integration, performance, and e2e test levels mandated. |
-| Security & Production | PASS | Zod validation middleware added; role-based auth added; CORS with allowlist; fail-fast error handling; secrets centralized in configs. |
-| Development Workflow | PASS | Extension pattern documented; `node --check` and clean boot remain minimum gates; test script added. |
+| Principle                             | Status | Notes                                                                                                                                                     |
+| ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I. Clean Architecture                 | PASS   | Plan introduces repository interfaces, moves Mongoose/Redis/Express coupling to infrastructure layer, and keeps controllers thin.                         |
+| II. SOLID                             | PASS   | Controllers delegate to services; repositories abstract persistence; new resources follow extension pattern; dependencies injected via configs.           |
+| III. Performance & Big-O              | PASS   | Pagination already present; rate limiting already Redis-backed; plan adds complexity documentation and eliminates N+1 via populated/batched queries.      |
+| IV. Multi-App Consumability           | PASS   | OpenAPI spec added; CORS support added; JSON envelope standardized; versioning preserved under `/api/v1`.                                                 |
+| V. Swappable Persistence              | PASS   | Repository interfaces introduced; business logic imports only interfaces; swapping to in-memory fakes for tests requires only test configuration changes. |
+| VI. Testability & Multi-Level Testing | PASS   | Vitest + supertest + mongodb-memory-server established; unit, integration, performance, and e2e test levels mandated.                                     |
+| Security & Production                 | PASS   | Zod validation middleware added; role-based auth added; CORS with allowlist; fail-fast error handling; secrets centralized in configs.                    |
+| Development Workflow                  | PASS   | Extension pattern documented; `node --check` and clean boot remain minimum gates; test script added.                                                      |
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/002-secure-clean-arch/
+specs/001-secure-clean-arch/
 ├── plan.md              # This file
 ├── research.md          # Phase 0 output
 ├── data-model.md        # Phase 1 output
@@ -139,8 +139,8 @@ backend/
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| Repository interfaces add boilerplate | Business logic must not import Mongoose/Redis/Express directly (Constitution I and V) | Direct model usage would violate clean-architecture layering and prevent testability with fakes |
-| Role model introduces new entity | RBAC is required by FR-014-FR-016 and clarified scope | Simple boolean flags would not support customizable/extensible permissions |
-| Error middleware layer | Flat stable-code error model and fail-fast dependency failures require centralized handling | Ad-hoc error responses in controllers would duplicate logic and risk leaking internals |
+| Violation                             | Why Needed                                                                                  | Simpler Alternative Rejected Because                                                            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Repository interfaces add boilerplate | Business logic must not import Mongoose/Redis/Express directly (Constitution I and V)       | Direct model usage would violate clean-architecture layering and prevent testability with fakes |
+| Role model introduces new entity      | RBAC is required by FR-014-FR-016 and clarified scope                                       | Simple boolean flags would not support customizable/extensible permissions                      |
+| Error middleware layer                | Flat stable-code error model and fail-fast dependency failures require centralized handling | Ad-hoc error responses in controllers would duplicate logic and risk leaking internals          |

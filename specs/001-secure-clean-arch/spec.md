@@ -1,6 +1,6 @@
 # Feature Specification: Secure Clean Architecture Refactor
 
-**Feature Branch**: `002-secure-clean-arch`
+**Feature Branch**: `001-secure-clean-arch`
 
 **Created**: 2026-08-08
 
@@ -19,7 +19,7 @@
 - Q: What categories of errors should the API distinguish, and what should each category signal to the caller about retry behavior? → A: Flat error model with stable codes only, no category; retry logic is left entirely to the consumer.
 - Q: Should the API support cross-origin requests from browser-based client applications, and if so, how should origins be controlled? → A: Yes, the API MUST support cross-origin requests from browser-based applications using an environment-driven origin allowlist, with credentials enabled and preflight handling.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - API consumers can discover and integrate endpoints using a complete contract (Priority: P1)
 
@@ -114,7 +114,7 @@ The API handles at least 1000 concurrent authenticated requests without degraded
 - What happens when a downstream dependency fails, and how does the system communicate that failure to the caller?
 - How does the flat error model with stable codes support different consumer retry strategies without the API prescribing specific behavior?
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -148,7 +148,7 @@ The API handles at least 1000 concurrent authenticated requests without degraded
 - **Role**: A named collection of permissions assigned to a consumer identity. Roles are customizable and extensible without changing endpoint logic.
 - **Permission**: A specific access right or action that can be granted to a role. Permissions are evaluated before any protected operation executes.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

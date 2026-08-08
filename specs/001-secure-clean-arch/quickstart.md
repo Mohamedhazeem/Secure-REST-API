@@ -1,6 +1,6 @@
 # Quickstart: Secure Clean Architecture Refactor
 
-**Feature**: 002-secure-clean-arch
+**Feature**: 001-secure-clean-arch
 **Date**: 2026-08-08
 
 ## Prerequisites
@@ -53,6 +53,7 @@ npm install
 **Command**: `npm run e2e`
 
 **Expected outcome**: Postman collections complete successfully:
+
 - Register → login → access protected endpoint → refresh token → logout
 - Create post → update own post → delete own post
 - Attempt to update/delete another user's post returns 403
@@ -64,7 +65,7 @@ npm install
 
 **Command**: Manual review or CI validation step
 
-**Expected outcome**: `specs/002-secure-clean-arch/contracts/openapi.yaml` accurately describes every public endpoint. Request/response schemas match actual API behavior. Error responses include `code`, `message`, and `traceId`.
+**Expected outcome**: `specs/001-secure-clean-arch/contracts/openapi.yaml` accurately describes every public endpoint. Request/response schemas match actual API behavior. Error responses include `code`, `message`, and `traceId`.
 
 ---
 
@@ -73,6 +74,7 @@ npm install
 **Command**: Send cross-origin request from a browser or `curl` with `Origin` header set to an allowed origin
 
 **Expected outcome**:
+
 - Response includes `Access-Control-Allow-Origin` matching the request origin
 - `Access-Control-Allow-Credentials: true` is present
 - Preflight `OPTIONS` request returns `200` with correct `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers`
@@ -85,6 +87,7 @@ npm install
 **Command**: Send rapid repeated requests to a protected endpoint
 
 **Expected outcome**:
+
 - Requests within the limit succeed
 - Requests exceeding the limit return `429 Too Many Requests`
 - Rate limit resets after the configured window
@@ -97,6 +100,7 @@ npm install
 **Command**: Trigger validation, auth, and dependency-failure errors
 
 **Expected outcome**:
+
 - All error responses contain `code`, `message`, and `traceId`
 - No stack traces or internal details are exposed
 - Error codes are stable and documented in the OpenAPI spec
