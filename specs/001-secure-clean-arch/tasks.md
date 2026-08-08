@@ -45,6 +45,7 @@
 - [ ] T018 [P] Create structured logger utility in `backend/src/utils/logger.js`
 - [ ] T019 Centralize environment variable reads in `backend/src/configs/config.js`
 - [ ] T020 Update database connection to support test environment in `backend/src/configs/database.js`
+- [ ] T021 [P] Create user validator in `backend/src/validators/user.validator.js`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -58,14 +59,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T021 [P] [US1] Add CORS integration tests in `backend/tests/integration/cors.test.js`
+- [ ] T022 [P] [US1] Add CORS integration tests in `backend/tests/integration/cors.test.js`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Validate and update OpenAPI contract in `specs/001-secure-clean-arch/contracts/openapi.yaml`
-- [ ] T023 [P] [US1] Create CORS config in `backend/src/configs/cors.js`
-- [ ] T024 [P] [US1] Create CORS middleware in `backend/src/middleware/cors.middleware.js`
-- [ ] T025 [US1] Wire CORS middleware and preflight handling in `backend/src/app.js`
+- [ ] T023 [US1] Validate and update OpenAPI contract in `specs/001-secure-clean-arch/contracts/openapi.yaml`
+- [ ] T024 [P] [US1] Create CORS config in `backend/src/configs/cors.js`
+- [ ] T025 [P] [US1] Create CORS middleware in `backend/src/middleware/cors.middleware.js`
+- [ ] T026 [US1] Wire CORS middleware and preflight handling in `backend/src/app.js`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -79,16 +80,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T026 [P] [US2] Create Role model in `backend/src/models/role.model.js`
-- [ ] T027 [P] [US2] Create Permission model in `backend/src/models/permission.model.js`
-- [ ] T028 [P] [US2] Create RefreshToken model in `backend/src/models/refresh_token.model.js`
-- [ ] T029 [US2] Implement role enforcement middleware in `backend/src/middleware/role.middleware.js`
-- [ ] T030 [US2] Add development seed data for roles and permissions in `backend/src/configs/seed.js`
-- [ ] T031 [US2] Add ownership checks in post service layer in `backend/src/service/post.service.js`
-- [ ] T032 [US2] Implement refresh token blacklist with Redis TTL in `backend/src/service/auth.service.js`
-- [ ] T033 [US2] Implement fail-fast error handling for external dependency failures in `backend/src/middleware/error.middleware.js`
-- [ ] T034 [US2] Update rate limiter configuration in `backend/src/configs/constants.js`
-- [ ] T035 [US2] Add RBAC and security integration tests in `backend/tests/integration/rbac.test.js`
+- [ ] T027 [P] [US2] Create Role model in `backend/src/models/role.model.js`
+- [ ] T028 [P] [US2] Create Permission model in `backend/src/models/permission.model.js`
+- [ ] T029 [P] [US2] Create RefreshToken model in `backend/src/models/refresh_token.model.js`
+- [ ] T030 [US2] Implement role enforcement middleware in `backend/src/middleware/role.middleware.js`
+- [ ] T031 [US2] Add development seed data for roles and permissions in `backend/src/configs/seed.js`, triggered on server boot in development mode
+- [ ] T032 [US2] Add ownership checks in post service layer in `backend/src/service/post.service.js`
+- [ ] T033 [US2] Implement refresh token blacklist with Redis TTL in `backend/src/service/auth.service.js`
+- [ ] T034 [US2] Implement fail-fast error handling for external dependency failures in `backend/src/middleware/error.middleware.js`
+- [ ] T035 [US2] Update rate limiter configuration in `backend/src/configs/constants.js` with separate limits for login and authenticated requests, and increase authenticated user limit
+- [ ] T036 [US2] Add RBAC and security integration tests in `backend/tests/integration/rbac.test.js`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -102,16 +103,17 @@
 
 ### Implementation for User Story 3
 
-- [ ] T036 [P] [US3] Refactor User model to inject repository interface in `backend/src/models/user.model.js`
-- [ ] T037 [P] [US3] Refactor Post model to inject repository interface in `backend/src/models/post.model.js`
-- [ ] T038 [US3] Refactor auth service to use repository interfaces in `backend/src/service/auth.service.js`
-- [ ] T039 [US3] Extract post service from controller in `backend/src/service/post.service.js`
-- [ ] T040 [US3] Refactor post controller to use post service in `backend/src/controller/post.controller.js`
-- [ ] T041 [P] [US3] Create user service in `backend/src/service/user.service.js`
-- [ ] T042 [P] [US3] Create user controller in `backend/src/controller/user.controller.js`
-- [ ] T043 [P] [US3] Create user routes in `backend/src/routes/user.routes.js`
-- [ ] T044 [US3] Document extension pattern in `backend/src/docs/extension-pattern.md`
-- [ ] T045 [US3] Add clean architecture integration tests in `backend/tests/integration/architecture.test.js`
+- [ ] T037 [P] [US3] Refactor User model to remove infrastructure imports and ensure pure domain representation in `backend/src/models/user.model.js`
+- [ ] T038 [P] [US3] Refactor Post model to remove infrastructure imports and ensure pure domain representation in `backend/src/models/post.model.js`
+- [ ] T039 [US3] Refactor auth service to use repository interfaces in `backend/src/service/auth.service.js`
+- [ ] T040 [US3] Extract post service from controller in `backend/src/service/post.service.js`
+- [ ] T041 [US3] Refactor post controller to use post service in `backend/src/controller/post.controller.js`
+- [ ] T042 [P] [US3] Create user service in `backend/src/service/user.service.js`
+- [ ] T043 [P] [US3] Create user controller in `backend/src/controller/user.controller.js`
+- [ ] T044 [P] [US3] Create user routes in `backend/src/routes/user.routes.js`
+- [ ] T045 [P] [US3] Extract auth controller logic from user.controller.js into `backend/src/controller/auth.controller.js`
+- [ ] T046 [US3] Document extension pattern in `backend/src/docs/extension-pattern.md`
+- [ ] T047 [US3] Add clean architecture integration tests in `backend/tests/integration/architecture.test.js`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -125,12 +127,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T046 [US4] Create error factory with stable codes in `backend/src/utils/errors.js`
-- [ ] T047 [P] [US4] Implement error handling middleware in `backend/src/middleware/error.middleware.js`
-- [ ] T048 [P] [US4] Implement error service in `backend/src/service/error.service.js`
-- [ ] T049 [P] [US4] Implement error controller in `backend/src/controller/error.controller.js`
-- [ ] T050 [US4] Standardize all controllers to throw domain errors instead of sending responses directly
-- [ ] T051 [US4] Add error handling integration tests in `backend/tests/integration/errors.test.js`
+- [ ] T048 [US4] Create error factory with stable codes in `backend/src/utils/errors.js`
+- [ ] T049 [P] [US4] Implement error handling middleware in `backend/src/middleware/error.middleware.js`
+- [ ] T050 [P] [US4] Implement error service in `backend/src/service/error.service.js`
+- [ ] T051 [P] [US4] Implement error controller in `backend/src/controller/error.controller.js`
+- [ ] T052 [US4] Standardize all controllers to throw domain errors instead of sending responses directly
+- [ ] T053 [US4] Add error handling integration tests in `backend/tests/integration/errors.test.js`
 
 **Checkpoint**: All error responses across the API follow the flat stable-code model
 
@@ -144,13 +146,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T052 [P] [US5] Add performance tests for pagination in `backend/tests/performance/pagination.test.js`
-- [ ] T053 [P] [US5] Add performance tests for rate limiting in `backend/tests/performance/rate-limit.test.js`
+- [ ] T054 [P] [US5] Add performance tests for pagination in `backend/tests/performance/pagination.test.js`
+- [ ] T055 [P] [US5] Add performance tests for rate limiting in `backend/tests/performance/rate-limit.test.js`
 
 ### Implementation for User Story 5
 
-- [ ] T054 [US5] Document Big-O complexity for hot paths in code comments
-- [ ] T055 [US5] Verify no N+1 queries in post and movie endpoints
+- [ ] T056 [US5] Document Big-O complexity for hot paths in code comments
+- [ ] T057 [US5] Verify no N+1 queries in post and movie endpoints by inspecting query plans and ensuring all population is batched
 
 **Checkpoint**: Performance targets met and documented
 
@@ -160,11 +162,15 @@
 
 **Purpose**: Final verification, documentation, and cleanup across all user stories
 
-- [ ] T056 [P] Run full test suite and fix failures
-- [ ] T057 [P] Validate OpenAPI spec matches live implementation
-- [ ] T058 [P] Update README with architecture overview and test commands
-- [ ] T059 Run quickstart.md validation scenarios
-- [ ] T060 Final security review and secret cleanup
+- [ ] T058 [P] Run full test suite and fix failures
+- [ ] T059 [P] Validate OpenAPI spec matches live implementation
+- [ ] T060 [P] Update README with architecture overview and test commands
+- [ ] T061 Run quickstart.md validation scenarios
+- [ ] T062 Final security review and secret cleanup
+- [ ] T063 [P] Add e2e tests for auth, refresh, and ownership flows in `backend/tests/e2e/`
+- [ ] T064 [P] Update spec.md SC-005 with exact p95 latency threshold of 950ms in `specs/001-secure-clean-arch/spec.md`
+- [ ] T065 [P] Standardize JSON envelope across all responses in `backend/src/utils/response.js`
+- [ ] T066 Audit and remove scattered `process.env` reads in `backend/src/` after central config is created
 
 ---
 

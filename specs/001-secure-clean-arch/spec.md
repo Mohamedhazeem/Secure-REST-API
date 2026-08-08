@@ -156,7 +156,7 @@ The API handles at least 1000 concurrent authenticated requests without degraded
 - **SC-002**: A developer can add a new endpoint following the documented pattern in under one development day, with zero modifications to existing code.
 - **SC-003**: The API resists brute-force, injection, and token-theft attacks, with zero service disruption to legitimate users during normal operation.
 - **SC-004**: 95% of client integration errors are diagnosable from the error response body alone, without access to server logs or support channels.
-- **SC-005**: The system maintains sub-second p95 response times for authenticated requests under 1000 concurrent users and achieves 99.9% availability during normal operating conditions.
+- **SC-005**: The system maintains sub-second p95 response times for authenticated requests under 1000 concurrent users, specifically below 950ms, and achieves 99.9% availability during normal operating conditions.
 - **SC-006**: Every architectural layer has automated test coverage for its contracts, and the full test suite passes before any change is merged.
 - **SC-007**: The published machine-readable API specification accurately reflects the live API, with no drift detected between specification and implementation.
 - **SC-008**: New roles and permission sets can be introduced and applied without modifying existing endpoint implementations.
