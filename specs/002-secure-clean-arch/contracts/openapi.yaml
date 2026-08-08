@@ -1,0 +1,552 @@
+openapi: 3.0.3
+info:
+  title: Secure REST API
+  description: |
+    A secure, production-style REST API with JWT authentication, role-based authorization,
+    rate limiting, and clean layered architecture. Backend-only by design.
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: /api/v1
+    description: Versioned API prefix
+
+security:
+  - cookieAuth: []
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+        - traceId
+      properties:
+        code:
+          type: string
+          description: Stable error code for programmatic handling
+        message:
+          type: string
+          description: Human-readable explanation
+        traceId:
+          type: string
+          description: Unique identifier for support investigation
+
+    User:
+      type: object
+      required:
+        - _id
+        - username
+        - email
+        - roles
+        - createdAt
+      properties:
+        _id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Post:
+      type: object
+      required:
+        - _id
+        - name
+        - author
+        - createdAt
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        age:
+          type: integer
+          minimum: 0
+          maximum: 150
+        author:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Role:
+      type: object
+      required:
+        - _id
+        - name
+        - permissions
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              code:
+                type: string
+              description:
+                type: string
+
+    Permission:
+      type: object
+      required:
+        - _id
+        - code
+      properties:
+        _id:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+          format: password
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    PostCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        age:
+          type: integer
+          minimum: 0
+          maximum: 150
+
+    PostUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        age:
+          type: integer
+          minimum: 0
+          maximum: 150
+
+    PaginatedPosts:
+      type: object
+      required:
+        - data
+        - page
+        - limit
+        - total
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedMovies:
+      type: object
+      required:
+        - data
+        - page
+        - limit
+        - total
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Authenticated but not authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses#/ValidationError'
+        '409':
+          $ref: '#/components/responses#/ValidationError'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful; access and refresh tokens set as HTTP-only cookies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '429':
+          description: Too many login attempts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout and invalidate tokens
+      security:
+        - cookieAuth: []
+      responses:
+        '204':
+          description: Logout successful
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token using refresh token cookie
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: New access token set as HTTP-only cookie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /auth/me:
+    delete:
+      tags:
+        - Authentication
+      summary: Delete own account
+      security:
+        - cookieAuth: []
+      responses:
+        '204':
+          description: Account deleted
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: List all posts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPosts'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+    post:
+      tags:
+        - Posts
+      summary: Create a post
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateRequest'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '403':
+          $ref: '#/components/responses#/Forbidden'
+        '400':
+          $ref: '#/components/responses#/ValidationError'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /posts/me:
+    get:
+      tags:
+        - Posts
+      summary: List own posts
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of own posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPosts'
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /posts/{id}:
+    patch:
+      tags:
+        - Posts
+      summary: Update own post
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdateRequest'
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '403':
+          $ref: '#/components/responses#/Forbidden'
+        '404':
+          $ref: '#/components/responses#/NotFound'
+        '400':
+          $ref: '#/components/responses#/ValidationError'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+    delete:
+      tags:
+        - Posts
+      summary: Delete own post
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Post deleted
+        '401':
+          $ref: '#/components/responses#/Unauthorized'
+        '403':
+          $ref: '#/components/responses#/Forbidden'
+        '404':
+          $ref: '#/components/responses#/NotFound'
+        '500':
+          $ref: '#/components/responses#/InternalError'
+
+  /shows/movies:
+    get:
+      tags:
+        - Movies
+      summary: List paginated movies from sample_mflix
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of movies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovies'
+        '500':
+          $ref: '#/components/responses#/InternalError'
