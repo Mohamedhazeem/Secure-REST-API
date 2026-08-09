@@ -62,14 +62,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T015 [P] [US1] Contract test asserting every path in `specs/002-trustfeed-social-api/contracts/openapi.yaml` has a matching implementation route in `backend/src/app.js`
+- [X] T015 [P] [US1] Contract test asserting every path in `specs/002-trustfeed-social-api/contracts/openapi.yaml` has a matching implementation route in `backend/src/app.js`
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Validate all existing endpoints are documented in `specs/002-trustfeed-social-api/contracts/openapi.yaml`
-- [ ] T017 [P] [US1] Add CORS, security scheme, and error schema documentation to `specs/002-trustfeed-social-api/contracts/components/`
-- [ ] T018 [P] [US1] Add response schema definitions to `specs/002-trustfeed-social-api/contracts/components/responses.yaml`
-- [ ] T019 [US1] Publish contract path in `backend/src/docs/openapi/` and wire contract validation into startup
+- [X] T016 [P] [US1] Validate all existing endpoints are documented in `specs/002-trustfeed-social-api/contracts/openapi.yaml`
+- [X] T017 [P] [US1] Add CORS, security scheme, and error schema documentation to `specs/002-trustfeed-social-api/contracts/components/`
+- [X] T018 [P] [US1] Add response schema definitions to `specs/002-trustfeed-social-api/contracts/components/responses.yaml`
+- [X] T019 [US1] Publish contract path in `backend/src/docs/openapi/` and wire contract validation into startup
 
 **Checkpoint**: At this point, the published contract accurately describes every endpoint.
 

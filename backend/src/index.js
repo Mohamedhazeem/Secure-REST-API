@@ -2,9 +2,12 @@ import dotenv from "dotenv";
 dotenv.config();
 import { app } from "./app.js";
 import { seedRolesAndPermissions } from "./configs/seed.js";
+import { assertContract, CONTRACT_PUBLISHED } from "./docs/contract-check.js";
 
 const startServer = async () => {
     try {
+        assertContract({ app, contractDir: CONTRACT_PUBLISHED });
+
         if (process.env.NODE_ENV !== "test") {
             try {
                 await seedRolesAndPermissions();

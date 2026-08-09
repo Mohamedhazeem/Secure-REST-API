@@ -1,0 +1,114 @@
+DependencyStatus:
+  type: object
+  required:
+    - status
+  properties:
+    status:
+      type: string
+      enum:
+        - up
+        - down
+    error:
+      type: string
+      description: Reason the dependency is down; absent when status is up
+
+liveness:
+  get:
+    tags:
+      - Health
+    summary: Liveness probe - the process is alive and serving requests
+    operationId: getLiveness
+    responses:
+      '200':
+        description: Process is alive
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+                - uptime
+                - timestamp
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - ok
+                uptime:
+                  type: number
+                  description: Process uptime in seconds
+                timestamp:
+                  type: string
+                  format: date-time
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+readiness:
+  get:
+    tags:
+      - Health
+    summary: Readiness probe - reports critical dependency status (FR-032, SC-018)
+    operationId: getReadiness
+    responses:
+      '200':
+        description: All critical dependencies are reachable
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+                - dependencies
+                - timestamp
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - ready
+                dependencies:
+                  type: object
+                  required:
+                    - mongodb
+                    - redis
+                  properties:
+                    mongodb:
+                      $ref: '#/DependencyStatus'
+                    redis:
+                      $ref: '#/DependencyStatus'
+                timestamp:
+                  type: string
+                  format: date-time
+      '503':
+        description: At least one critical dependency is down; the service is degraded
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+                - dependencies
+                - timestamp
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - degraded
+                dependencies:
+                  type: object
+                  required:
+                    - mongodb
+                    - redis
+                  properties:
+                    mongodb:
+                      $ref: '#/DependencyStatus'
+                    redis:
+                      $ref: '#/DependencyStatus'
+                timestamp:
+                  type: string
+                  format: date-time
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

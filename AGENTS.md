@@ -248,7 +248,7 @@ Limiter state is shared across processes via Redis.
 - **Integration tests**: `tests/integration/` — auth, RBAC, ownership, errors, CORS, architecture, contract
 - **E2E tests**: `tests/e2e/` — full flows against live server
 - **Performance tests**: `tests/performance/` — pagination & rate-limit latency (p95 < 950ms)
-- **Contract validation**: `src/docs/openapi/contract-check.js` — verifies implementation matches OpenAPI spec
+- **Contract validation**: `src/docs/contract-check.js` — verifies implementation matches OpenAPI spec
 
 ## OpenAPI Contract
 

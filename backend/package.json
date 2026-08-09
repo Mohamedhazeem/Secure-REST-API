@@ -11,8 +11,9 @@
     "start": "node src/index.js",
     "dev": "nodemon --watch src src/index.js",
     "dev-watch": "node --watch src/index.js",
-    "contract:sync": "node -e \"const fs=require('fs');fs.rmSync('../specs/001-secure-clean-arch/contracts',{recursive:true,force:true});fs.mkdirSync('../specs/001-secure-clean-arch/contracts',{recursive:true});fs.cpSync('docs','../specs/001-secure-clean-arch/contracts',{recursive:true});\"",
-    "contract:lint": "redocly lint docs/openapi.yaml"
+    "contract:sync": "node -e \"const fs=require('fs');fs.rmSync('src/docs/openapi',{recursive:true,force:true});fs.mkdirSync('src/docs/openapi',{recursive:true});fs.cpSync('../specs/002-trustfeed-social-api/contracts','src/docs/openapi',{recursive:true});\"",
+    "contract:lint": "redocly lint src/docs/openapi/openapi.yaml",
+    "contract:check": "node src/docs/contract-check.js"
   },
   "keywords": [],
   "author": "",
