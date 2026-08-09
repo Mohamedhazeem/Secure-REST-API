@@ -160,32 +160,27 @@
   <rect x="580" y="448" width="120" height="4" rx="2" fill="url(#accentLine)"/>
 
   <!-- Pill row: tech badges (centered) -->
-  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" text-anchor="middle">
     <g transform="translate(262,496)">
       <rect width="118" height="34" rx="17" fill="#ffffff" fill-opacity="0.06" stroke="#22d3ee" stroke-opacity="0.5"/>
-      <circle cx="18" cy="17" r="4" fill="#22d3ee"/>
-      <text x="32" y="22" fill="#e2e8f0">JWT</text>
-  </g>
+      <text x="59" y="22" fill="#e2e8f0">JWT</text>
+</g>
     <g transform="translate(390,496)">
       <rect width="118" height="34" rx="17" fill="#ffffff" fill-opacity="0.06" stroke="#22d3ee" stroke-opacity="0.5"/>
-      <circle cx="18" cy="17" r="4" fill="#22d3ee"/>
-      <text x="32" y="22" fill="#e2e8f0">RBAC</text>
-  </g>
+      <text x="59" y="22" fill="#e2e8f0">RBAC</text>
+</g>
     <g transform="translate(518,496)">
       <rect width="160" height="34" rx="17" fill="#ffffff" fill-opacity="0.06" stroke="#22d3ee" stroke-opacity="0.5"/>
-      <circle cx="18" cy="17" r="4" fill="#22d3ee"/>
-      <text x="32" y="22" fill="#e2e8f0">Rate Limit</text>
-  </g>
+      <text x="80" y="22" fill="#e2e8f0">Rate Limit</text>
+</g>
     <g transform="translate(688,496)">
       <rect width="200" height="34" rx="17" fill="#ffffff" fill-opacity="0.06" stroke="#22d3ee" stroke-opacity="0.5"/>
-      <circle cx="18" cy="17" r="4" fill="#22d3ee"/>
-      <text x="32" y="22" fill="#e2e8f0">OpenAPI Contract</text>
-  </g>
+      <text x="100" y="22" fill="#e2e8f0">OpenAPI Contract</text>
+</g>
     <g transform="translate(898,496)">
       <rect width="120" height="34" rx="17" fill="#ffffff" fill-opacity="0.06" stroke="#22d3ee" stroke-opacity="0.5"/>
-      <circle cx="18" cy="17" r="4" fill="#22d3ee"/>
-      <text x="32" y="22" fill="#e2e8f0">SOLID</text>
-  </g>
+      <text x="60" y="22" fill="#e2e8f0">SOLID</text>
+</g>
 </g>
 
   <!-- Footer (centered) -->

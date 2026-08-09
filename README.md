@@ -15,6 +15,7 @@ A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. 
 - [Why This Project Exists](#why-this-project-exists)
 - [Project Goals](#project-goals)
 - [Problems It Solves](#problems-it-solves)
+- [Implementation Status](#implementation-status)
 - [Key Features](#key-features)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
@@ -63,33 +64,37 @@ This project does. It is the working artifact behind `specs/001-secure-clean-arc
 
 ## Problems It Solves
 
-| Problem | How this project addresses it |
-|---|---|
-| Business rules coupled to Express and Mongoose | Services depend only on repository interfaces; controllers stay thin |
-| Every feature change risks regressions | New resources are added by creating new files; existing code is untouched |
-| Brute-force login attacks | Per-IP login limiter (default 5 / 5 min) backed by Redis |
-| Token theft via XSS | Tokens stored in HTTP-only cookies; never readable from JavaScript |
-| Stale refresh tokens reused after theft | Refresh tokens are rotated and added to a Redis blacklist with TTL |
-| A user modifying someone else's data | Ownership is enforced in the service layer on every mutating operation |
-| All-or-nothing admin access | Role-based access control with configurable roles and permissions, evaluated per-request |
-| Consumers integrating against outdated docs | OpenAPI YAML is the contract; it is updated alongside the implementation |
-| Undiagnosable errors for callers | Flat error envelope: `code`, `message`, `traceId`. Stable codes, no retry guidance baked in |
-| Silent failures when MongoDB or Redis is down | Fail-fast: dependency errors are detected and returned as `DEPENDENCY_FAILURE` with a 503 |
-| N+1 queries degrading list endpoints | Repositories batch their lookups; pagination is enforced at the service boundary |
-| Slow APIs under load | Sub-second p95 target under 1000 concurrent authenticated requests; performance tests gate the build |
-| Browser clients blocked by CORS | Environment-driven origin allowlist with credentials and preflight handling |
+| Problem                                        | How this project addresses it                                                                        |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Business rules coupled to Express and Mongoose | Services depend only on repository interfaces; controllers stay thin                                 |
+| Every feature change risks regressions         | New resources are added by creating new files; existing code is untouched                            |
+| Brute-force login attacks                      | Per-IP login limiter (default 5 / 5 min) backed by Redis                                             |
+| Token theft via XSS                            | Tokens stored in HTTP-only cookies; never readable from JavaScript                                   |
+| Stale refresh tokens reused after theft        | Refresh tokens are rotated and added to a Redis blacklist with TTL                                   |
+| A user modifying someone else's data           | Ownership is enforced in the service layer on every mutating operation                               |
+| All-or-nothing admin access                    | Role-based access control with configurable roles and permissions, evaluated per-request             |
+| Consumers integrating against outdated docs    | OpenAPI YAML is the contract; it is updated alongside the implementation                             |
+| Undiagnosable errors for callers               | Flat error envelope: `code`, `message`, `traceId`. Stable codes, no retry guidance baked in          |
+| Silent failures when MongoDB or Redis is down  | Fail-fast: dependency errors are detected and returned as `DEPENDENCY_FAILURE` with a 503            |
+| N+1 queries degrading list endpoints           | Repositories batch their lookups; pagination is enforced at the service boundary                     |
+| Slow APIs under load                           | Sub-second p95 target under 1000 concurrent authenticated requests; performance tests gate the build |
+| Browser clients blocked by CORS                | Environment-driven origin allowlist with credentials and preflight handling                          |
 
 ---
 
 ## Key Features
 
 **Architecture**
+
 - Clean architecture: `routes → controllers → services → repositories → models`
 - Repository pattern with Mongoose and in-memory implementations
 - Centralized configuration (`src/configs/config.js`) — no scattered `process.env`
 - Zod-based request validation at the HTTP boundary
+- Documented extension pattern (`src/docs/extension-pattern.md`) for adding new resources without modifying existing files
+- Hot-path Big-O complexity documented in code comments
 
 **Security**
+
 - JWT authentication (HTTP-only cookies, never exposed to JS)
 - Refresh token rotation with Redis-backed blacklist and TTL
 - bcrypt password hashing; secrets excluded from responses and logs
@@ -98,22 +103,27 @@ This project does. It is the working artifact behind `specs/001-secure-clean-arc
 - RBAC middleware (`requireRole`, `requirePermission`)
 - Ownership checks in the service layer on every mutating operation
 - Structured logger that redacts secrets and PII
+- Dev seed data for roles and permissions (`configs/seed.js`) bootstrapped in development mode
 
 **API Quality**
+
 - Versioned, machine-readable OpenAPI specification as the integration contract
 - Flat error model with stable codes and trace references
 - Fail-fast behavior on dependency failures (no silent retries)
 - CORS with environment-driven origin allowlist and credentials
 
 **Data**
+
 - MongoDB via Mongoose for application data
 - Native MongoDB driver for read-only `sample_mflix` access (movies endpoint)
 - Pagination on list endpoints
 - Indexes declared at the repository layer
+- N+1 queries audited and prevented on post and movie list endpoints; population is batched
 
 **Testing**
+
 - Vitest unit tests against in-memory repositories
-- Integration tests against `mongodb-memory-server` + Supertest
+- Integration tests against `mongodb-memory-server` + Supertest (auth, RBAC, ownership, CORS, errors, architecture)
 - Performance tests for pagination and rate limiting
 - End-to-end Newman (Postman collection) tests against the live server
 
@@ -158,19 +168,22 @@ See [`backend/src/docs/extension-pattern.md`](backend/src/docs/extension-pattern
 
 ## Tech Stack
 
-| Concern | Choice |
-|---|---|
-| Runtime | Node.js ≥ 20 (ES modules) |
-| HTTP framework | Express 5 |
-| Application database | MongoDB via Mongoose |
-| External database access | Native MongoDB driver (read-only `sample_mflix`) |
-| Cache / rate-limit store | Redis via ioredis |
-| Rate limiting | express-rate-limit + rate-limit-redis |
-| Authentication | jsonwebtoken (access + refresh), HTTP-only cookies |
-| Password hashing | bcrypt |
-| Request validation | Zod |
-| Logging | Custom structured logger (`src/utils/logger.js`) |
-| Testing | Vitest, Supertest, mongodb-memory-server, Newman (Postman) |
+| Concern                      | Choice                                                                        |
+| ---------------------------- | ----------------------------------------------------------------------------- |
+| Runtime                      | Node.js ≥ 20 with ES modules (`"type": "module"`)                             |
+| HTTP framework               | Express 5                                                                     |
+| Application database         | MongoDB via Mongoose 9 (app data)                                             |
+| External database access     | Native MongoDB driver (read-only `sample_mflix` movies)                       |
+| Cache / rate-limit store     | Redis via ioredis                                                             |
+| Rate limiting                | `express-rate-limit` + `rate-limit-redis` (per-caller keys: `userId` or IP)   |
+| Authentication               | `jsonwebtoken` (access + refresh), HTTP-only cookies                          |
+| Password hashing             | `bcrypt`                                                                      |
+| Request validation           | Zod schemas at the controller boundary                                        |
+| Logging                      | Custom structured logger (`src/utils/logger.js`)                              |
+| Configuration                | Centralized env access (`src/configs/config.js`) — no scattered `process.env` |
+| Testing — unit & integration | Vitest + Supertest + `mongodb-memory-server`                                  |
+| Testing — performance        | Vitest (pagination throughput, rate-limit fairness)                           |
+| Testing — end-to-end         | Newman running Postman collections (`backend/postman/`)                       |
 
 ---
 
@@ -260,29 +273,29 @@ All routes are prefixed with `/api/v1`.
 
 ### Auth
 
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/auth/` | Register a new user |
-| `POST` | `/auth/login` | Login (rate-limited) |
-| `POST` | `/auth/logout` | Invalidate refresh token |
-| `POST` | `/auth/refresh` | Rotate refresh token |
-| `DELETE` | `/auth/me` | Delete own account |
+| Method   | Path            | Description              |
+| -------- | --------------- | ------------------------ |
+| `POST`   | `/auth/`        | Register a new user      |
+| `POST`   | `/auth/login`   | Login (rate-limited)     |
+| `POST`   | `/auth/logout`  | Invalidate refresh token |
+| `POST`   | `/auth/refresh` | Rotate refresh token     |
+| `DELETE` | `/auth/me`      | Delete own account       |
 
 ### Posts (authenticated)
 
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/posts` | Create a post |
-| `GET` | `/posts/me` | List own posts |
-| `GET` | `/posts` | List all posts |
-| `PATCH` | `/posts/:id` | Update own post |
+| Method   | Path         | Description     |
+| -------- | ------------ | --------------- |
+| `POST`   | `/posts`     | Create a post   |
+| `GET`    | `/posts/me`  | List own posts  |
+| `GET`    | `/posts`     | List all posts  |
+| `PATCH`  | `/posts/:id` | Update own post |
 | `DELETE` | `/posts/:id` | Delete own post |
 
 ### Shows (authenticated)
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/shows/movies?page=1&limit=20` | Paginated movies (read-only `sample_mflix`) |
+| Method | Path                            | Description                                 |
+| ------ | ------------------------------- | ------------------------------------------- |
+| `GET`  | `/shows/movies?page=1&limit=20` | Paginated movies (read-only `sample_mflix`) |
 
 The full contract — parameters, schemas, security schemes, error responses, and CORS — is published in `specs/001-secure-clean-arch/contracts/openapi.yaml`.
 
@@ -291,16 +304,19 @@ The full contract — parameters, schemas, security schemes, error responses, an
 ## Authentication, Authorization & Ownership
 
 **Authentication** is JWT with two tokens:
+
 - **Access token** — short-lived (default 5m), HTTP-only cookie, validated on every protected request.
 - **Refresh token** — longer-lived (default 15m), HTTP-only cookie, rotated on every refresh. Old refresh tokens are added to a Redis blacklist with TTL = remaining lifetime, so a stolen token has bounded reuse.
 
 **Authorization** is RBAC:
+
 - `Role` is a named collection of `Permission` codes (e.g. `posts:create`, `posts:delete`).
 - Permissions and roles are stored in the database and seeded on boot in development.
 - Middleware: `requireRole("admin")`, `requirePermission("posts:delete")`.
 - Adding a new role or permission does not require touching endpoint code.
 
 **Ownership** is enforced in the service layer:
+
 - A user can only `PATCH` or `DELETE` their own posts.
 - A deleted user's tokens become inert because the auth middleware re-resolves the user on every request.
 - A revoked role or missing permission is re-evaluated per request — no cached authorization.
@@ -311,10 +327,10 @@ The full contract — parameters, schemas, security schemes, error responses, an
 
 Rate limits are enforced per caller using `express-rate-limit` with a Redis store. Defaults are overridable via environment variables.
 
-| Scope | Default | Window | Key |
-|---|---|---|---|
+| Scope                      | Default      | Window | Key      |
+| -------------------------- | ------------ | ------ | -------- |
 | Global API (authenticated) | 200 requests | 15 min | `userId` |
-| Login (`POST /auth/login`) | 5 requests | 5 min | IP |
+| Login (`POST /auth/login`) | 5 requests   | 5 min  | IP       |
 
 When a caller exceeds their limit, the API returns `429` with a `RATE_LIMITED` error code. Limiter state is shared across processes because the store is Redis, so the system stays correct behind a load balancer.
 
@@ -334,19 +350,19 @@ All error responses use a **flat envelope** with three fields:
 
 Stable codes (defined in `src/utils/errors.js`):
 
-| Code | HTTP | Meaning |
-|---|---|---|
-| `VALIDATION_ERROR` | 400 | Request body or params failed validation |
-| `UNAUTHORIZED` | 401 | Authentication required |
-| `INVALID_CREDENTIALS` | 401 | Bad email or password |
-| `FORBIDDEN` | 403 | Permission denied |
-| `ROLE_DENIED` | 403 | Required role or permission missing |
-| `OWNERSHIP_REQUIRED` | 403 | Caller is not the resource owner |
-| `NOT_FOUND` | 404 | Resource does not exist |
-| `CONFLICT` | 409 | State conflict (e.g. duplicate) |
-| `RATE_LIMITED` | 429 | Rate limit exceeded |
-| `DEPENDENCY_FAILURE` | 503 | External dependency is unavailable |
-| `INTERNAL_ERROR` | 500 | Unexpected error |
+| Code                  | HTTP | Meaning                                  |
+| --------------------- | ---- | ---------------------------------------- |
+| `VALIDATION_ERROR`    | 400  | Request body or params failed validation |
+| `UNAUTHORIZED`        | 401  | Authentication required                  |
+| `INVALID_CREDENTIALS` | 401  | Bad email or password                    |
+| `FORBIDDEN`           | 403  | Permission denied                        |
+| `ROLE_DENIED`         | 403  | Required role or permission missing      |
+| `OWNERSHIP_REQUIRED`  | 403  | Caller is not the resource owner         |
+| `NOT_FOUND`           | 404  | Resource does not exist                  |
+| `CONFLICT`            | 409  | State conflict (e.g. duplicate)          |
+| `RATE_LIMITED`        | 429  | Rate limit exceeded                      |
+| `DEPENDENCY_FAILURE`  | 503  | External dependency is unavailable       |
+| `INTERNAL_ERROR`      | 500  | Unexpected error                         |
 
 There is **no category field, no retry guidance, no HTTP-text duplication**. Consumers look up the stable code in the contract and decide their own retry policy. When a dependency (MongoDB, Redis) fails, the API returns `DEPENDENCY_FAILURE` immediately — it does not retry or fall back at the application layer.
 
@@ -380,12 +396,12 @@ To swap persistence (e.g. Mongoose → Prisma, Mongoose → SQL), implement the 
 
 ## Testing Strategy
 
-| Layer | Tooling | Scope |
-|---|---|---|
-| Unit | Vitest | Services against in-memory repositories; pure functions; validators |
-| Integration | Vitest + Supertest + mongodb-memory-server | API + DB: auth, RBAC, ownership, errors, CORS, architecture |
-| Performance | Vitest | Pagination throughput, rate limiter fairness |
-| End-to-end | Newman (Postman collections in `backend/postman/`) | Full request/response cycles against the live server |
+| Layer       | Tooling                                            | Scope                                                               |
+| ----------- | -------------------------------------------------- | ------------------------------------------------------------------- |
+| Unit        | Vitest                                             | Services against in-memory repositories; pure functions; validators |
+| Integration | Vitest + Supertest + mongodb-memory-server         | API + DB: auth, RBAC, ownership, errors, CORS, architecture         |
+| Performance | Vitest                                             | Pagination throughput, rate limiter fairness                        |
+| End-to-end  | Newman (Postman collections in `backend/postman/`) | Full request/response cycles against the live server                |
 
 Commands:
 
@@ -508,5 +524,6 @@ See [`license.md`](license.md) for full terms.
 ## Author
 
 **Mohamed Hazeem**
+
 - Email: a.mohamedhazeem@gmail.com
 - GitHub: [@mohamedhazeem](https://github.com/mohamedhazeem)
