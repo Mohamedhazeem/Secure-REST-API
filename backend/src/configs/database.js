@@ -1,33 +1,49 @@
 import mongoose from "mongoose";
 import { BASE_URI } from "./constants.js";
 
-if (!BASE_URI) {
+const isTest = process.env.NODE_ENV === "test";
+
+if (!isTest && !BASE_URI) {
     console.error("🛑 MONGODB_URI is missing from environment variables!");
     process.exit(1);
 }
 
 const mongooseOptions = {
-  // true in development, false in production
-  autoIndex: process.env.NODE_ENV !== 'production' 
+  autoIndex: process.env.NODE_ENV !== 'production'
 };
 
-// Helper function to create clean connection instances
 const makeConnection = (uri, dbName) => {
     const db = mongoose.createConnection(uri, {
         dbName: dbName,
         ...mongooseOptions
-        // Optional configuration tweaks for modern Mongoose setups can go here
     });
     db.on("connected", () => console.log(`💾 Connected to database: ${dbName}`));
     db.on("error", (err) => {
         console.error(`🛑 Database [${dbName}] error:`, err);
-        // Optional: process.exit(1) if you want the app to crash on initial connection loss
     });
 
     return db;
 };
 
-// Connections are initiated immediately upon file evaluation
-export const testDb = makeConnection(BASE_URI, "test");
-export const sampleDb = makeConnection(BASE_URI, "sample_mflix");
+if (BASE_URI) {
+    mongoose.connect(BASE_URI, { dbName: "test", ...mongooseOptions }).catch((err) => {
+        console.error("🛑 Primary database connection error:", err);
+    });
+    mongoose.connection.on("connected", () => console.log("💾 Connected to database: test"));
+}
+
+export const testDb = mongoose.connection;
+
+export const sampleDb = BASE_URI ? makeConnection(BASE_URI, "sample_mflix") : null;
+
+export const getTestDb = () => testDb;
+
+export const closeConnections = async () => {
+    const connections = [testDb, sampleDb].filter(Boolean);
+    await Promise.all(
+        connections.map((conn) =>
+            conn.readyState !== 0 ? conn.close() : Promise.resolve()
+        )
+    );
+};
 
