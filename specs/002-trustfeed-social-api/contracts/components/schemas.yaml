@@ -1,0 +1,463 @@
+Error:
+  type: object
+  required:
+    - code
+    - message
+    - traceId
+  properties:
+    code:
+      type: string
+      description: Stable error code for programmatic handling
+    message:
+      type: string
+      description: Human-readable explanation
+    traceId:
+      type: string
+      description: Unique identifier for support investigation
+
+User:
+  type: object
+  required:
+    - _id
+    - username
+    - email
+    - roles
+    - createdAt
+  properties:
+    _id:
+      type: string
+    username:
+      type: string
+    email:
+      type: string
+    displayName:
+      type: string
+    bio:
+      type: string
+    avatarUrl:
+      type: string
+      nullable: true
+    privacy:
+      type: object
+      properties:
+        profilePublic:
+          type: boolean
+        showFollows:
+          type: boolean
+    roles:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+          name:
+            type: string
+    status:
+      type: string
+      enum:
+        - active
+        - suspended
+        - deleted
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+
+Post:
+  type: object
+  required:
+    - _id
+    - content
+    - authorId
+    - createdAt
+  properties:
+    _id:
+      type: string
+    content:
+      type: string
+    authorId:
+      type: string
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+
+Comment:
+  type: object
+  required:
+    - _id
+    - postId
+    - authorId
+    - content
+    - createdAt
+  properties:
+    _id:
+      type: string
+    postId:
+      type: string
+    authorId:
+      type: string
+    content:
+      type: string
+    parentCommentId:
+      type: string
+      nullable: true
+    createdAt:
+      type: string
+      format: date-time
+
+Follow:
+  type: object
+  required:
+    - _id
+    - followerId
+    - followingId
+    - createdAt
+  properties:
+    _id:
+      type: string
+    followerId:
+      type: string
+    followingId:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+
+Notification:
+  type: object
+  required:
+    - _id
+    - recipientId
+    - actorId
+    - actorName
+    - action
+    - targetSummary
+    - deepLink
+    - type
+    - resourceId
+    - read
+    - createdAt
+  properties:
+    _id:
+      type: string
+    recipientId:
+      type: string
+    actorId:
+      type: string
+    actorName:
+      type: string
+    action:
+      type: string
+    targetSummary:
+      type: string
+    deepLink:
+      type: string
+      format: uri
+    type:
+      type: string
+      enum:
+        - follow
+        - comment
+        - like
+    resourceId:
+      type: string
+    read:
+      type: boolean
+    createdAt:
+      type: string
+      format: date-time
+
+Like:
+  type: object
+  required:
+    - _id
+    - userId
+    - postId
+    - createdAt
+  properties:
+    _id:
+      type: string
+    userId:
+      type: string
+    postId:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+
+Session:
+  type: object
+  required:
+    - id
+    - userId
+    - deviceFingerprint
+    - ipAddress
+    - userAgent
+    - createdAt
+    - expiresAt
+  properties:
+    id:
+      type: string
+    userId:
+      type: string
+    deviceFingerprint:
+      type: string
+    ipAddress:
+      type: string
+    userAgent:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+    expiresAt:
+      type: string
+      format: date-time
+
+Role:
+  type: object
+  required:
+    - _id
+    - name
+    - permissions
+  properties:
+    _id:
+      type: string
+    name:
+      type: string
+    permissions:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+          code:
+            type: string
+          description:
+            type: string
+
+Permission:
+  type: object
+  required:
+    - _id
+    - code
+  properties:
+    _id:
+      type: string
+    code:
+      type: string
+    description:
+      type: string
+
+RegisterRequest:
+  type: object
+  required:
+    - username
+    - email
+    - password
+  properties:
+    username:
+      type: string
+      minLength: 3
+      maxLength: 30
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      minLength: 8
+      format: password
+
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+
+UserUpdateRequest:
+  type: object
+  properties:
+    displayName:
+      type: string
+    bio:
+      type: string
+    avatarUrl:
+      type: string
+      nullable: true
+    privacy:
+      type: object
+      properties:
+        profilePublic:
+          type: boolean
+        showFollows:
+          type: boolean
+    version:
+      type: integer
+      description: Optimistic lock version
+
+PostCreateRequest:
+  type: object
+  required:
+    - content
+  properties:
+    content:
+      type: string
+      maxLength: 1000
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+
+PostUpdateRequest:
+  type: object
+  properties:
+    content:
+      type: string
+      maxLength: 1000
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+    version:
+      type: integer
+      description: Optimistic lock version
+
+LikeCreateRequest:
+  type: object
+  required:
+    - idempotencyKey
+  properties:
+    idempotencyKey:
+      type: string
+      description: Client-generated key for idempotent like creation
+
+CommentCreateRequest:
+  type: object
+  required:
+    - content
+  properties:
+    content:
+      type: string
+      maxLength: 1000
+    parentCommentId:
+      type: string
+      nullable: true
+    idempotencyKey:
+      type: string
+      description: Client-generated key for idempotent creation
+
+PaginatedPosts:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Post'
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer
+
+PaginatedComments:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Comment'
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer
+
+PaginatedNotifications:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Notification'
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer
+
+FeedPage:
+  type: object
+  required:
+    - data
+    - cursor
+    - hasNextPage
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Post'
+    cursor:
+      type: string
+      description: Opaque cursor for the next page
+    hasNextPage:
+      type: boolean
+
+PaginatedMovies:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer

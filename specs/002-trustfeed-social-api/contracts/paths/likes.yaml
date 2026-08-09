@@ -1,0 +1,100 @@
+collection:
+  post:
+    tags:
+      - Likes
+    summary: Like a post
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Post ID
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/LikeCreateRequest'
+    responses:
+      '201':
+        description: Post liked
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Like'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '409':
+        description: Already liked
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Error'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  delete:
+    tags:
+      - Likes
+    summary: Unlike a post
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Post ID
+    responses:
+      '204':
+        description: Post unliked
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+currentUser:
+  get:
+    tags:
+      - Likes
+    summary: Check if current user liked a post
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Post ID
+    responses:
+      '200':
+        description: Current user like status
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - liked
+              properties:
+                liked:
+                  type: boolean
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

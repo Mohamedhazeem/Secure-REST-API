@@ -1,0 +1,180 @@
+register:
+  post:
+    tags:
+      - Authentication
+    summary: Register a new user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/RegisterRequest'
+    responses:
+      '201':
+        description: User created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/User'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '409':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+login:
+  post:
+    tags:
+      - Authentication
+    summary: Login with email and password
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/LoginRequest'
+    responses:
+      '200':
+        description: Login successful; access and refresh tokens set as HTTP-only cookies
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                user:
+                  $ref: '../components/schemas.yaml#/User'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '429':
+        description: Too many login attempts
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Error'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+logout:
+  post:
+    tags:
+      - Authentication
+    summary: Logout and invalidate tokens
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: Logout successful
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+refresh:
+  post:
+    tags:
+      - Authentication
+    summary: Refresh access token using refresh token cookie
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: New access token set as HTTP-only cookie
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+me:
+  delete:
+    tags:
+      - Authentication
+    summary: Delete own account
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: Account deleted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+sessions:
+  get:
+    tags:
+      - Authentication
+    summary: List active sessions
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: Active sessions with device metadata
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../components/schemas.yaml#/Session'
+                total:
+                  type: integer
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+sessionsById:
+  delete:
+    tags:
+      - Authentication
+    summary: Revoke a single session
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Session revoked
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

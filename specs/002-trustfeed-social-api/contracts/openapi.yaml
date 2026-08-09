@@ -1,0 +1,77 @@
+openapi: 3.0.3
+info:
+  title: TrustFeed API
+  description: |
+    A secure, production-style social REST API with JWT authentication, role-based
+    and attribute-based authorization, cursor-paginated feeds, comments, follows,
+    notifications, and audit logging. Backend-only by design.
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: /api/v1
+    description: Versioned API prefix
+
+security:
+  - cookieAuth: []
+
+tags:
+  - name: Authentication
+  - name: Users
+  - name: Posts
+  - name: Comments
+  - name: Follows
+  - name: Feed
+  - name: Notifications
+  - name: Movies
+
+paths:
+  /auth/register:
+    $ref: './paths/auth.yaml#/register'
+  /auth/login:
+    $ref: './paths/auth.yaml#/login'
+  /auth/logout:
+    $ref: './paths/auth.yaml#/logout'
+  /auth/refresh:
+    $ref: './paths/auth.yaml#/refresh'
+  /auth/me:
+    $ref: './paths/auth.yaml#/me'
+  /auth/sessions:
+    $ref: './paths/auth.yaml#/sessions'
+  /auth/sessions/{id}:
+    $ref: './paths/auth.yaml#/sessionsById'
+  /users/me:
+    $ref: './paths/users.yaml#/me'
+  /users/{id}/follow:
+    $ref: './paths/follows.yaml#/follow'
+  /users/{id}/unfollow:
+    $ref: './paths/follows.yaml#/unfollow'
+  /posts:
+    $ref: './paths/posts.yaml#/collection'
+  /posts/me:
+    $ref: './paths/posts.yaml#/me'
+  /posts/{id}:
+    $ref: './paths/posts.yaml#/byId'
+  /posts/{id}/comments:
+    $ref: './paths/comments.yaml#/collection'
+  /posts/{id}/likes:
+    $ref: './paths/likes.yaml#/collection'
+  /posts/{id}/likes/me:
+    $ref: './paths/likes.yaml#/currentUser'
+  /feed:
+    $ref: './paths/feed.yaml#/feed'
+  /notifications:
+    $ref: './paths/notifications.yaml#/notifications'
+  /notifications/{id}/read:
+    $ref: './paths/notifications.yaml#/markRead'
+  /shows/movies:
+    $ref: './paths/shows.yaml#/movies'
+
+components:
+  securitySchemes:
+    $ref: './components/security.yaml'
+  schemas:
+    $ref: './components/schemas.yaml'
+  responses:
+    $ref: './components/responses.yaml'

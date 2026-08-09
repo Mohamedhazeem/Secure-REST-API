@@ -1,0 +1,64 @@
+follow:
+  post:
+    tags:
+      - Follows
+    summary: Follow a user
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '201':
+        description: Followed successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Follow'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '409':
+        description: Already following or self-follow not allowed
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Error'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+unfollow:
+  delete:
+    tags:
+      - Follows
+    summary: Unfollow a user
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Unfollowed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

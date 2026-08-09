@@ -1,0 +1,58 @@
+notifications:
+  get:
+    tags:
+      - Notifications
+    summary: List own notifications
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of notifications
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedNotifications'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+markRead:
+  patch:
+    tags:
+      - Notifications
+    summary: Mark notification as read
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Notification marked as read
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Notification'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

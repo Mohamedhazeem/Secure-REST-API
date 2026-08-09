@@ -1,0 +1,48 @@
+Unauthorized:
+  description: Missing or invalid authentication
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+
+Forbidden:
+  description: Authenticated but not authorized
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+
+NotFound:
+  description: Resource not found
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+
+ValidationError:
+  description: Request validation failed
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+
+Conflict:
+  description: State conflict or duplicate
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+
+InternalError:
+  description: Server error
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+
+DependencyFailure:
+  description: External dependency unavailable
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'

@@ -1,0 +1,49 @@
+me:
+  get:
+    tags:
+      - Users
+    summary: Get own profile
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: Current user profile
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/User'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  patch:
+    tags:
+      - Users
+    summary: Update own profile
+    security:
+      - cookieAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/UserUpdateRequest'
+    responses:
+      '200':
+        description: Profile updated
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/User'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '409':
+        description: Optimistic lock conflict
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Error'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
