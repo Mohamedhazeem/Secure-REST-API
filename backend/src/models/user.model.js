@@ -1,6 +1,5 @@
 import mongoose, {Schema} from "mongoose";
 import bcrypt from "bcrypt";
-import { testDb } from "../configs/database.js";
 const userSchema = new Schema({
     username:{
         type: String,
@@ -22,7 +21,11 @@ const userSchema = new Schema({
         required: true,
         trim:true,
         lowercase:true
-    }
+    },
+    roles:[{
+        type: Schema.Types.ObjectId,
+        ref: "Role"
+    }]
 },
 {
     timestamps: true
@@ -40,4 +43,4 @@ userSchema.methods.comparePassword = async function(password){
     return await bcrypt.compare(password, this.password);
 }
 
-export default testDb.model("User", userSchema);
+export default mongoose.model("User", userSchema);

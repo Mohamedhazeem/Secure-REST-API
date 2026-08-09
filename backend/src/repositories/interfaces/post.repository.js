@@ -1,0 +1,74 @@
+import mongoose from "mongoose";
+
+/**
+ * @typedef {Object} PostFilter
+ * @property {string} [author] - The author's user ObjectId.
+ * @property {string} [name] - Post name filter.
+ */
+
+/**
+ * @typedef {Object} PaginationOptions
+ * @property {number} [page=1]
+ * @property {number} [limit=10]
+ */
+
+/**
+ * @typedef {Object} PaginatedResult
+ * @property {Object[]} data
+ * @property {number} page
+ * @property {number} limit
+ * @property {number} total
+ */
+
+/**
+ * Repository interface for Post entities.
+ *
+ * Implementations must provide all methods defined here.
+ * The interface is framework-agnostic; implementations may use
+ * Mongoose, an in-memory store, or any other persistence mechanism.
+ */
+export default class PostRepositoryInterface {
+    /**
+     * Retrieve a post by its unique identifier.
+     * @param {string} id - The post's MongoDB ObjectId.
+     * @returns {Promise<Object|null>} The post document, or null if not found.
+     */
+    async findById(id) {}
+
+    /**
+     * Retrieve a single post matching the provided filter.
+     * @param {PostFilter} filter - Filter criteria (e.g. { author }, { name }).
+     * @returns {Promise<Object|null>} The matching post document, or null if not found.
+     */
+    async findOne(filter) {}
+
+    /**
+     * Persist a new post.
+     * @param {Object} data - The post data to persist.
+     * @returns {Promise<Object>} The created post document.
+     */
+    async create(data) {}
+
+    /**
+     * Update an existing post.
+     * @param {string} id - The post's unique identifier.
+     * @param {Object} data - Partial fields to update.
+     * @returns {Promise<Object|null>} The updated post document, or null if not found.
+     */
+    async update(id, data) {}
+
+    /**
+     * Permanently delete a post by id.
+     * @param {string} id - The post's unique identifier.
+     * @returns {Promise<Object|null>} The deleted post document, or null if not found.
+     */
+    async deleteById(id) {}
+
+    /**
+     * Retrieve posts matching an optional filter, with pagination.
+     * @param {PostFilter} [filter={}] - Filter criteria.
+     * @param {PaginationOptions} [pagination] - Pagination options.
+     * @returns {Promise<PaginatedResult>} Paginated result set.
+     */
+    async findMany(filter = {}, pagination) {}
+}
