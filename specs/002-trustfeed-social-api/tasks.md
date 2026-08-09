@@ -26,9 +26,9 @@
 
 **Purpose**: Project initialization, cleanup of legacy scaffolding, and structure validation.
 
-- [ ] T001 Remove legacy memory repository implementations under `backend/src/repositories/implementations/memory/`
-- [ ] T002 Remove legacy unit test scaffolding under `backend/tests/unit/` and coverage artifacts
-- [ ] T003 Validate existing project structure matches the implementation plan layout
+- [X] T001 Remove legacy memory repository implementations under `backend/src/repositories/implementations/memory/`
+- [X] T002 Remove legacy unit test scaffolding under `backend/tests/unit/` and coverage artifacts
+- [X] T003 Validate existing project structure matches the implementation plan layout
 
 ---
 
@@ -38,17 +38,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 [P] Add idempotency middleware in `backend/src/middleware/idempotency.middleware.js` with Redis key TTL = 7 days per FR-028
-- [ ] T005 [P] Add correlation ID middleware in `backend/src/middleware/correlation.middleware.js`
-- [ ] T006 [P] Add audit logging service in `backend/src/service/audit.service.js` exposing `record(event)`; consumed by auth (token reuse), follow (T052), like (T053), comment (T080), and post (T038) services to persist security-relevant events (FR-030)
-- [ ] T007 [P] Add error codes for social features in `backend/src/utils/errors.js` (names: `AUTH_REUSE_DETECTED`, `FORBIDDEN`, `CONFLICT`, `IDEMPOTENCY_CONFLICT`, `SELF_FOLLOW`, `VALIDATION_ERROR`, `DEPENDENCY_FAILURE`, `RATE_LIMITED`)
-- [ ] T008 [P] Add health check endpoints (liveness + readiness) in `backend/src/controller/health.controller.js`
-- [ ] T009 [P] Update `backend/src/configs/config.js` with new env vars: `BULLMQ_URL`, `FEED_CACHE_TTL_SECONDS`, `SESSION_IDLE_TTL_SECONDS`, `IDEMPOTENCY_TTL_DAYS=7`, `HEALTH_TIMEOUT_MS`
-- [ ] T010 [P] Update `backend/src/middleware/auth.middleware.js` for multi-session and token reuse detection
-- [ ] T011 [P] Update `backend/src/middleware/role.middleware.js` for runtime-configurable ABAC
-- [ ] T012 [P] Add structured logger integration with secret-redaction rules in `backend/src/utils/logger.js`
-- [ ] T013 [P] Add metrics collection (single source) in `backend/src/utils/metrics.js`
-- [ ] T014 [P] Add test infrastructure: `backend/vitest.config.js`, `backend/tests/global-setup.js` using mongodb-memory-server, and `backend/tests/helpers/` fixtures per Constitution VI
+- [X] T004 [P] Add idempotency middleware in `backend/src/middleware/idempotency.middleware.js` with Redis key TTL = 7 days per FR-028
+- [X] T005 [P] Add correlation ID middleware in `backend/src/middleware/correlation.middleware.js`
+- [X] T006 [P] Add audit logging service in `backend/src/service/audit.service.js` exposing `record(event)`; consumed by auth (token reuse), follow (T052), like (T053), comment (T080), and post (T038) services to persist security-relevant events (FR-030)
+- [X] T007 [P] Add error codes for social features in `backend/src/utils/errors.js` (names: `AUTH_REUSE_DETECTED`, `FORBIDDEN`, `CONFLICT`, `IDEMPOTENCY_CONFLICT`, `SELF_FOLLOW`, `VALIDATION_ERROR`, `DEPENDENCY_FAILURE`, `RATE_LIMITED`)
+- [X] T008 [P] Add health check endpoints (liveness + readiness) in `backend/src/controller/health.controller.js`
+- [X] T009 [P] Update `backend/src/configs/config.js` with new env vars: `BULLMQ_URL`, `FEED_CACHE_TTL_SECONDS`, `SESSION_IDLE_TTL_SECONDS`, `IDEMPOTENCY_TTL_DAYS=7`, `HEALTH_TIMEOUT_MS`
+- [X] T010 [P] Update `backend/src/middleware/auth.middleware.js` for multi-session and token reuse detection
+- [X] T011 [P] Update `backend/src/middleware/role.middleware.js` for runtime-configurable ABAC
+- [X] T012 [P] Add structured logger integration with secret-redaction rules in `backend/src/utils/logger.js`
+- [X] T013 [P] Add metrics collection (single source) in `backend/src/utils/metrics.js`
+- [X] T014 [P] Add test infrastructure: `backend/vitest.config.js`, `backend/tests/global-setup.js` using mongodb-memory-server, and `backend/tests/helpers/` fixtures per Constitution VI
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel.
 

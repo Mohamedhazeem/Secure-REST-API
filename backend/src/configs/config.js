@@ -22,4 +22,9 @@ export const config = {
     .map((s) => s.trim())
     .filter(Boolean),
   nodeEnv: process.env.NODE_ENV ?? "development",
+  bullmqUrl: process.env.BULLMQ_URL ?? process.env.REDIS_DB_URI ?? "redis://127.0.0.1:6379",
+  feedCacheTtlSeconds: parseInt(process.env.FEED_CACHE_TTL_SECONDS, 10) || 300,
+  sessionIdleTtlSeconds: parseInt(process.env.SESSION_IDLE_TTL_SECONDS, 10) || 30 * 24 * 60 * 60,
+  idempotencyTtlDays: parseInt(process.env.IDEMPOTENCY_TTL_DAYS, 10) || 7,
+  healthTimeoutMs: parseInt(process.env.HEALTH_TIMEOUT_MS, 10) || 5000,
 };

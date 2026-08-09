@@ -37,17 +37,25 @@ function createMemoryClient() {
   };
 
   return {
-    set(key, value, mode, ttl) {
+    set(key, value, mode, ttl, flag) {
+      if (flag === "NX" && store.has(key)) return Promise.resolve(null);
+      if (flag === "XX" && !store.has(key)) return Promise.resolve(null);
       store.set(key, value);
       clearTtl(key);
       if (mode === "EX" && typeof ttl === "number") {
-        const timer = setTimeout(() => store.delete(key), ttl * 1000);
+        const timer = setTimeout(() => {
+          store.delete(key);
+          ttlTimers.delete(key);
+        }, ttl * 1000);
         ttlTimers.set(key, timer);
       }
       return Promise.resolve("OK");
     },
     get(key) {
       return Promise.resolve(store.has(key) ? store.get(key) : null);
+    },
+    ping() {
+      return Promise.resolve("PONG");
     },
     del(...keys) {
       let count = 0;
@@ -58,10 +66,10 @@ function createMemoryClient() {
       return Promise.resolve(count);
     },
     call(...args) {
-      const [command, key, value, mode, ttl] = args;
+      const [command, key, value, mode, ttl, flag] = args;
       switch (command?.toUpperCase()) {
         case "SET":
-          return this.set(key, value, mode, ttl);
+          return this.set(key, value, mode, ttl, flag);
         case "GET":
           return this.get(key);
         case "DEL":

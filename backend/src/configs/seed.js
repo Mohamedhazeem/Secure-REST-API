@@ -1,5 +1,5 @@
-import Permission from "./permission.model.js";
-import Role from "./role.model.js";
+import Permission from "../models/permission.model.js";
+import Role from "../models/role.model.js";
 
 const PERMISSION_CODES = [
   "posts:create",

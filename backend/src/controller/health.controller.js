@@ -1,0 +1,51 @@
+import mongoose from "mongoose";
+import { config } from "../configs/config.js";
+import { redisClient } from "../configs/redis.js";
+
+const checkRedis = async () => {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("timeout")), config.healthTimeoutMs);
+    });
+    try {
+        await Promise.race([redisClient.ping(), timeout]);
+        return { status: "up" };
+    } catch (error) {
+        return { status: "down", error: "unreachable" };
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
+const checkMongo = () => {
+    const states = ["disconnected", "connected", "connecting", "disconnecting"];
+    const state = mongoose.connection.readyState;
+    return state === 1 ? { status: "up" } : { status: "down", error: states[state] ?? "unknown" };
+};
+
+/**
+ * Liveness endpoint - the process is alive and serving requests.
+ * Complexity: O(1).
+ */
+export const liveness = (req, res) => {
+    res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
+};
+
+/**
+ * Readiness endpoint - reports dependency status (FR-032, SC-018).
+ * Returns 200 when all critical dependencies are up, 503 otherwise.
+ * Complexity: O(1) ping + one connection state read.
+ */
+export const readiness = async (req, res) => {
+    const mongo = checkMongo();
+    const redis = await checkRedis();
+
+    const dependencies = { mongodb: mongo, redis };
+    const ready = mongo.status === "up" && redis.status === "up";
+
+    res.status(ready ? 200 : 503).json({
+        status: ready ? "ready" : "degraded",
+        dependencies,
+        timestamp: new Date().toISOString(),
+    });
+};

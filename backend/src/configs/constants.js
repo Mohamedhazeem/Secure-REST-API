@@ -1,3 +1,4 @@
+import "dotenv/config";
 import ms from "ms";
 
 export const DB_NAME = "DB Test";

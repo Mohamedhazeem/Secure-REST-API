@@ -8,9 +8,10 @@ import { createError } from "../utils/errors.js";
 /**
  * Authentication middleware.
  *
- * Complexity: O(1) per request - one Redis GET (blacklist check) + one Mongoose findById
- * with populate. The populate uses batched $in queries (Mongoose 6+), so there is no
- * N+1 issue when loading roles and permissions.
+ * Complexity: O(1) per request - two Redis GETs (blacklist + session
+ * revocation) + one Mongoose findById with populate. The populate uses
+ * batched $in queries (Mongoose 6+), so there is no N+1 issue when
+ * loading roles and permissions.
  */
 export const authMiddleWare = async(req,res,next) =>{
 
@@ -26,6 +27,16 @@ export const authMiddleWare = async(req,res,next) =>{
 
         const decoded = verifyAccessToken(token);
 
+        // Multi-session support (FR-020): access tokens are bound to a
+        // session via the `sid` claim. If the session was revoked (single,
+        // all, or via reuse-triggered global revocation), the token is
+        // rejected before any business logic executes.
+        if (decoded.sid) {
+            const sessionRevoked = await redisClient.get(`session:revoked:${decoded.sid}`);
+            if (sessionRevoked)
+                return next(createError("UNAUTHORIZED", "Session has been revoked", 401));
+        }
+
         const user =  await User.findById(decoded.sub)
             .select("-password")
             .populate({ path: "roles", populate: { path: "permissions" } });
@@ -38,6 +49,7 @@ export const authMiddleWare = async(req,res,next) =>{
         );
         req.user = user;
         req.user.permissions = permissions;
+        req.sessionId = decoded.sid ?? null;
         next();
     } catch (error) {
         return next(createError("UNAUTHORIZED", "Invalid or expired token", 401));
