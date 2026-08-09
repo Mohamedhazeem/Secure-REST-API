@@ -2,7 +2,7 @@
 
 # LICENSE
 
-## Secure REST API Portfolio Project
+## TrustFeed API Portfolio Project
 
 ### ⚠️ IMPORTANT NOTICE
 
@@ -18,7 +18,7 @@ This project is a **portfolio showcase** created by Mohamed Hazeem.
 
 | Attribute        | Details                                           |
 | ---------------- | ------------------------------------------------- |
-| **Project**      | Secure REST API                                   |
+| **Project**      | TrustFeed API                                   |
 | **Author**       | Mohamed Hazeem                                    |
 | **Email**        | a.mohamedhazeem@gmail.com                         |
 | **GitHub**       | [mohamedhazeem](https://github.com/MohamedHazeem) |
@@ -68,7 +68,7 @@ It showcases:
 If you reference this work in any capacity (articles, talks, discussions), you **must** credit the original author:
 
 ```
-Secure REST API — A portfolio project by Mohamed Hazeem
+TrustFeed API — A portfolio project by Mohamed Hazeem
 GitHub: https://github.com/mohamedhazeem/secure-rest-api
 Email: a.mohamedhazeem@gmail.com
 ```

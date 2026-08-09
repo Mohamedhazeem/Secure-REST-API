@@ -9,7 +9,7 @@
   Deferred TODOs: none
 -->
 
-# Secure REST API Constitution
+# TrustFeed API Constitution
 
 ## Core Principles
 

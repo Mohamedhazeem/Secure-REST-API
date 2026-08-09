@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Secure REST API
+  title: TrustFeed API
   description: |
     A secure, production-style REST API with JWT authentication, role-based authorization,
     rate limiting, and clean layered architecture. Backend-only by design.

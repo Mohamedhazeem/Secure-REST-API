@@ -1,11 +1,11 @@
-# Secure REST API
+# TrustFeed API
 
 A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. Designed around clean architecture, SOLID principles, role-based access control, and defense-in-depth security. The codebase is the contract: a published machine-readable OpenAPI specification, layered separation of concerns, and a documented extension pattern that lets a developer add a new resource without touching existing code.
 
 > Backend only. No UI by design. The API is consumed by clients built from the OpenAPI contract.
 
 <p align="center">
-  <img src="assets/cover.svg" alt="Secure REST API — Clean architecture, defense-in-depth security, stable API contract" width="100%">
+  <img src="assets/cover.svg" alt="TrustFeed API — Clean architecture, defense-in-depth security, stable API contract" width="100%">
 </p>
 
 ---
