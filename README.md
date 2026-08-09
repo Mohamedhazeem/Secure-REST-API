@@ -122,10 +122,10 @@ This project does. It is structured so a technical evaluator can verify the arch
 
 **Testing**
 
-- Vitest unit tests against in-memory repositories
-- Integration tests against `mongodb-memory-server` + Supertest (auth, RBAC, ownership, CORS, errors, architecture)
+- Vitest integration tests against `mongodb-memory-server` + Supertest (auth, RBAC, ownership, errors, CORS, architecture, smoke)
 - Performance tests for pagination and rate limiting
 - End-to-end Newman (Postman collection) tests against the live server
+- `tests/unit/` reserved for future pure unit tests (services against in-memory repositories, validators, pure functions)
 
 ---
 
@@ -408,17 +408,18 @@ To swap persistence (e.g. Mongoose → Prisma, Mongoose → SQL), implement the 
 
 ## Testing Strategy
 
-| Layer       | Tooling                                            | Scope                                                               |
-| ----------- | -------------------------------------------------- | ------------------------------------------------------------------- |
-| Unit        | Vitest                                             | Services against in-memory repositories; pure functions; validators |
-| Integration | Vitest + Supertest + mongodb-memory-server         | API + DB: auth, RBAC, ownership, errors, CORS, architecture         |
-| Performance | Vitest                                             | Pagination throughput, rate limiter fairness                        |
-| End-to-end  | Newman (Postman collections in `backend/postman/`) | Full request/response cycles against the live server                |
+| Layer | Tooling | Scope |
+|---|---|---|
+| Integration | Vitest + Supertest + mongodb-memory-server | API + DB: auth, RBAC, ownership, errors, CORS, architecture, smoke |
+| Performance | Vitest | Pagination throughput, rate limiter fairness |
+| End-to-end | Newman (Postman collections in `backend/postman/`) | Full request/response cycles against the live server |
+
+The `tests/unit/` directory is reserved for future pure unit tests (services against in-memory repositories, validators, pure functions).
 
 Commands:
 
 ```bash
-# Unit + integration + performance
+# Integration + performance + e2e (vitest discovers tests in tests/)
 npm test
 
 # Watch mode
