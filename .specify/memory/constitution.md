@@ -1,10 +1,9 @@
 <!--
   SYNC IMPACT REPORT
-  Version change: 1.0.0 → 1.1.0
-  Modified principles: none renamed
-  Added sections: Core Principle VI. Testability & Multi-Level Testing
-  Modified sections: Development Workflow & Quality Gates (test gate expanded
-                     from "no test suite yet" to mandated multi-level testing)
+  Version change: 1.1.0 → 1.2.0
+  Modified principles: I. Clean Architecture (Layered Boundaries) — strengthened business-logic independence language; VI. Testability & Multi-Level Testing — added test-before-implement mandate
+  Added principles: VII. Contract-First Development, VIII. No Speculative Infrastructure, IX. Explicit Failure Semantics, X. Observability Mandatory, XI. Concurrency Awareness for Mutations
+  Modified sections: Security & Production Standards — added security-by-design mandate and explicit no-secrets-in-logs rule
   Removed sections: none
   Deferred TODOs: none
 -->
@@ -20,6 +19,7 @@ middleware) → application (controllers, services) → domain (models, business
 MUST point inward; outer layers may import inner layers, never the reverse. No
 circular imports. Domain and application code MUST NOT depend on Express, Mongoose,
 the native MongoDB driver, or ioredis directly — such coupling is infrastructure-only.
+Business logic MUST remain independent of infrastructure.
 
 ### II. SOLID & Single Responsibility
 Every module MUST have exactly one responsibility. Controllers MUST stay thin and
@@ -65,10 +65,56 @@ unit (services, validators, utils, complexity assertions), integration
 (pagination latency, rate-limiter behavior, Big-O regressions on hot paths), and
 e2e (register → login → authorized mutation → refresh → ownership denial over real
 HTTP with cookies). A dedicated test script MUST exist and pass before merge.
-Rationale: the refactor's guarantees (layering, swapping, performance) are only
-credible if each one is proven by a test.
+Test critical behavior before implementation: tests for auth flows, ownership
+checks, and failure modes MUST be written before the feature code that satisfies
+them. Rationale: the refactor's guarantees (layering, swapping, performance) are
+only credible if each one is proven by a test.
+
+### VII. Contract-First Development
+The OpenAPI specification MUST be the source of truth and MUST be written before
+implementation begins. Every endpoint's request/response schema, status codes, and
+error envelope MUST be defined in the contract first. Implementation MUST match the
+contract; the contract MUST NOT be derived from working code. Contract validation
+MUST run in CI and MUST gate merges. Rationale: a contract-first API prevents drift
+between documentation and behavior and lets consumers integrate against a stable
+specification.
+
+### VIII. No Speculative Infrastructure
+Infrastructure MUST be added only when a proven requirement exists. Caching layers,
+additional queues, new database indexes, and external services MUST be justified by
+demonstrated need (profiling data, load measurements, or concrete feature
+requirements). YAGNI applies: an unused cache is complexity without benefit.
+Rationale: speculative infrastructure obscures real bottlenecks and increases
+operational surface area without delivering value.
+
+### IX. Explicit Failure Semantics
+Every failure path MUST have an explicit, documented outcome. Retries MUST be
+bounded and explicit; silent fallbacks and hidden retries are FORBIDDEN.
+Dependencies that fail MUST produce a structured error response immediately — the
+application MUST NOT retry incoming requests or fall back to degraded behavior
+without an explicit, documented policy. Error codes MUST be stable and
+machine-readable. Rationale: consumers must be able to reason about failure modes
+without reading source code.
+
+### X. Observability Mandatory
+Every request MUST carry a correlation ID. Structured logs MUST include trace IDs,
+user context, and duration. Metrics MUST be exported for every critical path. Health
+endpoints MUST report dependency status. Observability MUST be designed into the
+system, not bolted on after implementation. Rationale: production incidents are only
+diagnosable if the system exposes its internal state.
+
+### XI. Concurrency Awareness for Mutations
+All mutating operations MUST account for concurrent access. Optimistic locking MUST
+be used where conflicts are possible. Atomic database operations MUST be preferred
+over read-modify-write cycles. Race conditions in mutation paths are defects, not
+edge cases. Rationale: social APIs have high write concurrency; lost updates and
+duplicate writes are user-visible data corruption.
 
 ## Security & Production Standards
+
+Security by design is non-negotiable. Every feature MUST be evaluated for security
+implications before implementation. Threat modeling MUST precede feature work for
+auth, authorization, and data-access paths.
 
 - Input validation: ALL request bodies/params/queries MUST pass Zod schemas via the
   validate middleware before reaching handlers.
@@ -81,6 +127,9 @@ credible if each one is proven by a test.
 - Rate limiting: global API limiter (per user) and strict login limiter (per IP),
   both Redis-backed, MUST remain in front of all endpoints.
 - Secrets MUST live only in backend/.env, never in code, logs, or commits.
+- No secrets in logs: the structured logger MUST redact passwords, tokens, cookies,
+  authorization headers, and any field whose name suggests sensitivity. Redaction
+  rules MUST be verified in log-related tests.
 - No UI: backend-only by design; the API surface is the only product.
 
 ## Development Workflow & Quality Gates
@@ -111,4 +160,4 @@ clarifications. Every PR and code review MUST verify compliance with this
 Constitution. Runtime development guidance lives in AGENTS.md and MUST be kept in
 sync with this document.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-08 | **Last Amended**: 2026-08-08
+**Version**: 1.2.0 | **Ratified**: 2026-08-08 | **Last Amended**: 2026-08-09
