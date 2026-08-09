@@ -1,71 +1,60 @@
-import Post from "../models/post.model.js"
+import * as postService from "../service/post.service.js";
+import { sendSuccess } from "../utils/response.js";
 
-export const createPost= async(req,res)=>{
+export const createPost = async (req, res, next) => {
     try {
-        const{name, age, description} = req.body;
-
-        const post = await Post.create({
-            name, age, description, author: req.user._id
-        });
-        return res.status(201).json({message:"post created", post});
-    } catch (error) {
-         return res.status(500).json({message: error.message});
+        const post = await postService.createPost({ ...req.body, authorId: req.user._id });
+        return sendSuccess(res, 201, { post });
+    } catch (err) {
+        next(err);
     }
-}
-export const getAllPosts = async (req, res) => {
-    const posts = await Post.find().populate("author", "username email");
-
-    return res.status(200).json({
-        message: "All posts",
-        posts
-    });
 };
 
-export const getPosts = async(req,res)=>{
-    const posts = await Post.find({author: req.user._id}).populate("author", "username email");
-    return res.status(200).json({message: "your posts", posts})
-}
-export const updatePost = async(req,res)=>{
+/**
+ * List all posts with pagination.
+ * Complexity: O(limit) per page + O(n) countDocuments scan.
+ * See post.repository.findMany for full breakdown.
+ */
+export const getAllPosts = async (req, res, next) => {
     try {
-        const {id} = req.params;
-        const post = await Post.findById(id);
-        if(!post) return res.status(404).json({message:"post not found"});
-
-        if (post.author.toString() !== req.user._id.toString())
-        {
-            return res.status(403).json({ message: "Not allowed" });
-        }
-
-        const { name, description, age } = req.body;
-        if (name !== undefined) post.name = name;
-        if (description !== undefined) post.description = description;
-        if (age !== undefined) post.age = age;
-
-        await post.save();
-        return res.status(200).json({message: "post updated", post});
-
-    } catch (error) {
-        return res.status(500).json({message: error.message});
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20;
+        const result = await postService.listAllPosts({ page, limit });
+        return sendSuccess(res, 200, result);
+    } catch (err) {
+        next(err);
     }
-}
+};
 
-export const deletePost = async(req,res)=>{
+/**
+ * List authenticated user's own posts with pagination.
+ * Complexity: O(limit) per page + O(n) countDocuments on author index.
+ */
+export const getPosts = async (req, res, next) => {
     try {
-        const {id} = req.params;
-        if(!id) return res.status(400).json({message:"post id required"});
-
-        const post = await Post.findById(id);
-        if(!post) return res.status(404).json({message:"not post found"});
-
-        if(post.author.toString() !== req.user._id.toString())
-            return res.status(403).json({message:"Unauthorized"});
-
-        await post.deleteOne();
-
-        return res.status(200).json({message:"post deleted"});
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20;
+        const result = await postService.listMyPosts(req.user._id, { page, limit });
+        return sendSuccess(res, 200, result);
+    } catch (err) {
+        next(err);
     }
-    catch (error) {
-        return res.status(500).json({message: error.message});
-    }
+};
 
-}
+export const updatePost = async (req, res, next) => {
+    try {
+        const post = await postService.updatePost(req.params.id, req.user._id, req.body);
+        return sendSuccess(res, 200, { post });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const deletePost = async (req, res, next) => {
+    try {
+        await postService.deletePost(req.params.id, req.user._id);
+        return sendSuccess(res, 204);
+    } catch (err) {
+        next(err);
+    }
+};

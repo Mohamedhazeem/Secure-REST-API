@@ -1,36 +1,34 @@
-import { ACCESS_TOKEN, ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN } from "../configs/constants.js";
 import { redisClient } from "../configs/redis.js";
-import { generateAccessToken, verifyRefreshToken } from "../utils/generateToken.js";
+import { verifyRefreshToken } from "../utils/generateToken.js";
+import { isRefreshTokenBlacklisted, blacklistRefreshToken, createAuthSession } from "../controller/auth.controller.js";
+import { createError } from "../utils/errors.js";
+import { sendSuccess } from "../utils/response.js";
 
-export const refreshTokenController = async (req, res) => {
-  const token = req.cookies[REFRESH_TOKEN];
-  if (!token) return res.sendStatus(401);
+export const refreshTokenController = async (req, res, next) => {
+    const token = req.cookies.refresh_token;
+    if (!token) return next(createError("UNAUTHORIZED", "Refresh token is missing", 401));
 
-  try {
-    const payload = verifyRefreshToken(token);
+    try {
+        const payload = verifyRefreshToken(token);
 
-    const stored = await redisClient.get(
-      `auth:refresh:${payload.sub}`
-    );
-    if(stored == null) return res.sendStatus(401);
-    if (stored !== token) {
-      await redisClient.del(`auth:refresh:${payload.sub}`);
-      console.log("1");
-      return res.status(403);
+        if (await isRefreshTokenBlacklisted(payload.jti)) {
+            return next(createError("FORBIDDEN", "Refresh token has been revoked", 403));
+        }
+
+        const stored = await redisClient.get(`auth:refresh:${payload.sub}`);
+        if (stored == null) return next(createError("UNAUTHORIZED", "Refresh token is invalid", 401));
+        if (stored !== token) {
+            await redisClient.del(`auth:refresh:${payload.sub}`);
+            return next(createError("FORBIDDEN", "Refresh token has been revoked", 403));
+        }
+
+        const ttl = Math.max(1, Math.floor((payload.exp || Date.now() / 1000 + 900) - Date.now() / 1000));
+        await blacklistRefreshToken(payload.jti, ttl);
+
+        await createAuthSession(res, { _id: payload.sub });
+
+        return sendSuccess(res, 200, { message: "Token refreshed" });
+    } catch {
+        return next(createError("FORBIDDEN", "Refresh token is invalid", 403));
     }
-
-    const newAccessToken = generateAccessToken({ sub: payload.sub });
-
-    res.cookie(ACCESS_TOKEN, newAccessToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: ACCESS_TOKEN_MAX_AGE,
-    });
-
-    return res.status(200).json({ message: "Token refreshed" });
-  } catch {
-    console.log("2");
-    return res.sendStatus(403);
-  }
 };
