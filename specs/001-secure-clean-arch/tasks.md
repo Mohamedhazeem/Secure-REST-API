@@ -16,9 +16,9 @@
 
 **Purpose**: Project initialization and directory structure
 
-- [ ] T001 Create directory structure for repositories, validators, and docs per plan.md
-- [ ] T002 [P] Create vitest configuration with test environment setup in `backend/vitest.config.js`
-- [ ] T003 [P] Create test helper utilities in `backend/tests/helpers/`
+- [X] T001 Create directory structure for repositories, validators, and docs per plan.md
+- [X] T002 [P] Create vitest configuration with test environment setup in `backend/vitest.config.js`
+- [X] T003 [P] Create test helper utilities in `backend/tests/helpers/`
 
 ---
 
@@ -28,24 +28,24 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Create user repository interface in `backend/src/repositories/interfaces/user.repository.js`
-- [ ] T005 [P] Create post repository interface in `backend/src/repositories/interfaces/post.repository.js`
-- [ ] T006 [P] Create role repository interface in `backend/src/repositories/interfaces/role.repository.js`
-- [ ] T007 [P] Create permission repository interface in `backend/src/repositories/interfaces/permission.repository.js`
-- [ ] T008 [P] Create refresh repository interface in `backend/src/repositories/interfaces/refresh.repository.js`
-- [ ] T009 [P] Implement mongoose user repository in `backend/src/repositories/implementations/mongoose/user.repository.js`
-- [ ] T010 [P] Implement mongoose post repository in `backend/src/repositories/implementations/mongoose/post.repository.js`
-- [ ] T011 [P] Implement mongoose role repository in `backend/src/repositories/implementations/mongoose/role.repository.js`
-- [ ] T012 [P] Implement mongoose permission repository in `backend/src/repositories/implementations/mongoose/permission.repository.js`
-- [ ] T013 [P] Implement mongoose refresh repository in `backend/src/repositories/implementations/mongoose/refresh.repository.js`
-- [ ] T014 [P] Implement memory user repository for tests in `backend/src/repositories/implementations/memory/user.repository.js`
-- [ ] T015 [P] Implement memory post repository for tests in `backend/src/repositories/implementations/memory/post.repository.js`
-- [ ] T016 [P] Implement memory role repository for tests in `backend/src/repositories/implementations/memory/role.repository.js`
-- [ ] T017 Create stable error codes utility in `backend/src/utils/errors.js`
-- [ ] T018 [P] Create structured logger utility in `backend/src/utils/logger.js`
-- [ ] T019 Centralize environment variable reads in `backend/src/configs/config.js`
-- [ ] T020 Update database connection to support test environment in `backend/src/configs/database.js`
-- [ ] T021 [P] Create user validator in `backend/src/validators/user.validator.js`
+- [X] T004 [P] Create user repository interface in `backend/src/repositories/interfaces/user.repository.js`
+- [X] T005 [P] Create post repository interface in `backend/src/repositories/interfaces/post.repository.js`
+- [X] T006 [P] Create role repository interface in `backend/src/repositories/interfaces/role.repository.js`
+- [X] T007 [P] Create permission repository interface in `backend/src/repositories/interfaces/permission.repository.js`
+- [X] T008 [P] Create refresh repository interface in `backend/src/repositories/interfaces/refresh.repository.js`
+- [X] T009 [P] Implement mongoose user repository in `backend/src/repositories/implementations/mongoose/user.repository.js`
+- [X] T010 [P] Implement mongoose post repository in `backend/src/repositories/implementations/mongoose/post.repository.js`
+- [X] T011 [P] Implement mongoose role repository in `backend/src/repositories/implementations/mongoose/role.repository.js`
+- [X] T012 [P] Implement mongoose permission repository in `backend/src/repositories/implementations/mongoose/permission.repository.js`
+- [X] T013 [P] Implement mongoose refresh repository in `backend/src/repositories/implementations/mongoose/refresh.repository.js`
+- [X] T014 [P] Implement memory user repository for tests in `backend/src/repositories/implementations/memory/user.repository.js`
+- [X] T015 [P] Implement memory post repository for tests in `backend/src/repositories/implementations/memory/post.repository.js`
+- [X] T016 [P] Implement memory role repository for tests in `backend/src/repositories/implementations/memory/role.repository.js`
+- [X] T017 Create stable error codes utility in `backend/src/utils/errors.js`
+- [X] T018 [P] Create structured logger utility in `backend/src/utils/logger.js`
+- [X] T019 Centralize environment variable reads in `backend/src/configs/config.js`
+- [X] T020 Update database connection to support test environment in `backend/src/configs/database.js`
+- [X] T021 [P] Create user validator in `backend/src/validators/user.validator.js`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -59,14 +59,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T022 [P] [US1] Add CORS integration tests in `backend/tests/integration/cors.test.js`
+- [X] T022 [P] [US1] Add CORS integration tests in `backend/tests/integration/cors.test.js`
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Validate and update OpenAPI contract in `specs/001-secure-clean-arch/contracts/openapi.yaml`
-- [ ] T024 [P] [US1] Create CORS config in `backend/src/configs/cors.js`
-- [ ] T025 [P] [US1] Create CORS middleware in `backend/src/middleware/cors.middleware.js`
-- [ ] T026 [US1] Wire CORS middleware and preflight handling in `backend/src/app.js`
+- [X] T023 [US1] Validate and update OpenAPI contract in `specs/001-secure-clean-arch/contracts/openapi.yaml`
+- [X] T024 [P] [US1] Create CORS config in `backend/src/configs/cors.js`
+- [X] T025 [P] [US1] Create CORS middleware in `backend/src/middleware/cors.middleware.js`
+- [X] T026 [US1] Wire CORS middleware and preflight handling in `backend/src/app.js`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -80,16 +80,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T027 [P] [US2] Create Role model in `backend/src/models/role.model.js`
-- [ ] T028 [P] [US2] Create Permission model in `backend/src/models/permission.model.js`
-- [ ] T029 [P] [US2] Create RefreshToken model in `backend/src/models/refresh_token.model.js`
-- [ ] T030 [US2] Implement role enforcement middleware in `backend/src/middleware/role.middleware.js`
-- [ ] T031 [US2] Add development seed data for roles and permissions in `backend/src/configs/seed.js`, triggered on server boot in development mode
-- [ ] T032 [US2] Add ownership checks in post service layer in `backend/src/service/post.service.js`
-- [ ] T033 [US2] Implement refresh token blacklist with Redis TTL in `backend/src/service/auth.service.js`
-- [ ] T034 [US2] Implement fail-fast error handling for external dependency failures in `backend/src/middleware/error.middleware.js`
-- [ ] T035 [US2] Update rate limiter configuration in `backend/src/configs/constants.js` with separate limits for login and authenticated requests, and increase authenticated user limit
-- [ ] T036 [US2] Add RBAC and security integration tests in `backend/tests/integration/rbac.test.js`
+- [X] T027 [P] [US2] Create Role model in `backend/src/models/role.model.js`
+- [X] T028 [P] [US2] Create Permission model in `backend/src/models/permission.model.js`
+- [X] T029 [P] [US2] Create RefreshToken model in `backend/src/models/refresh_token.model.js`
+- [X] T030 [US2] Implement role enforcement middleware in `backend/src/middleware/role.middleware.js`
+- [X] T031 [US2] Add development seed data for roles and permissions in `backend/src/configs/seed.js`, triggered on server boot in development mode
+- [X] T032 [US2] Add ownership checks in post service layer in `backend/src/service/post.service.js`
+- [X] T033 [US2] Implement refresh token blacklist with Redis TTL in `backend/src/service/auth.service.js`
+- [X] T034 [US2] Implement fail-fast error handling for external dependency failures in `backend/src/middleware/error.middleware.js`
+- [X] T035 [US2] Update rate limiter configuration in `backend/src/configs/constants.js` with separate limits for login and authenticated requests, and increase authenticated user limit
+- [X] T036 [US2] Add RBAC and security integration tests in `backend/tests/integration/rbac.test.js`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -103,17 +103,17 @@
 
 ### Implementation for User Story 3
 
-- [ ] T037 [P] [US3] Refactor User model to remove infrastructure imports and ensure pure domain representation in `backend/src/models/user.model.js`
-- [ ] T038 [P] [US3] Refactor Post model to remove infrastructure imports and ensure pure domain representation in `backend/src/models/post.model.js`
-- [ ] T039 [US3] Refactor auth service to use repository interfaces in `backend/src/service/auth.service.js`
-- [ ] T040 [US3] Extract post service from controller in `backend/src/service/post.service.js`
-- [ ] T041 [US3] Refactor post controller to use post service in `backend/src/controller/post.controller.js`
-- [ ] T042 [P] [US3] Create user service in `backend/src/service/user.service.js`
-- [ ] T043 [P] [US3] Create user controller in `backend/src/controller/user.controller.js`
-- [ ] T044 [P] [US3] Create user routes in `backend/src/routes/user.routes.js`
-- [ ] T045 [P] [US3] Extract auth controller logic from user.controller.js into `backend/src/controller/auth.controller.js`
-- [ ] T046 [US3] Document extension pattern in `backend/src/docs/extension-pattern.md`
-- [ ] T047 [US3] Add clean architecture integration tests in `backend/tests/integration/architecture.test.js`
+- [X] T037 [P] [US3] Refactor User model to remove infrastructure imports and ensure pure domain representation in `backend/src/models/user.model.js`
+- [X] T038 [P] [US3] Refactor Post model to remove infrastructure imports and ensure pure domain representation in `backend/src/models/post.model.js`
+- [X] T039 [US3] Refactor auth service to use repository interfaces in `backend/src/service/auth.service.js`
+- [X] T040 [US3] Extract post service from controller in `backend/src/service/post.service.js`
+- [X] T041 [US3] Refactor post controller to use post service in `backend/src/controller/post.controller.js`
+- [X] T042 [P] [US3] Create user service in `backend/src/service/user.service.js`
+- [X] T043 [P] [US3] Create user controller in `backend/src/controller/user.controller.js`
+- [X] T044 [P] [US3] Create user routes in `backend/src/routes/user.routes.js`
+- [X] T045 [US3] Extract auth controller logic from user.controller.js into `backend/src/controller/auth.controller.js`
+- [X] T046 [US3] Document extension pattern in `backend/src/docs/extension-pattern.md`
+- [X] T047 [US3] Add clean architecture integration tests in `backend/tests/integration/architecture.test.js`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -127,12 +127,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T048 [US4] Create error factory with stable codes in `backend/src/utils/errors.js`
-- [ ] T049 [P] [US4] Implement error handling middleware in `backend/src/middleware/error.middleware.js`
-- [ ] T050 [P] [US4] Implement error service in `backend/src/service/error.service.js`
-- [ ] T051 [P] [US4] Implement error controller in `backend/src/controller/error.controller.js`
-- [ ] T052 [US4] Standardize all controllers to throw domain errors instead of sending responses directly
-- [ ] T053 [US4] Add error handling integration tests in `backend/tests/integration/errors.test.js`
+- [X] T048 [US4] Create error factory with stable codes in `backend/src/utils/errors.js`
+- [X] T049 [P] [US4] Implement error handling middleware in `backend/src/middleware/error.middleware.js`
+- [X] T050 [P] [US4] Implement error service in `backend/src/service/error.service.js`
+- [X] T051 [P] [US4] Implement error controller in `backend/src/controller/error.controller.js`
+- [X] T052 [US4] Standardize all controllers to throw domain errors instead of sending responses directly
+- [X] T053 [US4] Add error handling integration tests in `backend/tests/integration/errors.test.js`
 
 **Checkpoint**: All error responses across the API follow the flat stable-code model
 
@@ -146,13 +146,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T054 [P] [US5] Add performance tests for pagination in `backend/tests/performance/pagination.test.js`
-- [ ] T055 [P] [US5] Add performance tests for rate limiting in `backend/tests/performance/rate-limit.test.js`
+- [X] T054 [P] [US5] Add performance tests for pagination in `backend/tests/performance/pagination.test.js`
+- [X] T055 [P] [US5] Add performance tests for rate limiting in `backend/tests/performance/rate-limit.test.js`
 
 ### Implementation for User Story 5
 
-- [ ] T056 [US5] Document Big-O complexity for hot paths in code comments
-- [ ] T057 [US5] Verify no N+1 queries in post and movie endpoints by inspecting query plans and ensuring all population is batched
+- [X] T056 [US5] Document Big-O complexity for hot paths in code comments
+- [X] T057 [US5] Verify no N+1 queries in post and movie endpoints by inspecting query plans and ensuring all population is batched
 
 **Checkpoint**: Performance targets met and documented
 
@@ -162,15 +162,15 @@
 
 **Purpose**: Final verification, documentation, and cleanup across all user stories
 
-- [ ] T058 [P] Run full test suite and fix failures
-- [ ] T059 [P] Validate OpenAPI spec matches live implementation
-- [ ] T060 [P] Update README with architecture overview and test commands
-- [ ] T061 Run quickstart.md validation scenarios
-- [ ] T062 Final security review and secret cleanup
-- [ ] T063 [P] Add e2e tests for auth, refresh, and ownership flows in `backend/tests/e2e/`
-- [ ] T064 [P] Update spec.md SC-005 with exact p95 latency threshold of 950ms in `specs/001-secure-clean-arch/spec.md`
-- [ ] T065 [P] Standardize JSON envelope across all responses in `backend/src/utils/response.js`
-- [ ] T066 Audit and remove scattered `process.env` reads in `backend/src/` after central config is created
+- [X] T058 [P] Run full test suite and fix failures
+- [X] T059 [P] Validate OpenAPI spec matches live implementation
+- [X] T060 [P] Update README with architecture overview and test commands
+- [X] T061 Run quickstart.md validation scenarios
+- [X] T062 Final security review and secret cleanup
+- [X] T063 [P] Add e2e tests for auth, refresh, and ownership flows in `backend/tests/e2e/`
+- [X] T064 [P] Update spec.md SC-005 with exact p95 latency threshold of 950ms in `specs/001-secure-clean-arch/spec.md`
+- [X] T065 [P] Standardize JSON envelope across all responses in `backend/src/utils/response.js`
+- [X] T066 Audit and remove scattered `process.env` reads in `backend/src/` after central config is created
 
 ---
 

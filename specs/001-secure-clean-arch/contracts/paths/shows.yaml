@@ -1,0 +1,25 @@
+movies:
+  get:
+    tags:
+      - Movies
+    summary: List paginated movies from sample_mflix
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of movies
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedMovies'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

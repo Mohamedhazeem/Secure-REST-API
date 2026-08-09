@@ -10,7 +10,9 @@
     "e2e": "newman run postman/Auth.postman_collection.json && newman run postman/Posts.postman_collection.json && newman run postman/Shows.postman_collection.json",
     "start": "node src/index.js",
     "dev": "nodemon --watch src src/index.js",
-    "dev-watch": "node --watch src/index.js"
+    "dev-watch": "node --watch src/index.js",
+    "contract:sync": "node -e \"const fs=require('fs');fs.rmSync('../specs/001-secure-clean-arch/contracts',{recursive:true,force:true});fs.mkdirSync('../specs/001-secure-clean-arch/contracts',{recursive:true});fs.cpSync('docs','../specs/001-secure-clean-arch/contracts',{recursive:true});\"",
+    "contract:lint": "redocly lint docs/openapi.yaml"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +32,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@redocly/cli": "^2.46.0",
     "@vitest/coverage-v8": "^4.1.10",
     "mongodb-memory-server": "^11.2.0",
     "newman": "^6.2.2",

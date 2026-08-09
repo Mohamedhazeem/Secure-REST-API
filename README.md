@@ -46,7 +46,7 @@ Most portfolio REST APIs stop at "register, login, CRUD". That proves the obviou
 - Give consumers a stable, machine-readable contract they can code against.
 - Fail predictably when dependencies misbehave.
 
-This project does. It is the working artifact behind `specs/001-secure-clean-arch/` and is structured so a technical evaluator can verify the architecture from the directory layout alone.
+This project does. It is structured so a technical evaluator can verify the architecture from the directory layout alone.
 
 ---
 
@@ -297,7 +297,7 @@ All routes are prefixed with `/api/v1`.
 | ------ | ------------------------------- | ------------------------------------------- |
 | `GET`  | `/shows/movies?page=1&limit=20` | Paginated movies (read-only `sample_mflix`) |
 
-The full contract — parameters, schemas, security schemes, error responses, and CORS — is published in `specs/001-secure-clean-arch/contracts/openapi.yaml`.
+The full contract — parameters, schemas, security schemes, error responses, and CORS — is published as a multi-file OpenAPI specification under `backend/docs/` (split by concern: `openapi.yaml`, `paths/`, and `components/` containing `schemas.yaml`, `responses.yaml`, `security.yaml`).
 
 ---
 
@@ -379,7 +379,19 @@ CORS_CREDENTIALS=true
 
 Credentials are enabled and preflight (`OPTIONS`) is handled correctly, so browser clients can complete the full auth flow from any configured origin.
 
-**Contract** — `specs/001-secure-clean-arch/contracts/openapi.yaml` — describes every endpoint, every parameter, every response schema, every security scheme, and every documented error. It is the source of truth for integration. The implementation is checked against it.
+**Contract** — `backend/docs/` is the canonical, machine-readable API description and the source of truth for integration. It is a multi-file OpenAPI specification split into grouped files for maintainability:
+
+- `openapi.yaml` — root document (info, servers, security, tags, and `$ref`s to the rest)
+- `paths/auth.yaml`, `paths/posts.yaml`, `paths/shows.yaml` — per-resource path definitions
+- `components/schemas.yaml`, `components/responses.yaml`, `components/security.yaml` — reusable components
+
+After editing, validate it:
+
+```bash
+npm run contract:lint   # validate backend/docs/openapi.yaml
+```
+
+The implementation is checked against this contract.
 
 ---
 
@@ -496,7 +508,7 @@ Follow the documented pattern in [`backend/src/docs/extension-pattern.md`](backe
 7. **Controller** — `src/controller/widget.controller.js`
 8. **Routes** — `src/routes/widget.routes.js`
 9. **Permissions & seed** — add codes to `configs/seed.js`; gate with `requirePermission(...)`
-10. **Contract** — add paths to `specs/001-secure-clean-arch/contracts/openapi.yaml`
+10. **Contract** — add the new resource's paths to `backend/docs/paths/<resource>.yaml` and reference it from the root `backend/docs/openapi.yaml`; add shared schemas to `backend/docs/components/schemas.yaml`. Then run `npm run contract:lint`.
 
 No existing file is modified.
 
@@ -526,4 +538,4 @@ See [`license.md`](license.md) for full terms.
 **Mohamed Hazeem**
 
 - Email: a.mohamedhazeem@gmail.com
-- GitHub: [@mohamedhazeem](https://github.com/mohamedhazeem)
+- GitHub: [@mohamedhazeem](https://github.com/Mohamedhazeem)

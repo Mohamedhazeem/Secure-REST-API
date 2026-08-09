@@ -1,0 +1,142 @@
+collection:
+  get:
+    tags:
+      - Posts
+    summary: List all posts
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of posts
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedPosts'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  post:
+    tags:
+      - Posts
+    summary: Create a post
+    security:
+      - cookieAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/PostCreateRequest'
+    responses:
+      '201':
+        description: Post created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Post'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+me:
+  get:
+    tags:
+      - Posts
+    summary: List own posts
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of own posts
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedPosts'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+byId:
+  patch:
+    tags:
+      - Posts
+    summary: Update own post
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/PostUpdateRequest'
+    responses:
+      '200':
+        description: Post updated
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Post'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  delete:
+    tags:
+      - Posts
+    summary: Delete own post
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '204':
+        description: Post deleted
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
