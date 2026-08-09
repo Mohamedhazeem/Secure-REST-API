@@ -92,15 +92,20 @@ This project does. It is structured so a technical evaluator can verify the arch
 - Zod-based request validation at the HTTP boundary
 - Documented extension pattern (`src/docs/extension-pattern.md`) for adding new resources without modifying existing files
 - Hot-path Big-O complexity documented in code comments
+- Idempotency via `Idempotency-Key` header (Redis-backed dedup)
+- Correlation IDs via `X-Correlation-Id` header (AsyncLocalStorage propagation)
+- In-memory metrics (request volume, duration histograms, auth outcomes)
 
 **Security**
 
 - JWT authentication (HTTP-only cookies, never exposed to JS)
 - Refresh token rotation with Redis-backed blacklist and TTL
+- Session revocation via `sid` claim in access tokens
 - bcrypt password hashing; secrets excluded from responses and logs
 - Per-caller rate limiting (authenticated by `userId`, public by IP)
 - Strict login limiter to deter credential stuffing
-- RBAC middleware (`requireRole`, `requirePermission`)
+- RBAC middleware (`requirePermission`)
+- ABAC middleware (`requireAttributes`) for arbitrary policy predicates
 - Ownership checks in the service layer on every mutating operation
 - Structured logger that redacts secrets and PII
 - Dev seed data for roles and permissions (`configs/seed.js`) bootstrapped in development mode
@@ -122,9 +127,9 @@ This project does. It is structured so a technical evaluator can verify the arch
 
 **Testing**
 
-- Vitest integration tests against `mongodb-memory-server` + Supertest (auth, RBAC, ownership, errors, CORS, architecture, smoke)
-- Performance tests for pagination and rate limiting
-- End-to-end Newman (Postman collection) tests against the live server
+- Vitest integration tests against `mongodb-memory-server` + Supertest (architecture, contract, CORS, errors, RBAC)
+- Performance tests for pagination and rate-limit latency (p95 < 950ms)
+- End-to-end Newman (Postman collections in `backend/postman/`) for auth flows and post CRUD
 - `tests/unit/` reserved for future pure unit tests (services against in-memory repositories, validators, pure functions)
 
 ---
@@ -203,20 +208,25 @@ backend/
 │   │   └── seed.js                 Dev seed for roles & permissions
 │   ├── controller/
 │   │   ├── auth.controller.js
-│   │   ├── error.controller.js
+│   │   ├── error.controller.js     404 handler
+│   │   ├── health.controller.js    Liveness & readiness probes
 │   │   ├── movie.controller.js
 │   │   ├── post.controller.js
 │   │   ├── refresh_token.controller.js
 │   │   └── user.controller.js
 │   ├── docs/
-│   │   └── extension-pattern.md    How to add a new resource
+│   │   ├── extension-pattern.md    How to add a new resource
+│   │   └── openapi/
+│   │       └── contract-check.js   Validates implementation matches contract
 │   ├── middleware/
-│   │   ├── auth.middleware.js      JWT verify + blacklist + user attach
+│   │   ├── auth.middleware.js      JWT verify + blacklist + user/permissions attach
 │   │   ├── authlimiter.middleware.js  Strict login limiter
+│   │   ├── correlation.middleware.js  AsyncLocalStorage correlation IDs
 │   │   ├── cors.middleware.js
 │   │   ├── error.middleware.js     Fail-fast + envelope shaping
+│   │   ├── idempotency.middleware.js  Redis-backed dedup via Idempotency-Key
 │   │   ├── ratelimiter.middleware.js   Global API limiter
-│   │   ├── role.middleware.js      RBAC (requireRole / requirePermission)
+│   │   ├── role.middleware.js      RBAC (requirePermission) + ABAC (requireAttributes)
 │   │   └── validate.middleware.js  Zod validation
 │   ├── models/
 │   │   ├── permission.model.js
@@ -225,40 +235,46 @@ backend/
 │   │   ├── role.model.js
 │   │   └── user.model.js
 │   ├── repositories/
-│   │   ├── interfaces/             Pure contracts
+│   │   ├── interfaces/             Pure abstract contracts (no ORM)
 │   │   │   ├── permission.repository.js
 │   │   │   ├── post.repository.js
 │   │   │   ├── refresh.repository.js
 │   │   │   ├── role.repository.js
 │   │   │   └── user.repository.js
 │   │   └── implementations/
-│   │       ├── memory/             In-memory implementations (tests)
-│   │       └── mongoose/           Production implementations
+│   │       └── mongoose/           Production Mongoose-backed implementations
+│   │           ├── permission.repository.js
+│   │           ├── post.repository.js
+│   │           ├── refresh.repository.js
+│   │           ├── role.repository.js
+│   │           └── user.repository.js
 │   ├── routes/
 │   │   ├── auth.routes.js
 │   │   ├── movie.routes.js
-│   │   └── post.routes.js
+│   │   ├── post.routes.js
+│   │   └── user.routes.js
 │   ├── service/
-│   │   ├── error.service.js
-│   │   ├── post.service.js
-│   │   └── user.service.js
+│   │   ├── audit.service.js        Audit event writer (not yet wired in app.js)
+│   │   ├── error.service.js        Classifies errors, generates traceId
+│   │   ├── post.service.js         Post CRUD with ownership checks
+│   │   └── user.service.js         Registration, login, delete, JTI generation
 │   ├── utils/
-│   │   ├── errors.js               Stable error codes & envelope
-│   │   ├── generateToken.js        JWT access + refresh
-│   │   ├── logger.js               Structured logger
+│   │   ├── errors.js               Stable error codes & envelope definitions
+│   │   ├── generateToken.js        JWT access + refresh generation
+│   │   ├── logger.js               Structured JSON logger (redacts secrets/PII)
+│   │   ├── metrics.js              In-memory counters + duration histograms
 │   │   └── response.js             JSON envelope helper
 │   └── validators/
 │       ├── auth.validator.js
 │       ├── post.validator.js
 │       └── user.validator.js
 ├── tests/
-│   ├── helpers/                    Shared test utilities
-│   ├── unit/                       Pure unit tests
-│   ├── integration/                API + DB integration
-│   ├── performance/                Pagination & rate-limit perf
-│   ├── e2e/                        End-to-end flows
-│   ├── global-setup.js
-│   └── smoke.test.js
+│   ├── helpers/                    Shared test utilities (fixtures, request helper)
+│   ├── unit/                       Reserved for future pure unit tests
+│   ├── integration/                API + DB integration (architecture, contract, CORS, errors, RBAC)
+│   ├── performance/                Pagination & rate-limit latency (p95 < 950ms)
+│   ├── e2e/                        End-to-end flows (auth flows, post CRUD)
+│   └── global-setup.js             mongodb-memory-server bootstrap
 ├── postman/                        Newman collections for e2e
 ├── vitest.config.js
 ├── package.json
@@ -297,6 +313,13 @@ All routes are prefixed with `/api/v1`.
 | ------ | ------------------------------- | ------------------------------------------- |
 | `GET`  | `/shows/movies?page=1&limit=20` | Paginated movies (read-only `sample_mflix`) |
 
+### Health (unprotected)
+
+| Method | Path             | Description                          |
+| ------ | ---------------- | ------------------------------------ |
+| `GET`  | `/health`        | Liveness probe                       |
+| `GET`  | `/health/ready`  | Readiness probe (Mongo + Redis)      |
+
 The full contract — parameters, schemas, security schemes, error responses, and CORS — is published as a multi-file OpenAPI specification under `backend/docs/` (split by concern: `openapi.yaml`, `paths/`, and `components/` containing `schemas.yaml`, `responses.yaml`, `security.yaml`).
 
 ---
@@ -305,14 +328,17 @@ The full contract — parameters, schemas, security schemes, error responses, an
 
 **Authentication** is JWT with two tokens:
 
-- **Access token** — short-lived (default 5m), HTTP-only cookie, validated on every protected request.
-- **Refresh token** — longer-lived (default 15m), HTTP-only cookie, rotated on every refresh. Old refresh tokens are added to a Redis blacklist with TTL = remaining lifetime, so a stolen token has bounded reuse.
+- **Access token** — short-lived (default 5m), HTTP-only cookie (`access_token`), validated on every protected request.
+- **Refresh token** — longer-lived (default 15m), HTTP-only cookie (`refresh_token`), rotated on every refresh. Old refresh tokens are blacklisted in Redis with TTL = remaining lifetime.
+- **Session revocation**: access tokens carry a `sid` claim; revoking a session writes `session:revoked:<sid>` in Redis.
+- **Multi-session support**: each refresh token gets a unique `jti`.
 
-**Authorization** is RBAC:
+**Authorization** is RBAC + ABAC:
 
 - `Role` is a named collection of `Permission` codes (e.g. `posts:create`, `posts:delete`).
 - Permissions and roles are stored in the database and seeded on boot in development.
-- Middleware: `requireRole("admin")`, `requirePermission("posts:delete")`.
+- **RBAC middleware**: `requirePermission("posts:delete")` checks `req.user.permissions`. Supports an optional `attributes` parameter for inline ABAC.
+- **ABAC middleware**: `requireAttributes(evaluate)` evaluates arbitrary predicates against user/params/query/body independently of roles.
 - Adding a new role or permission does not require touching endpoint code.
 
 **Ownership** is enforced in the service layer:
@@ -327,10 +353,11 @@ The full contract — parameters, schemas, security schemes, error responses, an
 
 Rate limits are enforced per caller using `express-rate-limit` with a Redis store. Defaults are overridable via environment variables.
 
-| Scope                      | Default      | Window | Key      |
-| -------------------------- | ------------ | ------ | -------- |
-| Global API (authenticated) | 200 requests | 15 min | `userId` |
-| Login (`POST /auth/login`) | 5 requests   | 5 min  | IP       |
+| Scope                      | Default      | Window | Key        |
+| -------------------------- | ------------ | ------ | ---------- |
+| Global API (authenticated) | 200 requests | 15 min | `user:<id>` |
+| Global API (public)        | 200 requests | 15 min | IP         |
+| Login (`POST /auth/login`) | 5 requests   | 5 min  | IP         |
 
 When a caller exceeds their limit, the API returns `429` with a `RATE_LIMITED` error code. Limiter state is shared across processes because the store is Redis, so the system stays correct behind a load balancer.
 
@@ -350,19 +377,21 @@ All error responses use a **flat envelope** with three fields:
 
 Stable codes (defined in `src/utils/errors.js`):
 
-| Code                  | HTTP | Meaning                                  |
-| --------------------- | ---- | ---------------------------------------- |
-| `VALIDATION_ERROR`    | 400  | Request body or params failed validation |
-| `UNAUTHORIZED`        | 401  | Authentication required                  |
-| `INVALID_CREDENTIALS` | 401  | Bad email or password                    |
-| `FORBIDDEN`           | 403  | Permission denied                        |
-| `ROLE_DENIED`         | 403  | Required role or permission missing      |
-| `OWNERSHIP_REQUIRED`  | 403  | Caller is not the resource owner         |
-| `NOT_FOUND`           | 404  | Resource does not exist                  |
-| `CONFLICT`            | 409  | State conflict (e.g. duplicate)          |
-| `RATE_LIMITED`        | 429  | Rate limit exceeded                      |
-| `DEPENDENCY_FAILURE`  | 503  | External dependency is unavailable       |
-| `INTERNAL_ERROR`      | 500  | Unexpected error                         |
+| Code | HTTP | Meaning |
+|------|------|---------|
+| `VALIDATION_ERROR` | 400 | Request body or params failed validation |
+| `UNAUTHORIZED` | 401 | Authentication required |
+| `INVALID_CREDENTIALS` | 401 | Bad email or password |
+| `AUTH_REUSE_DETECTED` | 401 | Refresh token reuse detected |
+| `FORBIDDEN` | 403 | Permission denied |
+| `ROLE_DENIED` | 403 | Required role or permission missing |
+| `OWNERSHIP_REQUIRED` | 403 | Caller is not the resource owner |
+| `NOT_FOUND` | 404 | Resource does not exist |
+| `CONFLICT` | 409 | State conflict (e.g. duplicate) |
+| `IDEMPOTENCY_CONFLICT` | 409 | Concurrent request with same idempotency key |
+| `RATE_LIMITED` | 429 | Rate limit exceeded |
+| `DEPENDENCY_FAILURE` | 503 | External dependency is unavailable |
+| `INTERNAL_ERROR` | 500 | Unexpected error |
 
 There is **no category field, no retry guidance, no HTTP-text duplication**. Consumers look up the stable code in the contract and decide their own retry policy. When a dependency (MongoDB, Redis) fails, the API returns `DEPENDENCY_FAILURE` immediately — it does not retry or fall back at the application layer.
 
@@ -373,8 +402,7 @@ There is **no category field, no retry guidance, no HTTP-text duplication**. Con
 **CORS** is configured via environment variables (no hardcoded origins):
 
 ```
-CORS_ALLOWED_ORIGINS="https://app.example.com,https://admin.example.com"
-CORS_CREDENTIALS=true
+ALLOWED_ORIGINS="https://app.example.com,https://admin.example.com"
 ```
 
 Credentials are enabled and preflight (`OPTIONS`) is handled correctly, so browser clients can complete the full auth flow from any configured origin.
@@ -397,12 +425,11 @@ The implementation is checked against this contract.
 
 ## Repository Pattern & Persistence Swap
 
-Services never import Mongoose. They import a repository interface and depend on the methods declared there. Two implementations live alongside it:
+Services never import Mongoose. They import a repository interface and depend on the methods declared there. The production implementation lives at:
 
-- `repositories/implementations/mongoose/` — production
-- `repositories/implementations/memory/` — tests
+- `repositories/implementations/mongoose/` — production (Mongoose)
 
-To swap persistence (e.g. Mongoose → Prisma, Mongoose → SQL), implement the same interface and change the import in the service. Controllers, routes, middleware, and tests do not change.
+A memory implementation can be added at `repositories/implementations/memory/` for tests. To swap persistence (e.g. Mongoose → Prisma, Mongoose → SQL), implement the same interface and change the import in the service. Controllers, routes, middleware, and tests do not change.
 
 ---
 
@@ -410,9 +437,9 @@ To swap persistence (e.g. Mongoose → Prisma, Mongoose → SQL), implement the 
 
 | Layer | Tooling | Scope |
 |---|---|---|
-| Integration | Vitest + Supertest + mongodb-memory-server | API + DB: auth, RBAC, ownership, errors, CORS, architecture, smoke |
-| Performance | Vitest | Pagination throughput, rate limiter fairness |
-| End-to-end | Newman (Postman collections in `backend/postman/`) | Full request/response cycles against the live server |
+| Integration | Vitest + Supertest + mongodb-memory-server | API + DB: architecture, contract, CORS, errors, RBAC |
+| Performance | Vitest | Pagination throughput, rate-limit latency (p95 < 950ms) |
+| End-to-end | Newman (Postman collections in `backend/postman/`) | Auth flows, post CRUD flows |
 
 The `tests/unit/` directory is reserved for future pure unit tests (services against in-memory repositories, validators, pure functions).
 
@@ -463,9 +490,8 @@ API_RATE_LIMIT=200
 LOGIN_RATE_WINDOW_MS=300000
 LOGIN_RATE_LIMIT=5
 
-# CORS (comma-separated; required)
-CORS_ALLOWED_ORIGINS="http://localhost:3000,https://app.example.com"
-CORS_CREDENTIALS=true
+# CORS (comma-separated; required for CORS)
+ALLOWED_ORIGINS="http://localhost:3000,https://app.example.com"
 ```
 
 See `backend/README` and the inline comments in `src/configs/config.js` for the canonical list.
