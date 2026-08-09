@@ -13,7 +13,6 @@ coverage/
 .env
 .env.*
 !.env.example
-TRUSTFEED.md
 
 # Logs
 *.log
