@@ -73,4 +73,18 @@ export default class PostRepository {
         const total = await Post.countDocuments(filter).exec();
         return { data, page, limit, total };
     }
+
+    /**
+     * Reassign authorship of every post by one author to another user.
+     * @param {string} fromAuthorId - The deleted user's ObjectId.
+     * @param {string} toAuthorId - The "[deleted]" placeholder's ObjectId.
+     * @returns {Promise<number>} Number of posts updated.
+     */
+    async reassignAuthor(fromAuthorId, toAuthorId) {
+        const result = await Post.updateMany(
+            { author: fromAuthorId },
+            { $set: { author: toAuthorId } }
+        ).exec();
+        return result.modifiedCount ?? 0;
+    }
 }

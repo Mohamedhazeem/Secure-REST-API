@@ -3,6 +3,9 @@ dotenv.config();
 import { app } from "./app.js";
 import { seedRolesAndPermissions } from "./configs/seed.js";
 import { assertContract, CONTRACT_PUBLISHED } from "./docs/contract-check.js";
+import { sweepInactiveSessions } from "./service/session.service.js";
+
+const SWEEP_INTERVAL_MS = 5 * 60 * 1000;
 
 const startServer = async () => {
     try {
@@ -29,6 +32,15 @@ const startServer = async () => {
             console.error("🛑 Server error:", error);
             process.exit(1);
         });
+
+        if (process.env.NODE_ENV !== "test") {
+            const sweepTimer = setInterval(() => {
+                sweepInactiveSessions().catch((error) =>
+                    console.error("🛑 Session sweep failed:", error)
+                );
+            }, SWEEP_INTERVAL_MS);
+            sweepTimer.unref?.();
+        }
     } catch (error) {
         console.error(`🛑 Server startup failed: ${error}`);
         process.exit(1);

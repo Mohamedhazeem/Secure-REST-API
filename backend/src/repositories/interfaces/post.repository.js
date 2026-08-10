@@ -71,4 +71,13 @@ export default class PostRepositoryInterface {
      * @returns {Promise<PaginatedResult>} Paginated result set.
      */
     async findMany(filter = {}, pagination) {}
+
+    /**
+     * Reassign authorship of every post by one author to another user
+     * (account deletion anonymization, FR-038).
+     * @param {string} fromAuthorId - The deleted user's ObjectId.
+     * @param {string} toAuthorId - The "[deleted]" placeholder's ObjectId.
+     * @returns {Promise<number>} Number of posts updated.
+     */
+    async reassignAuthor(fromAuthorId, toAuthorId) {}
 }

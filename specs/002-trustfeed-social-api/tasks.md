@@ -83,22 +83,22 @@
 
 ### Tests for User Story 2
 
-- [ ] T020 [P] [US2] Integration test: auth lifecycle register→login→list sessions→refresh→logout in `backend/tests/integration/auth.test.js`
-- [ ] T021 [P] [US2] Integration test: reused refresh token triggers global revocation in `backend/tests/integration/auth.test.js`
-- [ ] T022 [P] [US2] Integration test: session revocation (single + all) in `backend/tests/integration/session.test.js`
+- [X] T020 [P] [US2] Integration test: auth lifecycle register→login→list sessions→refresh→logout in `backend/tests/integration/auth.test.js`
+- [X] T021 [P] [US2] Integration test: reused refresh token triggers global revocation in `backend/tests/integration/auth.test.js`
+- [X] T022 [P] [US2] Integration test: session revocation (single + all) in `backend/tests/integration/session.test.js`
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Create Session model in `backend/src/models/session.model.js`
-- [ ] T024 [P] [US2] Create Session repository interface in `backend/src/repositories/interfaces/session.repository.js`
-- [ ] T025 [P] [US2] Create Session mongoose implementation in `backend/src/repositories/implementations/mongoose/session.repository.js`
-- [ ] T026 [P] [US2] Create Session validator in `backend/src/validators/session.validator.js`
-- [ ] T027 [US2] Update auth service for multi-session creation and metadata storage in `backend/src/service/auth.service.js`
-- [ ] T028 [US2] Implement token reuse detection and global revocation, and emit an audit entry in `backend/src/service/auth.service.js` (FR-030)
-- [ ] T029 [US2] Create session routes in `backend/src/routes/auth.routes.js`
-- [ ] T030 [US2] Wire session endpoints to controller and middleware in `backend/src/controller/auth.controller.js`
-- [ ] T031 [US2] Implement account deletion in `backend/src/service/user.service.js`: anonymize posts & comments (attribution → "[deleted]"), remove likes & follows, permanently delete credentials and personal data (FR-038)
-- [ ] T032 [US2] Add inactive-session expiry/cleanup sweep (honors `SESSION_IDLE_TTL_SECONDS`) in `backend/src/service/session.service.js` (FR-013)
+- [X] T023 [P] [US2] Create Session model in `backend/src/models/session.model.js`
+- [X] T024 [P] [US2] Create Session repository interface in `backend/src/repositories/interfaces/session.repository.js`
+- [X] T025 [P] [US2] Create Session mongoose implementation in `backend/src/repositories/implementations/mongoose/session.repository.js`
+- [X] T026 [P] [US2] Create Session validator in `backend/src/validators/session.validator.js`
+- [X] T027 [US2] Update auth service for multi-session creation and metadata storage in `backend/src/service/auth.service.js`
+- [X] T028 [US2] Implement token reuse detection and global revocation, and emit an audit entry in `backend/src/service/auth.service.js` (FR-030)
+- [X] T029 [US2] Create session routes in `backend/src/routes/auth.routes.js`
+- [X] T030 [US2] Wire session endpoints to controller and middleware in `backend/src/controller/auth.controller.js`
+- [X] T031 [US2] Implement account deletion in `backend/src/service/user.service.js`: anonymize posts & comments (attribution → "[deleted]"), remove likes & follows, permanently delete credentials and personal data (FR-038)
+- [X] T032 [US2] Add inactive-session expiry/cleanup sweep (honors `SESSION_IDLE_TTL_SECONDS`) in `backend/src/service/session.service.js` (FR-013)
 
 **Checkpoint**: At this point, User Story 2 should be fully functional and testable independently.
 

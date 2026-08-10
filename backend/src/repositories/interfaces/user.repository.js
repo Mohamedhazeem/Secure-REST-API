@@ -66,6 +66,14 @@ export default class UserRepositoryInterface {
     async delete(id) {}
 
     /**
+     * Permanently delete a user and all personal data (account deletion,
+     * FR-038). Used after content attribution is anonymized.
+     * @param {string} id - The user's unique identifier.
+     * @returns {Promise<Object|null>} The deleted user document, or null if not found.
+     */
+    async permanentlyDelete(id) {}
+
+    /**
      * Retrieve users matching an optional filter, with pagination.
      * @param {UserFilter} [filter={}] - Filter criteria.
      * @param {PaginationOptions} [pagination] - Pagination options.

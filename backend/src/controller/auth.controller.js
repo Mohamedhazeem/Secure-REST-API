@@ -1,64 +1,58 @@
-import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN, ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN, REFRESH_TOKEN_MAX_AGE } from "../configs/constants.js";
-import { redisClient } from "../configs/redis.js";
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/generateToken.js";
 import { config } from "../configs/config.js";
-
+import * as authService from "../service/auth.service.js";
+import * as sessionService from "../service/session.service.js";
 import { createError } from "../utils/errors.js";
+import { sendSuccess } from "../utils/response.js";
+import { revokeSessionParamsSchema } from "../validators/session.validator.js";
 
-export const createAuthSession = async (res, user) => {
+const cookieOptions = () => ({
+    httpOnly: true,
+    sameSite: "strict",
+    secure: config.nodeEnv === "production",
+});
+
+export const setAuthCookies = (res, { accessToken, refreshToken }) => {
+    res.cookie(ACCESS_TOKEN, accessToken, { ...cookieOptions(), maxAge: ACCESS_TOKEN_MAX_AGE });
+    res.cookie(REFRESH_TOKEN, refreshToken, { ...cookieOptions(), maxAge: REFRESH_TOKEN_MAX_AGE });
+};
+
+export const clearAuthCookies = (res) => res.clearCookie(ACCESS_TOKEN).clearCookie(REFRESH_TOKEN);
+
+/**
+ * Issue a fresh session (register/login) and set the token cookies.
+ */
+export const createAuthSession = async (res, user, req) => {
     if (!user || !user._id) throw createError("UNAUTHORIZED", "User not found", 401);
 
-    const access_token = generateAccessToken({ sub: user._id });
-    const refresh_token = generateRefreshToken({ sub: user._id, jti: crypto.randomUUID() });
-
-    await redisClient.set(`auth:refresh:${user._id}`, refresh_token, "EX", REFRESH_TOKEN_MAX_AGE);
-
-    res.cookie(ACCESS_TOKEN, access_token, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: config.nodeEnv === "production",
-        maxAge: ACCESS_TOKEN_MAX_AGE,
+    const { accessToken, refreshToken } = await authService.issueAuthSession({
+        userId: user._id,
+        ipAddress: req?.ip,
+        userAgent: req?.get("user-agent"),
+        acceptLanguage: req?.get("accept-language"),
     });
-    res.cookie(REFRESH_TOKEN, refresh_token, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: config.nodeEnv === "production",
-        maxAge: REFRESH_TOKEN_MAX_AGE,
-    });
+
+    setAuthCookies(res, { accessToken, refreshToken });
 };
 
-export const blacklistRefreshToken = async (jti, ttlSeconds) => {
-    if (!jti) return;
-    await redisClient.set(`auth:refresh:blacklist:${jti}`, "true", "EX", ttlSeconds);
-};
-
-export const isRefreshTokenBlacklisted = async (jti) => {
-    if (!jti) return false;
-    const val = await redisClient.get(`auth:refresh:blacklist:${jti}`);
-    return val !== null;
-};
-
-export const blacklistAccessToken = async (token) => {
-    if (!token) return;
+export const listSessions = async (req, res, next) => {
     try {
-        const decoded = jwt.decode(token);
-        const ttl = decoded?.exp ? decoded.exp - Math.floor(Date.now() / 1000) : 0;
-        if (ttl > 0) {
-            await redisClient.set(`auth:blacklist:${token}`, "true", "EX", ttl);
-        }
-    } catch {
-        // ignore undecodable tokens
+        const data = await sessionService.listSessions(req.user._id);
+        return sendSuccess(res, 200, { data, total: data.length });
+    } catch (err) {
+        next(err);
     }
 };
 
-export const blacklistRefreshTokenOnLogout = async (refreshToken) => {
-    if (!refreshToken) return;
+export const revokeSession = async (req, res, next) => {
     try {
-        const decoded = verifyRefreshToken(refreshToken);
-        const ttl = Math.max(1, Math.floor((decoded.exp || Date.now() / 1000 + 900) - Date.now() / 1000));
-        await redisClient.set(`auth:refresh:blacklist:${decoded.jti}`, "true", "EX", ttl);
-    } catch {
-        // ignore invalid refresh tokens on logout
+        const parsed = revokeSessionParamsSchema.safeParse({ id: req.params.id });
+        if (!parsed.success) {
+            return next(createError("VALIDATION_ERROR", "Invalid session id", 400));
+        }
+        await sessionService.revokeSession({ sessionId: parsed.data.id, userId: req.user._id });
+        return sendSuccess(res, 200, { message: "Session revoked" });
+    } catch (err) {
+        next(err);
     }
 };

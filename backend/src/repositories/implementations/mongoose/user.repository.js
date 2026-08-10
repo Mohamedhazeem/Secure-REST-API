@@ -50,6 +50,15 @@ export default class UserRepository {
     }
 
     /**
+     * Permanently delete a user and all personal data (FR-038).
+     * @param {string} id - The user's MongoDB ObjectId.
+     * @returns {Promise<Object|null>} The deleted user document, or null if not found.
+     */
+    async permanentlyDelete(id) {
+        return User.findByIdAndDelete(id).lean().exec();
+    }
+
+    /**
      * Find users matching an optional filter with pagination.
      * Excludes soft-deleted users by default.
      * @param {Object} [filter={}] - Mongoose query filter.
