@@ -138,8 +138,7 @@ A reviewer executes `GET /health` and `GET /health/ready` to verify backend heal
 - **FR-013**: The console MUST be served as a single page from the backend at `/console`.
 - **FR-014**: The console MUST NOT modify existing backend API semantics, authentication flows, or security models.
 - **FR-015**: The console MUST be responsive and suitable for demonstration on common screen sizes.
-- **FR-016**: The console MUST support CORS for cross-origin API requests from its served origin.
-- **FR-017**: The console MUST NOT duplicate endpoint definitions, request validation, or authorization logic client-side.
+- **FR-016**: The console MUST NOT duplicate endpoint definitions, request validation, or authorization logic client-side.
 
 ### Key Entities
 
@@ -165,7 +164,6 @@ A reviewer executes `GET /health` and `GET /health/ready` to verify backend heal
 ## Assumptions
 
 - The reviewer has access to a running TrustFeed backend instance.
-- The backend's CORS configuration allows the console's origin.
 - The OpenAPI contract is available at `/console/openapi.json` as a static file served by the backend.
 - The console is a static single-page application served by Express and makes API requests to the same origin.
 - HTTP-only cookies are automatically included in cross-origin requests when credentials mode is enabled.
