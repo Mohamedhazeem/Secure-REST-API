@@ -20,6 +20,7 @@ import { setAuditWriter } from "./service/audit.service.js";
 import AuditLogRepository from "./repositories/implementations/mongoose/audit-log.repository.js";
 import { registerNotificationDispatcher } from "./workers/notification.worker.js";
 import "./configs/database.js";
+import { API_VERSION } from "./configs/constants.js";
 
 export const app = express();
 
@@ -40,14 +41,14 @@ app.use(corsMiddleware);
 app.use(correlationMiddleware);
 app.use(metricsMiddleware);
 
-app.get("/api/v1/health", liveness);
-app.get("/api/v1/health/ready", readiness);
+app.get(`${API_VERSION}/health`, liveness);
+app.get(`${API_VERSION}/health/ready`, readiness);
 
-app.use("/api/v1/auth", authRouter, userRouter);
-app.use("/api/v1/posts", authMiddleWare, apiLimiter, postRouter, commentRouter, likeRouter);
-app.use("/api/v1/users", authMiddleWare, socialMutationLimiter, followRouter);
-app.use("/api/v1/feed", authMiddleWare, apiLimiter, feedRouter);
-app.use("/api/v1/notifications", authMiddleWare, apiLimiter, notificationRouter);
+app.use(`${API_VERSION}/auth`, authRouter, userRouter);
+app.use(`${API_VERSION}/posts`, authMiddleWare, apiLimiter, postRouter, commentRouter, likeRouter);
+app.use(`${API_VERSION}/users`, authMiddleWare, socialMutationLimiter, followRouter);
+app.use(`${API_VERSION}/feed`, authMiddleWare, apiLimiter, feedRouter);
+app.use(`${API_VERSION}/notifications`, authMiddleWare, apiLimiter, notificationRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

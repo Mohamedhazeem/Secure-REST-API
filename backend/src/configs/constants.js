@@ -19,3 +19,5 @@ export const ACCESS_TOKEN_MAX_AGE = ms(ACCESS_TOKEN_EXPIRES_IN);
 
 export const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN;
 export const REFRESH_TOKEN_MAX_AGE = ms(REFRESH_TOKEN_EXPIRES_IN);
+
+export const API_VERSION = '/api/v1';

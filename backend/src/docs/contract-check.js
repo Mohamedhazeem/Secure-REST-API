@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { load } from "js-yaml";
+import { API_VERSION } from "../../configs/constants.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -67,7 +68,7 @@ export function collectContractRoutes(doc, contractDir) {
 export function collectImplementedRoutes(app, { doc, contractDir } = {}) {
     const router = app.router ?? app._router;
     if (!router?.stack) return [];
-    const serverUrl = doc?.servers?.[0]?.url ?? "/api/v1";
+    const serverUrl = doc?.servers?.[0]?.url ?? API_VERSION;
     const probePath = (path) => path.replace(/\{([^}]+)\}/g, "probe");
     const collected = new Map();
     const walk = (stack, path, prefix) => {
@@ -105,7 +106,7 @@ export function collectImplementedRoutes(app, { doc, contractDir } = {}) {
 
 export function assertContract({ app, contractDir = CONTRACT_PUBLISHED } = {}) {
     const doc = loadContract(join(contractDir, "openapi.yaml"));
-    const serverUrl = doc.servers?.[0]?.url ?? "/api/v1";
+    const serverUrl = doc.servers?.[0]?.url ?? API_VERSION;
     const contractRoutes = collectContractRoutes(doc, contractDir);
     const implementedRoutes = collectImplementedRoutes(app, { doc, contractDir });
     const implementedKeys = new Set(implementedRoutes.map((r) => `${r.method} ${r.path}`));
