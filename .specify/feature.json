@@ -1,1 +1,3 @@
-﻿{ "feature_directory": "specs\\002-trustfeed-social-api" }
+﻿{
+  "feature_directory": "specs/003-api-console"
+}
