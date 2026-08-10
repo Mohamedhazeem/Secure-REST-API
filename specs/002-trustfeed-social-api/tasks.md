@@ -170,20 +170,20 @@
 
 ### Tests for User Story 6
 
-- [ ] T059 [P] [US6] Integration test: health readiness reflects dependency failure within `HEALTH_TIMEOUT_MS` in `backend/tests/integration/health.test.js`
-- [ ] T060 [P] [US6] Integration test: rate-limit brute-force protection in `backend/tests/integration/ratelimit.test.js`
+- [X] T059 [P] [US6] Integration test: health readiness reflects dependency failure within `HEALTH_TIMEOUT_MS` in `backend/tests/integration/health.test.js`
+- [X] T060 [P] [US6] Integration test: rate-limit brute-force protection in `backend/tests/integration/ratelimit.test.js`
 
 ### Implementation for User Story 6
 
-- [ ] T061 [P] [US6] Create Audit Log model in `backend/src/models/audit-log.model.js`
-- [ ] T062 [P] [US6] Create Audit Log repository interface in `backend/src/repositories/interfaces/audit-log.repository.js`
-- [ ] T063 [P] [US6] Create Audit Log mongoose implementation in `backend/src/repositories/implementations/mongoose/audit-log.repository.js`
-- [ ] T064 [US6] Implement rate limiting for new social endpoints in `backend/src/middleware/ratelimiter.middleware.js`
-- [ ] T065 [US6] Add dependency readiness checks in `backend/src/controller/health.controller.js`
-- [ ] T066 [US6] Wire correlation ID and audit logging into request lifecycle orchestration in `backend/src/app.js` (middleware added in T005/T006; this task performs app-level composition only)
-- [ ] T067 [US6] Add CORS origin allowlist enforcement in `backend/src/middleware/cors.middleware.js`
-- [ ] T068 [US6] Add explicit structured dependency-failure error path in `backend/src/middleware/error.middleware.js` (FR-017, Principle IX)
-- [ ] T069 [US6] Implement graceful shutdown handlers (SIGTERM/SIGINT) in `backend/src/index.js` with 10s in-flight HTTP / 30s background-job bounds (FR-034, SC-019, Decision 7)
+- [X] T061 [P] [US6] Create Audit Log model in `backend/src/models/audit-log.model.js`
+- [X] T062 [P] [US6] Create Audit Log repository interface in `backend/src/repositories/interfaces/audit-log.repository.js`
+- [X] T063 [P] [US6] Create Audit Log mongoose implementation in `backend/src/repositories/implementations/mongoose/audit-log.repository.js`
+- [X] T064 [US6] Implement rate limiting for new social endpoints in `backend/src/middleware/ratelimiter.middleware.js`
+- [X] T065 [US6] Add dependency readiness checks in `backend/src/controller/health.controller.js`
+- [X] T066 [US6] Wire correlation ID and audit logging into request lifecycle orchestration in `backend/src/app.js` (middleware added in T005/T006; this task performs app-level composition only)
+- [X] T067 [US6] Add CORS origin allowlist enforcement in `backend/src/middleware/cors.middleware.js`
+- [X] T068 [US6] Add explicit structured dependency-failure error path in `backend/src/middleware/error.middleware.js` (FR-017, Principle IX)
+- [X] T069 [US6] Implement graceful shutdown handlers (SIGTERM/SIGINT) in `backend/src/index.js` with 10s in-flight HTTP / 30s background-job bounds (FR-034, SC-019, Decision 7)
 
 **Checkpoint**: At this point, User Stories 1 through 4 and 6 should all work independently.
 
@@ -197,27 +197,27 @@
 
 ### Tests for User Story 5
 
-- [ ] T070 [P] [US5] Integration test: comment, follow, and like events each create a notification for the target user in `backend/tests/integration/notification.test.js` (FR-027)
-- [ ] T071 [P] [US5] Integration test: repeated comment/follow/like events (same idempotency key) produce exactly one notification each, no duplicates in `backend/tests/integration/notification.test.js` (FR-027)
+- [X] T070 [P] [US5] Integration test: comment, follow, and like events each create a notification for the target user in `backend/tests/integration/notification.test.js` (FR-027)
+- [X] T071 [P] [US5] Integration test: repeated comment/follow/like events (same idempotency key) produce exactly one notification each, no duplicates in `backend/tests/integration/notification.test.js` (FR-027)
 
 ### Implementation for User Story 5
 
-- [ ] T072 [P] [US5] Create Comment model in `backend/src/models/comment.model.js`
-- [ ] T073 [P] [US5] Create Notification model in `backend/src/models/notification.model.js`
-- [ ] T074 [P] [US5] Create Comment repository interface in `backend/src/repositories/interfaces/comment.repository.js`
-- [ ] T075 [P] [US5] Create Notification repository interface in `backend/src/repositories/interfaces/notification.repository.js`
-- [ ] T076 [P] [US5] Create Comment mongoose implementation in `backend/src/repositories/implementations/mongoose/comment.repository.js`
-- [ ] T077 [P] [US5] Create Notification mongoose implementation in `backend/src/repositories/implementations/mongoose/notification.repository.js`
-- [ ] T078 [P] [US5] Create Comment validator in `backend/src/validators/comment.validator.js`
-- [ ] T079 [P] [US5] Create Notification validator in `backend/src/validators/notification.validator.js`
-- [ ] T080 [US5] Create Comment service with optimistic locking and emit an audit entry on create in `backend/src/service/comment.service.js` (FR-030)
-- [ ] T081 [US5] Create Notification service in `backend/src/service/notification.service.js`
-- [ ] T082 [US5] Create notification queue and worker with bounded retry + dead-letter queue in `backend/src/workers/notification.worker.js` (FR-027, SC-017, Decision 6)
-- [ ] T083 [P] [US5] Create Comment routes in `backend/src/routes/comment.routes.js`
-- [ ] T084 [P] [US5] Create Notification routes in `backend/src/routes/notification.routes.js`
-- [ ] T085 [US5] Wire comment and notification controllers in `backend/src/controller/comment.controller.js` and `backend/src/controller/notification.controller.js`
-- [ ] T086 [US5] Wire comment and notification routes into `backend/src/app.js`
-- [ ] T087 [US5] Seed default roles and permissions via `backend/src/configs/seed.js` for the runtime-configurable ABAC admin API (FR-015)
+- [X] T072 [P] [US5] Create Comment model in `backend/src/models/comment.model.js`
+- [X] T073 [P] [US5] Create Notification model in `backend/src/models/notification.model.js`
+- [X] T074 [P] [US5] Create Comment repository interface in `backend/src/repositories/interfaces/comment.repository.js`
+- [X] T075 [P] [US5] Create Notification repository interface in `backend/src/repositories/interfaces/notification.repository.js`
+- [X] T076 [P] [US5] Create Comment mongoose implementation in `backend/src/repositories/implementations/mongoose/comment.repository.js`
+- [X] T077 [P] [US5] Create Notification mongoose implementation in `backend/src/repositories/implementations/mongoose/notification.repository.js`
+- [X] T078 [P] [US5] Create Comment validator in `backend/src/validators/comment.validator.js`
+- [X] T079 [P] [US5] Create Notification validator in `backend/src/validators/notification.validator.js`
+- [X] T080 [US5] Create Comment service with optimistic locking and emit an audit entry on create in `backend/src/service/comment.service.js` (FR-030)
+- [X] T081 [US5] Create Notification service in `backend/src/service/notification.service.js`
+- [X] T082 [US5] Create notification queue and worker with bounded retry + dead-letter queue in `backend/src/workers/notification.worker.js` (FR-027, SC-017, Decision 6)
+- [X] T083 [P] [US5] Create Comment routes in `backend/src/routes/comment.routes.js`
+- [X] T084 [P] [US5] Create Notification routes in `backend/src/routes/notification.routes.js`
+- [X] T085 [US5] Wire comment and notification controllers in `backend/src/controller/comment.controller.js` and `backend/src/controller/notification.controller.js`
+- [X] T086 [US5] Wire comment and notification routes into `backend/src/app.js`
+- [X] T087 [US5] Seed default roles and permissions via `backend/src/configs/seed.js` for the runtime-configurable ABAC admin API (FR-015)
 
 **Checkpoint**: At this point, all user stories should be independently functional.
 

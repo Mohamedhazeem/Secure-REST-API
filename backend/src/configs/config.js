@@ -27,4 +27,6 @@ export const config = {
   sessionIdleTtlSeconds: parseInt(process.env.SESSION_IDLE_TTL_SECONDS, 10) || 30 * 24 * 60 * 60,
   idempotencyTtlDays: parseInt(process.env.IDEMPOTENCY_TTL_DAYS, 10) || 7,
   healthTimeoutMs: parseInt(process.env.HEALTH_TIMEOUT_MS, 10) || 5000,
+  gracefulShutdownHttpTimeoutMs: parseInt(process.env.GRACEFUL_SHUTDOWN_HTTP_TIMEOUT_MS, 10) || 10_000,
+  gracefulShutdownJobsTimeoutMs: parseInt(process.env.GRACEFUL_SHUTDOWN_JOBS_TIMEOUT_MS, 10) || 30_000,
 };

@@ -1,9 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import request from "supertest";
 import { app } from "../../src/app.js";
 import User from "../../src/models/user.model.js";
 import Role from "../../src/models/role.model.js";
 import Permission from "../../src/models/permission.model.js";
+import UserRepository from "../../src/repositories/implementations/mongoose/user.repository.js";
+
+afterEach(() => {
+    vi.restoreAllMocks();
+});
 
 const unique = (p) => `${p}${Math.random().toString(36).slice(2, 9)}`;
 
@@ -132,5 +137,19 @@ describe("Error response envelope (US4)", () => {
         const res = await request(app).get("/api/v1/does-not-exist");
         expect(res.body.traceId).toMatch(UUID_RE);
         expect(res.body.traceId.length).toBe(36);
+    });
+
+    it("maps dependency failures to a structured 503 DEPENDENCY_FAILURE (FR-017)", async () => {
+        vi.spyOn(UserRepository.prototype, "findByEmail").mockRejectedValue(new Error("Redis connection refused"));
+        try {
+            const res = await request(app)
+                .post("/api/v1/auth/login")
+                .send({ email: "missing@example.com", password: "password123" });
+
+            expect(res.status).toBe(503);
+            assertFlatEnvelope(res.body, "DEPENDENCY_FAILURE", 503);
+        } finally {
+            vi.restoreAllMocks();
+        }
     });
 });

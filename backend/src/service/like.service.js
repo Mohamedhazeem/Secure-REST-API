@@ -33,7 +33,7 @@ export const likePost = async ({ userId, postId, idempotencyKey }) => {
 
     let like;
     try {
-        like = await likeRepository.create({ userId, postId });
+        like = await likeRepository.create({ userId, postId, idempotencyKey: idempotencyKey ?? null });
     } catch (error) {
         if (isDuplicateKey(error)) {
             throw createError("CONFLICT", "Already liked this post", 409);
@@ -47,6 +47,8 @@ export const likePost = async ({ userId, postId, idempotencyKey }) => {
         recipientId: post.author.toString(),
         actorId: userId.toString(),
         resourceId: postId.toString(),
+        dedupeKey: `like:${like._id}`,
+        targetSummary: post.content.trim().slice(0, 140),
     });
     return like;
 };

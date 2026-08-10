@@ -14,6 +14,10 @@ const PERMISSION_CODES = [
   "likes:delete",
   "likes:read",
   "feed:read",
+  "comments:create",
+  "comments:read",
+  "notifications:read",
+  "notifications:update",
 ];
 
 const PERMISSION_DESCRIPTIONS = {
@@ -29,6 +33,10 @@ const PERMISSION_DESCRIPTIONS = {
   "likes:delete": "Unlike posts",
   "likes:read": "View like status",
   "feed:read": "Read the personalized feed",
+  "comments:create": "Comment on posts",
+  "comments:read": "View comments on posts",
+  "notifications:read": "List own notifications",
+  "notifications:update": "Mark own notifications as read",
 };
 
 const ROLES = [

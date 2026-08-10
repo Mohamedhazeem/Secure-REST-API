@@ -54,6 +54,7 @@ export const followUser = async ({ followerId, followingId }) => {
         recipientId: followingId.toString(),
         actorId: followerId.toString(),
         resourceId: follow._id.toString(),
+        dedupeKey: `follow:${follow._id}`,
     });
     return follow;
 };

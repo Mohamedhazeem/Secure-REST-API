@@ -4,8 +4,10 @@ import { userRouter } from "./routes/user.routes.js";
 import {postRouter, feedRouter} from "./routes/post.routes.js";
 import { followRouter } from "./routes/follow.routes.js";
 import { likeRouter } from "./routes/like.routes.js";
+import { commentRouter } from "./routes/comment.routes.js";
+import { notificationRouter } from "./routes/notification.routes.js";
 import cookieParser  from "cookie-parser";
-import { apiLimiter } from "./middleware/ratelimiter.middleware.js";
+import { apiLimiter, socialMutationLimiter } from "./middleware/ratelimiter.middleware.js";
 import { authMiddleWare } from "./middleware/auth.middleware.js";
 
 import { corsMiddleware } from "./middleware/cors.middleware.js";
@@ -14,9 +16,23 @@ import { notFoundHandler } from "./controller/error.controller.js";
 import { correlationMiddleware } from "./middleware/correlation.middleware.js";
 import { metricsMiddleware } from "./utils/metrics.js";
 import { liveness, readiness } from "./controller/health.controller.js";
+import { setAuditWriter } from "./service/audit.service.js";
+import AuditLogRepository from "./repositories/implementations/mongoose/audit-log.repository.js";
+import { registerNotificationDispatcher } from "./workers/notification.worker.js";
 import "./configs/database.js";
 
 export const app = express();
+
+// App-level composition (US6, T066): audit events (FR-030) are persisted
+// through the AuditLog repository; every entry is correlated via the
+// correlation middleware installed below (FR-031).
+const auditLogRepository = new AuditLogRepository();
+setAuditWriter({ write: (entry) => auditLogRepository.write(entry) });
+
+// Social events (follow, like, comment) publish notification jobs through
+// the notification worker (US5, T082/T086, FR-027). Registering the
+// dispatcher here keeps the services decoupled from the queue backend.
+registerNotificationDispatcher();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -28,9 +44,10 @@ app.get("/api/v1/health", liveness);
 app.get("/api/v1/health/ready", readiness);
 
 app.use("/api/v1/auth", authRouter, userRouter);
-app.use("/api/v1/posts",authMiddleWare, apiLimiter, postRouter, likeRouter);
-app.use("/api/v1/users", authMiddleWare, apiLimiter, followRouter);
+app.use("/api/v1/posts", authMiddleWare, apiLimiter, postRouter, commentRouter, likeRouter);
+app.use("/api/v1/users", authMiddleWare, socialMutationLimiter, followRouter);
 app.use("/api/v1/feed", authMiddleWare, apiLimiter, feedRouter);
+app.use("/api/v1/notifications", authMiddleWare, apiLimiter, notificationRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

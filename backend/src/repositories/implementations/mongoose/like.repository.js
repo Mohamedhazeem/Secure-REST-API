@@ -5,7 +5,7 @@ export default class LikeRepository {
      * Create a like. The compound unique index on { userId, postId } rejects
      * duplicates atomically (FR-037); the duplicate-key error (code 11000)
      * is mapped to CONFLICT by the service layer.
-     * @param {Object} data - { userId, postId }.
+     * @param {Object} data - { userId, postId, idempotencyKey }.
      * @returns {Promise<Object>} The created like document.
      */
     async create(data) {

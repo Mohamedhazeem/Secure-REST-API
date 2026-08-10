@@ -17,10 +17,32 @@ const checkRedis = async () => {
     }
 };
 
-const checkMongo = () => {
+const checkMongo = async () => {
     const states = ["disconnected", "connected", "connecting", "disconnecting"];
-    const state = mongoose.connection.readyState;
-    return state === 1 ? { status: "up" } : { status: "down", error: states[state] ?? "unknown" };
+    if (mongoose.connection.readyState !== 1) {
+        return { status: "down", error: states[mongoose.connection.readyState] ?? "unknown" };
+    }
+
+    const db = mongoose.connection.db;
+    if (!db) {
+        // Transient window during connection establishment: the driver
+        // reports connected but the native Db handle is not yet assigned.
+        // The ready state is authoritative here.
+        return { status: "up" };
+    }
+
+    let timer;
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("timeout")), config.healthTimeoutMs);
+    });
+    try {
+        await Promise.race([db.admin().ping(), timeout]);
+        return { status: "up" };
+    } catch {
+        return { status: "down", error: "unreachable" };
+    } finally {
+        clearTimeout(timer);
+    }
 };
 
 /**
@@ -34,11 +56,12 @@ export const liveness = (req, res) => {
 /**
  * Readiness endpoint - reports dependency status (FR-032, SC-018).
  * Returns 200 when all critical dependencies are up, 503 otherwise.
- * Complexity: O(1) ping + one connection state read.
+ * Each probe is bounded by HEALTH_TIMEOUT_MS (SC-018: degraded status
+ * within five seconds of a dependency failure).
+ * Complexity: O(1) ping + one connection state read, in parallel.
  */
 export const readiness = async (req, res) => {
-    const mongo = checkMongo();
-    const redis = await checkRedis();
+    const [mongo, redis] = await Promise.all([checkMongo(), checkRedis()]);
 
     const dependencies = { mongodb: mongo, redis };
     const ready = mongo.status === "up" && redis.status === "up";

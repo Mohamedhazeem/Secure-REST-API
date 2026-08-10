@@ -12,6 +12,24 @@ const mongooseOptions = {
   autoIndex: process.env.NODE_ENV !== 'production'
 };
 
+/**
+ * Explicitly build every registered model's indexes (T090, deploy safety).
+ *
+ * In production `autoIndex` is disabled (it blocks connection startup and is
+ * unsafe on a live cluster), so the unique indexes that guard correctness -
+ * notably the notification `dedupeKey` index and the comment
+ * `{ authorId, idempotencyKey }` partial unique index - would otherwise never
+ * be created. This runs once at boot, regardless of `autoIndex`, so those
+ * guarantees hold in every environment. Must run after the connection is
+ * established and after all models are compiled.
+ * @returns {Promise<void>}
+ */
+export const ensureIndexes = async () => {
+  await mongoose.connection.asPromise();
+  const names = mongoose.modelNames();
+  await Promise.all(names.map((name) => mongoose.model(name).createIndexes()));
+};
+
 const makeConnection = (uri, dbName) => {
     const db = mongoose.createConnection(uri, {
         dbName: dbName,

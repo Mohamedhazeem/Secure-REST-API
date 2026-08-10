@@ -23,6 +23,10 @@ const likeSchema = new mongoose.Schema(
             ref: Post,
             required: true,
         },
+        idempotencyKey: {
+            type: String,
+            default: null,
+        },
     },
     { timestamps: true }
 );

@@ -28,4 +28,17 @@ describe("CORS middleware", () => {
         const res = await request(app).options("/api/v1/posts").set("Origin", DISALLOWED);
         expect(res.headers["access-control-allow-origin"]).toBeUndefined();
     });
+
+    it("enforces the origin allowlist by rejecting disallowed origins with 403", async () => {
+        const res = await request(app).get("/api/v1/health").set("Origin", DISALLOWED);
+        expect(res.status).toBe(403);
+        expect(res.body.code).toBe("FORBIDDEN");
+        expect(res.headers["access-control-allow-origin"]).toBeUndefined();
+    });
+
+    it("rejects preflight from disallowed origin with 403", async () => {
+        const res = await request(app).options("/api/v1/health").set("Origin", DISALLOWED);
+        expect(res.status).toBe(403);
+        expect(res.headers["access-control-allow-origin"]).toBeUndefined();
+    });
 });
