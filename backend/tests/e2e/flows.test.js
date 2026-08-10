@@ -58,16 +58,16 @@ describe("End-to-end flows (quickstart scenarios)", () => {
         const created = await request(app)
             .post("/api/v1/posts")
             .set("Cookie", cookies)
-            .send({ name: "First", description: "my post", age: 21 });
+            .send({ content: "First post" });
         expect(created.status).toBe(201);
         const id = created.body.post._id;
 
         const updated = await request(app)
             .patch(`/api/v1/posts/${id}`)
             .set("Cookie", cookies)
-            .send({ name: "Renamed" });
+            .send({ content: "Renamed", version: 0 });
         expect(updated.status).toBe(200);
-        expect(updated.body.post.name).toBe("Renamed");
+        expect(updated.body.post.content).toBe("Renamed");
 
         const deleted = await request(app).delete(`/api/v1/posts/${id}`).set("Cookie", cookies);
         expect(deleted.status).toBe(204);
@@ -83,7 +83,7 @@ describe("End-to-end flows (quickstart scenarios)", () => {
         const created = await request(app)
             .post("/api/v1/posts")
             .set("Cookie", ownerCookies)
-            .send({ name: "mine", description: "owned", age: 1 });
+            .send({ content: "mine" });
         const postId = created.body.post._id;
 
         const attacker = unique("attacker");

@@ -18,7 +18,6 @@ security:
 tags:
   - name: Authentication
   - name: Posts
-  - name: Movies
 
 paths:
   /auth/register:
@@ -37,8 +36,6 @@ paths:
     $ref: './paths/posts.yaml#/me'
   /posts/{id}:
     $ref: './paths/posts.yaml#/byId'
-  /shows/movies:
-    $ref: './paths/shows.yaml#/movies'
 
 components:
   securitySchemes:

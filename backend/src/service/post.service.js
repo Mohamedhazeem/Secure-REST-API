@@ -1,21 +1,39 @@
 import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
+import { auditService } from "./audit.service.js";
 import { createError } from "../utils/errors.js";
 
 const postRepository = new PostRepository();
 
-export const createPost = async ({ name, description, age, authorId }) => {
-    return postRepository.create({ name, description, age, author: authorId });
+const recordAudit = (action, actorId, resourceId) =>
+    auditService.record({
+        action,
+        actorId,
+        resourceType: "Post",
+        resourceId,
+        severity: "info",
+    });
+
+export const createPost = async ({ content, visibility = "public", authorId }) => {
+    const post = await postRepository.create({ content, visibility, author: authorId });
+    await recordAudit("post.create", authorId, post._id.toString());
+    return post;
 };
 
-export const listAllPosts = async ({ page = 1, limit = 20 } = {}) => {
-    return postRepository.findMany({}, { page, limit });
+/**
+ * List posts the caller may view: public posts plus the caller's own
+ * (FR-036). Followers-only posts become visible to followers once the
+ * follow repository lands (US4); until then only the author sees them.
+ */
+export const listAllPosts = async (callerId, { page = 1, limit = 20 } = {}) => {
+    const filter = { $or: [{ visibility: "public" }, { author: callerId }] };
+    return postRepository.findMany(filter, { page, limit });
 };
 
 export const listMyPosts = async (authorId, { page = 1, limit = 20 } = {}) => {
     return postRepository.findMany({ author: authorId }, { page, limit });
 };
 
-export const updatePost = async (id, authorId, updates) => {
+export const updatePost = async (id, authorId, { content, visibility, version }) => {
     const post = await postRepository.findById(id);
     if (!post) {
         throw createError("NOT_FOUND", "Post not found", 404);
@@ -23,7 +41,15 @@ export const updatePost = async (id, authorId, updates) => {
     if (post.author.toString() !== authorId.toString()) {
         throw createError("OWNERSHIP_REQUIRED", "You can only modify your own posts", 403);
     }
-    return postRepository.update(id, updates);
+    const updated = await postRepository.updateIfCurrent(
+        { id, expectedVersion: version },
+        { ...(content !== undefined && { content }), ...(visibility !== undefined && { visibility }) }
+    );
+    if (!updated) {
+        throw createError("CONFLICT", "Post was modified by another request; refresh and retry", 409);
+    }
+    await recordAudit("post.update", authorId, updated._id.toString());
+    return updated;
 };
 
 export const deletePost = async (id, authorId) => {
@@ -34,5 +60,7 @@ export const deletePost = async (id, authorId) => {
     if (post.author.toString() !== authorId.toString()) {
         throw createError("OWNERSHIP_REQUIRED", "You can only delete your own posts", 403);
     }
-    return postRepository.deleteById(id);
+    await postRepository.deleteById(id);
+    await recordAudit("post.delete", authorId, post._id.toString());
+    return { id };
 };

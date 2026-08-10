@@ -8,7 +8,7 @@ A secure, production-style REST API portfolio project built with Node.js, Expres
 
 - **Node.js** (>= 20, currently 26) with ES Modules (`"type": "module"`)
 - **Express** 5.x
-- **MongoDB** via Mongoose 9 (app data) + native MongoDB driver (read-only `sample_mflix`)
+- **MongoDB** via Mongoose 9 (app data)
 - **Redis** via ioredis 6 (rate limiting store, token blacklist, session revocation, idempotency)
 - **JWT** auth with `jsonwebtoken`, access + refresh tokens in HTTP-only cookies
 - **express-rate-limit** + **rate-limit-redis** for rate limiting
@@ -36,7 +36,7 @@ All commands run from `backend/`:
 
 Copy to `backend/.env`:
 
-- `MONGODB_URI` — MongoDB cloud URI (main app database + sample_mflix)
+- `MONGODB_URI` — MongoDB cloud URI (main app database)
 - `REDIS_DB_URI` — Redis URI (optional; falls back to in-memory in test)
 - `PORT` — server port (default 1430)
 - `NODE_ENV` — `production`, `development`, or `test`
@@ -60,14 +60,13 @@ backend/src/
 │   ├── config.js               — Centralized env access (no scattered process.env)
 │   ├── constants.js            — rate-limit & token constants
 │   ├── cors.js                 — environment-driven origin allowlist
-│   ├── database.js             — Mongoose + native MongoDB connections
+│   ├── database.js             — Mongoose connection
 │   ├── redis.js                — ioredis singleton (or in-memory in test)
 │   └── seed.js                 — dev seed for roles & permissions
 ├── controller/
 │   ├── auth.controller.js      — register, login, logout, refresh, delete account
 │   ├── error.controller.js     — 404 handler
 │   ├── health.controller.js    — liveness & readiness probes
-│   ├── movie.controller.js     — paginated movies from sample_mflix
 │   ├── post.controller.js      — CRUD for posts
 │   ├── refresh_token.controller.js — token rotation
 │   └── user.controller.js      — user management
@@ -107,7 +106,6 @@ backend/src/
 │           └── user.repository.js
 ├── routes/
 │   ├── auth.routes.js
-│   ├── movie.routes.js
 │   ├── post.routes.js
 │   └── user.routes.js
 ├── service/
@@ -145,7 +143,6 @@ backend/src/
 6. Route mounts:
    - `/api/v1/auth` — authLimiter on public routes
    - `/api/v1/posts` — authMiddleware + apiLimiter + requirePermission
-   - `/api/v1/shows` — authMiddleware + apiLimiter
 7. `notFoundHandler` — 404 catch-all
 8. `errorHandler` — envelope shaping
 
@@ -181,9 +178,6 @@ backend/src/
 - `GET /api/v1/posts` — list all posts (`posts:read`)
 - `PATCH /api/v1/posts/:id` — update own post (`posts:update`)
 - `DELETE /api/v1/posts/:id` — delete own post (`posts:delete`)
-
-### Shows (authenticated)
-- `GET /api/v1/shows/movies?page=1&limit=20` — paginated movies (read-only sample_mflix)
 
 ### Health (unprotected)
 - `GET /api/v1/health` — liveness probe
@@ -252,9 +246,10 @@ Limiter state is shared across processes via Redis.
 
 ## OpenAPI Contract
 
-- Root: `backend/docs/openapi.yaml`
-- Components: `backend/docs/components/` (schemas, responses, security)
-- Paths: `backend/docs/paths/` (auth, posts, shows)
+- Root: `specs/002-trustfeed-social-api/contracts/openapi.yaml` (canonical)
+- Components: `specs/002-trustfeed-social-api/contracts/components/` (schemas, responses, security)
+- Paths: `specs/002-trustfeed-social-api/contracts/paths/` (auth, posts)
+- Published copy: `backend/src/docs/openapi/` — must stay byte-identical to canonical (`contract:sync` regenerates it)
 - Validate: `npm run contract:lint`
 - Sync: `npm run contract:sync`
 
@@ -264,4 +259,3 @@ Limiter state is shared across processes via Redis.
 - `refresh-token.model.js` and its repository exist but the auth flow stores refresh tokens as plain strings in Redis (`auth:refresh:<userId>`), not in MongoDB.
 - `requireAttributes` ABAC middleware is implemented but no route currently uses it.
 - Health endpoints are unprotected (no auth middleware).
-- Movies endpoint is authenticated despite being read-only sample data.

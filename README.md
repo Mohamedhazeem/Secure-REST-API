@@ -52,7 +52,7 @@ This project does. It is structured so a technical evaluator can verify the arch
 
 ## Project Goals
 
-1. **Clean Architecture & SOLID.** Domain logic is isolated from transport (Express), persistence (Mongoose), and external services (Redis, native MongoDB driver). Dependencies point inward.
+ 1. **Clean Architecture & SOLID.** Domain logic is isolated from transport (Express), persistence (Mongoose), and external services (Redis). Dependencies point inward.
 2. **Extensibility without regression.** Adding a new resource means creating new files in a documented pattern. Existing handlers, services, and routes are not modified.
 3. **Defense-in-depth security.** JWT with HTTP-only cookies, rotating refresh tokens with a Redis-backed blacklist, bcrypt-hashed passwords, per-caller rate limiting, RBAC, and ownership checks on every mutating operation.
 4. **Stable, machine-readable API contract.** Every public endpoint is documented in a versioned OpenAPI YAML. The contract is the source of truth for integration.
@@ -120,10 +120,9 @@ This project does. It is structured so a technical evaluator can verify the arch
 **Data**
 
 - MongoDB via Mongoose for application data
-- Native MongoDB driver for read-only `sample_mflix` access (movies endpoint)
 - Pagination on list endpoints
 - Indexes declared at the repository layer
-- N+1 queries audited and prevented on post and movie list endpoints; population is batched
+- N+1 queries audited and prevented on post list endpoints; population is batched
 
 **Testing**
 
@@ -154,7 +153,7 @@ services ──► business rules; depend only on repository interfaces
 repositories ──► persistence boundary; Mongoose today, anything tomorrow
     │
     ▼
-models / Redis / native MongoDB driver
+models / Redis
 ```
 
 ### Dependency rules
@@ -178,7 +177,6 @@ See [`backend/src/docs/extension-pattern.md`](backend/src/docs/extension-pattern
 | Runtime                      | Node.js ≥ 20 with ES modules (`"type": "module"`)                             |
 | HTTP framework               | Express 5                                                                     |
 | Application database         | MongoDB via Mongoose 9 (app data)                                             |
-| External database access     | Native MongoDB driver (read-only `sample_mflix` movies)                       |
 | Cache / rate-limit store     | Redis via ioredis                                                             |
 | Rate limiting                | `express-rate-limit` + `rate-limit-redis` (per-caller keys: `userId` or IP)   |
 | Authentication               | `jsonwebtoken` (access + refresh), HTTP-only cookies                          |
@@ -203,14 +201,13 @@ backend/
 │   │   ├── config.js               Centralized env access
 │   │   ├── constants.js            Rate-limit & token constants
 │   │   ├── cors.js                 Environment-driven origin allowlist
-│   │   ├── database.js             Mongoose + native MongoDB connections
+│   │   ├── database.js             Mongoose connection
 │   │   ├── redis.js                ioredis singleton
 │   │   └── seed.js                 Dev seed for roles & permissions
 │   ├── controller/
 │   │   ├── auth.controller.js
 │   │   ├── error.controller.js     404 handler
 │   │   ├── health.controller.js    Liveness & readiness probes
-│   │   ├── movie.controller.js
 │   │   ├── post.controller.js
 │   │   ├── refresh_token.controller.js
 │   │   └── user.controller.js
@@ -250,7 +247,6 @@ backend/
 │   │           └── user.repository.js
 │   ├── routes/
 │   │   ├── auth.routes.js
-│   │   ├── movie.routes.js
 │   │   ├── post.routes.js
 │   │   └── user.routes.js
 │   ├── service/
@@ -307,12 +303,6 @@ All routes are prefixed with `/api/v1`.
 | `PATCH`  | `/posts/:id` | Update own post |
 | `DELETE` | `/posts/:id` | Delete own post |
 
-### Shows (authenticated)
-
-| Method | Path                            | Description                                 |
-| ------ | ------------------------------- | ------------------------------------------- |
-| `GET`  | `/shows/movies?page=1&limit=20` | Paginated movies (read-only `sample_mflix`) |
-
 ### Health (unprotected)
 
 | Method | Path             | Description                          |
@@ -320,7 +310,7 @@ All routes are prefixed with `/api/v1`.
 | `GET`  | `/health`        | Liveness probe                       |
 | `GET`  | `/health/ready`  | Readiness probe (Mongo + Redis)      |
 
-The full contract — parameters, schemas, security schemes, error responses, and CORS — is published as a multi-file OpenAPI specification under `backend/docs/` (split by concern: `openapi.yaml`, `paths/`, and `components/` containing `schemas.yaml`, `responses.yaml`, `security.yaml`).
+The full contract — parameters, schemas, security schemes, error responses, and CORS — is published as a multi-file OpenAPI specification (canonical copy under `specs/002-trustfeed-social-api/contracts/`, published under `backend/src/docs/openapi/`, split by concern: `openapi.yaml`, `paths/`, and `components/` containing `schemas.yaml`, `responses.yaml`, `security.yaml`).
 
 ---
 
@@ -407,16 +397,17 @@ ALLOWED_ORIGINS="https://app.example.com,https://admin.example.com"
 
 Credentials are enabled and preflight (`OPTIONS`) is handled correctly, so browser clients can complete the full auth flow from any configured origin.
 
-**Contract** — `backend/docs/` is the canonical, machine-readable API description and the source of truth for integration. It is a multi-file OpenAPI specification split into grouped files for maintainability:
+**Contract** — `specs/002-trustfeed-social-api/contracts/` is the canonical, machine-readable API description and the source of truth for integration; `backend/src/docs/openapi/` is the published copy, kept byte-identical via `npm run contract:sync`. It is a multi-file OpenAPI specification split into grouped files for maintainability:
 
 - `openapi.yaml` — root document (info, servers, security, tags, and `$ref`s to the rest)
-- `paths/auth.yaml`, `paths/posts.yaml`, `paths/shows.yaml` — per-resource path definitions
+- `paths/auth.yaml`, `paths/posts.yaml` — per-resource path definitions
 - `components/schemas.yaml`, `components/responses.yaml`, `components/security.yaml` — reusable components
 
-After editing, validate it:
+After editing, sync and validate it:
 
 ```bash
-npm run contract:lint   # validate backend/docs/openapi.yaml
+npm run contract:sync   # regenerate backend/src/docs/openapi from the canonical copy
+npm run contract:lint   # validate the published openapi.yaml
 ```
 
 The implementation is checked against this contract.
@@ -535,7 +526,7 @@ Follow the documented pattern in [`backend/src/docs/extension-pattern.md`](backe
 7. **Controller** — `src/controller/widget.controller.js`
 8. **Routes** — `src/routes/widget.routes.js`
 9. **Permissions & seed** — add codes to `configs/seed.js`; gate with `requirePermission(...)`
-10. **Contract** — add the new resource's paths to `backend/docs/paths/<resource>.yaml` and reference it from the root `backend/docs/openapi.yaml`; add shared schemas to `backend/docs/components/schemas.yaml`. Then run `npm run contract:lint`.
+10. **Contract** — add the new resource's paths to `specs/002-trustfeed-social-api/contracts/paths/<resource>.yaml` and reference it from the canonical root `openapi.yaml`; add shared schemas to `contracts/components/schemas.yaml`. Then run `npm run contract:sync` and `npm run contract:lint`.
 
 No existing file is modified.
 

@@ -34,12 +34,10 @@ if (BASE_URI) {
 
 export const testDb = mongoose.connection;
 
-export const sampleDb = BASE_URI ? makeConnection(BASE_URI, "sample_mflix") : null;
-
 export const getTestDb = () => testDb;
 
 export const closeConnections = async () => {
-    const connections = [testDb, sampleDb].filter(Boolean);
+    const connections = [testDb].filter(Boolean);
     await Promise.all(
         connections.map((conn) =>
             conn.readyState !== 0 ? conn.close() : Promise.resolve()

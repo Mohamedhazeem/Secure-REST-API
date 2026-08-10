@@ -189,22 +189,3 @@ PaginatedPosts:
       type: integer
     total:
       type: integer
-
-PaginatedMovies:
-  type: object
-  required:
-    - data
-    - page
-    - limit
-    - total
-  properties:
-    data:
-      type: array
-      items:
-        type: object
-    page:
-      type: integer
-    limit:
-      type: integer
-    total:
-      type: integer

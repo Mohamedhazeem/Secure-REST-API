@@ -131,6 +131,8 @@ byId:
         $ref: '../components/responses.yaml#/Forbidden'
       '404':
         $ref: '../components/responses.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses.yaml#/Conflict'
       '400':
         $ref: '../components/responses.yaml#/ValidationError'
       '429':

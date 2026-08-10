@@ -20,7 +20,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"new post\",\r\n    \"age\": 20,\r\n    \"description\": \"Industry standard flow User logs in JWT issued Auth middleware runs req.user. vailable Post auto-linked to user No userId in request body\"\r\n}",
+					"raw": "{\r\n    \"content\": \"Industry standard flow User logs in JWT issued Auth middleware runs req.user. vailable Post auto-linked to user No userId in request body\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -169,7 +169,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"new post patched\",\r\n    \"description\": \"new description patch\",\r\n    \"age\": 20\r\n}",
+					"raw": "{\r\n    \"content\": \"new post patched\",\r\n    \"version\": 0\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

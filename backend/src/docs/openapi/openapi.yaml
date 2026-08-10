@@ -64,8 +64,6 @@ tags:
     description: Personalized post feed
   - name: Notifications
     description: Notification listing and read status
-  - name: Movies
-    description: Read-only movie catalog from sample_mflix
   - name: Health
     description: Liveness and readiness probes
 
@@ -108,8 +106,6 @@ paths:
     $ref: './paths/notifications.yaml#/notifications'
   /notifications/{id}/read:
     $ref: './paths/notifications.yaml#/markRead'
-  /shows/movies:
-    $ref: './paths/shows.yaml#/movies'
   /health:
     $ref: './paths/health.yaml#/liveness'
   /health/ready:

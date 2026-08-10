@@ -14,9 +14,7 @@ export const createUser = async (overrides = {}) => {
 
 export const createPost = async ({ author, overrides = {} }) => {
     return Post.create({
-        name: overrides.name ?? "Test post",
-        description: overrides.description ?? "Test post description",
-        age: overrides.age ?? 25,
+        content: overrides.content ?? "Test post content",
         author: author._id ?? author,
         ...overrides,
     });

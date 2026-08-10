@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
-
 /**
  * @typedef {Object} PostFilter
  * @property {string} [author] - The author's user ObjectId.
- * @property {string} [name] - Post name filter.
+ * @property {string} [visibility] - Visibility level ("public", "followers-only", "private").
+ * @property {Object} [$or] - Raw disjunction (e.g. visibility ∪ author visibility rule).
  */
 
 /**
@@ -37,25 +36,28 @@ export default class PostRepositoryInterface {
 
     /**
      * Retrieve a single post matching the provided filter.
-     * @param {PostFilter} filter - Filter criteria (e.g. { author }, { name }).
+     * @param {PostFilter} filter - Filter criteria (e.g. { author }, { visibility }).
      * @returns {Promise<Object|null>} The matching post document, or null if not found.
      */
     async findOne(filter) {}
 
     /**
      * Persist a new post.
-     * @param {Object} data - The post data to persist.
+     * @param {Object} data - The post data to persist (content, author, visibility).
      * @returns {Promise<Object>} The created post document.
      */
     async create(data) {}
 
     /**
-     * Update an existing post.
-     * @param {string} id - The post's unique identifier.
-     * @param {Object} data - Partial fields to update.
-     * @returns {Promise<Object|null>} The updated post document, or null if not found.
+     * Atomically update a post only if its version still matches the
+     * version the caller read (compare-and-set optimistic locking,
+     * FR-029). On success the version counter is incremented by one.
+     * @param {Object} criteria - { id, expectedVersion }.
+     * @param {Object} data - Fields to update (content, visibility).
+     * @returns {Promise<Object|null>} The updated post with the new version,
+     * or null when the version no longer matches (conflict).
      */
-    async update(id, data) {}
+    async updateIfCurrent({ id, expectedVersion }, data) {}
 
     /**
      * Permanently delete a post by id.

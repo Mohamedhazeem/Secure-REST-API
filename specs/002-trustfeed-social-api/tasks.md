@@ -112,17 +112,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T033 [P] [US3] Integration test: post CRUD + ownership denial in `backend/tests/integration/post.test.js`
-- [ ] T034 [P] [US3] Concurrency test: two simultaneous updates → one 200, one 409 in `backend/tests/integration/post.test.js`
+- [X] T033 [P] [US3] Integration test: post CRUD + ownership denial in `backend/tests/integration/post.test.js`
+- [X] T034 [P] [US3] Concurrency test: two simultaneous updates → one 200, one 409 in `backend/tests/integration/post.test.js`
 
 ### Implementation for User Story 3
 
-- [ ] T035 [P] [US3] Update Post model with visibility enum and optimistic lock version in `backend/src/models/post.model.js`
-- [ ] T036 [P] [US3] Update Post repository interface for visibility filters and version checks in `backend/src/repositories/interfaces/post.repository.js`
-- [ ] T037 [P] [US3] Update Post mongoose implementation for visibility queries and optimistic locking in `backend/src/repositories/implementations/mongoose/post.repository.js`
-- [ ] T038 [US3] Update Post service for visibility enforcement and optimistic locking, and emit audit entries on create/update/delete in `backend/src/service/post.service.js` (FR-030)
-- [ ] T039 [P] [US3] Create Post validator for visibility and content constraints in `backend/src/validators/post.validator.js`
-- [ ] T040 [US3] Update Post controller to return 409 on version mismatch in `backend/src/controller/post.controller.js`
+- [X] T035 [P] [US3] Update Post model with visibility enum and optimistic lock version in `backend/src/models/post.model.js`
+- [X] T036 [P] [US3] Update Post repository interface for visibility filters and version checks in `backend/src/repositories/interfaces/post.repository.js`
+- [X] T037 [P] [US3] Update Post mongoose implementation for visibility queries and optimistic locking in `backend/src/repositories/implementations/mongoose/post.repository.js`
+- [X] T038 [US3] Update Post service for visibility enforcement and optimistic locking, and emit audit entries on create/update/delete in `backend/src/service/post.service.js` (FR-030)
+- [X] T039 [P] [US3] Create Post validator for visibility and content constraints in `backend/src/validators/post.validator.js`
+- [X] T040 [US3] Update Post controller to return 409 on version mismatch in `backend/src/controller/post.controller.js`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently.
 

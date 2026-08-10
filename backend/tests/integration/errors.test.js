@@ -65,7 +65,7 @@ describe("Error response envelope (US4)", () => {
     });
 
     it("returns UNAUTHORIZED for a missing access token", async () => {
-        const res = await request(app).post("/api/v1/posts").send({ name: "x", description: "y", age: 1 });
+        const res = await request(app).post("/api/v1/posts").send({ content: "x" });
         expect(res.status).toBe(401);
         assertFlatEnvelope(res.body, "UNAUTHORIZED", 401);
     });
@@ -78,7 +78,7 @@ describe("Error response envelope (US4)", () => {
         const res = await request(app)
             .patch("/api/v1/posts/64b2c4d3e4b0c2a5f8e9d000")
             .set("Cookie", cookie)
-            .send({ name: "x" });
+            .send({ content: "x", version: 0 });
 
         expect(res.status).toBe(403);
         assertFlatEnvelope(res.body, "ROLE_DENIED", 403);
@@ -99,7 +99,7 @@ describe("Error response envelope (US4)", () => {
         const res = await request(app)
             .patch(`/api/v1/posts/64b2c4d3e4b0c2a5f8e9d000`)
             .set("Cookie", cookie)
-            .send({ name: "renamed" });
+            .send({ content: "renamed", version: 0 });
 
         expect(res.status).toBe(404);
         assertFlatEnvelope(res.body, "NOT_FOUND", 404);
@@ -112,7 +112,7 @@ describe("Error response envelope (US4)", () => {
         const created = await request(app)
             .post("/api/v1/posts")
             .set("Cookie", ownerCookie)
-            .send({ name: "mine", description: "owned", age: 1 });
+            .send({ content: "mine" });
         const postId = created.body.post._id;
 
         const attacker = unique("attacker");

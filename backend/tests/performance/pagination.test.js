@@ -33,9 +33,7 @@ const grantPermissions = async (email, codes) => {
 
 const seedPosts = async (count, authorId) => {
     const docs = Array.from({ length: count }, (_, i) => ({
-        name: `post-${i}`,
-        description: `description for post ${i}`,
-        age: i % 150,
+        content: `post content ${i}`,
         author: authorId,
     }));
     await Post.insertMany(docs);

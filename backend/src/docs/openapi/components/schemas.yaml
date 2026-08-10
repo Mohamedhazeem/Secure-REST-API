@@ -81,29 +81,33 @@ Post:
   type: object
   required:
     - _id
-    - name
-    - description
-    - age
+    - content
     - author
+    - visibility
+    - version
     - createdAt
   properties:
     _id:
       type: string
-    name:
+    content:
       type: string
-      maxLength: 100
-    description:
-      type: string
+      minLength: 1
       maxLength: 2000
-    age:
-      type: integer
-      minimum: 0
-      maximum: 150
     author:
       oneOf:
         - type: string
           description: Author id (single-document responses)
         - $ref: '#/AuthorSummary'
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+    version:
+      type: integer
+      minimum: 0
+      description: Optimistic lock counter; every update must present the version it read
     createdAt:
       type: string
       format: date-time
@@ -318,38 +322,39 @@ UserUpdateRequest:
 PostCreateRequest:
   type: object
   required:
-    - name
-    - description
-    - age
+    - content
   properties:
-    name:
-      type: string
-      minLength: 1
-      maxLength: 100
-    description:
+    content:
       type: string
       minLength: 1
       maxLength: 2000
-    age:
-      type: integer
-      minimum: 0
-      maximum: 150
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+      default: public
 
 PostUpdateRequest:
   type: object
+  required:
+    - version
   properties:
-    name:
-      type: string
-      minLength: 1
-      maxLength: 100
-    description:
+    content:
       type: string
       minLength: 1
       maxLength: 2000
-    age:
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+    version:
       type: integer
       minimum: 0
-      maximum: 150
+      description: Version read from the last post response; a stale version returns 409
 
 LikeCreateRequest:
   type: object
@@ -448,22 +453,3 @@ FeedPage:
       description: Opaque cursor for the next page
     hasNextPage:
       type: boolean
-
-PaginatedMovies:
-  type: object
-  required:
-    - data
-    - page
-    - limit
-    - total
-  properties:
-    data:
-      type: array
-      items:
-        type: object
-    page:
-      type: integer
-    limit:
-      type: integer
-    total:
-      type: integer

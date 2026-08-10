@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Post from "../../../models/post.model.js";
 
 export default class PostRepository {
@@ -31,13 +30,23 @@ export default class PostRepository {
     }
 
     /**
-     * Update an existing post by id.
-     * @param {string} id - The post's MongoDB ObjectId.
+     * Atomically update a post only if its version matches (compare-and-set
+     * optimistic locking, FR-029). The version filter and `$inc` make the
+     * check-and-increment atomic: two concurrent updates with the same
+     * expected version cannot both succeed.
+     * @param {Object} criteria - { id, expectedVersion }.
      * @param {Object} data - Fields to update.
-     * @returns {Promise<Object|null>} The updated post document, or null if not found.
+     * @returns {Promise<Object|null>} The updated post (version incremented),
+     * or null when the version no longer matches.
      */
-    async update(id, data) {
-        return Post.findByIdAndUpdate(id, data, { new: true }).lean().exec();
+    async updateIfCurrent({ id, expectedVersion }, data) {
+        return Post.findOneAndUpdate(
+            { _id: id, version: expectedVersion },
+            { $set: data, $inc: { version: 1 } },
+            { returnDocument: "after" }
+        )
+            .lean()
+            .exec();
     }
 
     /**
@@ -66,6 +75,7 @@ export default class PostRepository {
         const { page = 1, limit = 10 } = pagination || {};
         const data = await Post.find(filter)
             .populate("author", "username email")
+            .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
             .lean()

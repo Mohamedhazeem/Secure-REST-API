@@ -7,7 +7,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "e2e": "newman run postman/Auth.postman_collection.json && newman run postman/Posts.postman_collection.json && newman run postman/Shows.postman_collection.json",
+    "e2e": "newman run postman/Auth.postman_collection.json && newman run postman/Posts.postman_collection.json",
     "start": "node src/index.js",
     "dev": "nodemon --watch src src/index.js",
     "dev-watch": "node --watch src/index.js",

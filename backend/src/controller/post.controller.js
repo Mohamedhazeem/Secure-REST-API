@@ -11,7 +11,7 @@ export const createPost = async (req, res, next) => {
 };
 
 /**
- * List all posts with pagination.
+ * List posts visible to the caller with pagination (FR-036).
  * Complexity: O(limit) per page + O(n) countDocuments scan.
  * See post.repository.findMany for full breakdown.
  */
@@ -19,7 +19,7 @@ export const getAllPosts = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 20;
-        const result = await postService.listAllPosts({ page, limit });
+        const result = await postService.listAllPosts(req.user._id, { page, limit });
         return sendSuccess(res, 200, result);
     } catch (err) {
         next(err);

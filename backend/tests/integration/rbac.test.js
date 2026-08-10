@@ -21,13 +21,13 @@ describe("RBAC and security", () => {
         const res = await request(app)
             .post("/api/v1/posts")
             .set("Cookie", cookie)
-            .send({ name: "Hello", description: "world", age: 20 });
+            .send({ content: "Hello world" });
         expect(res.status).toBe(201);
         expect(res.body.post).toBeDefined();
     });
 
     it("rejects an unauthenticated post creation with 401", async () => {
-        const res = await request(app).post("/api/v1/posts").send({ name: "x" });
+        const res = await request(app).post("/api/v1/posts").send({ content: "x" });
         expect(res.status).toBe(401);
     });
 
@@ -39,7 +39,7 @@ describe("RBAC and security", () => {
         await User.findOneAndUpdate({ email: email.toLowerCase() }, { roles: [limited._id] });
         const login = await request(app).post("/api/v1/auth/login").send({ email, password: "password123" });
         const cookie = login.headers["set-cookie"];
-        const res = await request(app).post("/api/v1/posts").set("Cookie", cookie).send({ name: "x", description: "y", age: 1 });
+        const res = await request(app).post("/api/v1/posts").set("Cookie", cookie).send({ content: "x", visibility: "private" });
         expect(res.status).toBe(403);
         expect(res.body.code).toBe("ROLE_DENIED");
     });
@@ -48,7 +48,7 @@ describe("RBAC and security", () => {
         const owner = unique("owner");
         const ownerEmail = `${owner}@example.com`;
         const ownerCookie = await registerAndLogin(owner, ownerEmail);
-        const created = await request(app).post("/api/v1/posts").set("Cookie", ownerCookie).send({ name: "mine", description: "owned", age: 1 });
+        const created = await request(app).post("/api/v1/posts").set("Cookie", ownerCookie).send({ content: "mine" });
         const postId = created.body.post._id;
 
         const delPerm = await Permission.findOneAndUpdate(
