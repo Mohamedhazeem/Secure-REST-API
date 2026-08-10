@@ -31,13 +31,18 @@ export function loadContract(file) {
     return load(readFileSync(file, "utf8"));
 }
 
-export function resolveRef(fromFile, doc, value) {
+export function resolveRef(fromFile, doc, value, fileCache) {
     if (!value || typeof value !== "object" || typeof value.$ref !== "string") return value;
     const ref = value.$ref;
     const [filePart, fragment] = ref.split("#");
     let target = doc;
     if (filePart) {
-        target = load(readFileSync(resolve(dirname(fromFile), filePart), "utf8"));
+        const file = resolve(dirname(fromFile), filePart);
+        target = fileCache?.get(file);
+        if (!target) {
+            target = load(readFileSync(file, "utf8"));
+            fileCache?.set(file, target);
+        }
     }
     if (!fragment) return target;
     let current = target;
@@ -57,9 +62,10 @@ export function normalizePath(path) {
 
 export function collectContractRoutes(doc, contractDir) {
     const routes = [];
+    const fileCache = new Map();
     for (const [pathKey, rawItem] of Object.entries(doc.paths ?? {})) {
         if (pathKey.startsWith("x-")) continue;
-        const item = resolveRef(join(contractDir, "openapi.yaml"), doc, rawItem);
+        const item = resolveRef(join(contractDir, "openapi.yaml"), doc, rawItem, fileCache);
         if (!item || typeof item !== "object") continue;
         for (const method of HTTP_METHODS) {
             if (item[method]) routes.push({ method: method.toUpperCase(), path: normalizePath(pathKey) });

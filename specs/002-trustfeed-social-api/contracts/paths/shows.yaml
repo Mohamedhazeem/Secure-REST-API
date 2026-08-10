@@ -28,5 +28,7 @@ movies:
         $ref: '../components/responses.yaml#/Unauthorized'
       '429':
         $ref: '../components/responses.yaml#/RateLimited'
+      '503':
+        $ref: '../components/responses.yaml#/DependencyFailure'
       '500':
         $ref: '../components/responses.yaml#/InternalError'

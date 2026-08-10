@@ -26,6 +26,8 @@ collection:
               $ref: '../components/schemas.yaml#/PaginatedPosts'
       '401':
         $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
       '429':
         $ref: '../components/responses.yaml#/RateLimited'
       '500':
@@ -89,6 +91,8 @@ me:
               $ref: '../components/schemas.yaml#/PaginatedPosts'
       '401':
         $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
       '429':
         $ref: '../components/responses.yaml#/RateLimited'
       '500':

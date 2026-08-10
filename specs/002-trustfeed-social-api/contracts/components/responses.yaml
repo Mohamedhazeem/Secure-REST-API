@@ -157,3 +157,21 @@ InternalError:
     application/json:
       schema:
         $ref: './schemas.yaml#/Error'
+
+DependencyFailure:
+  description: External dependency unavailable
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'

@@ -4,6 +4,7 @@ register:
       - Authentication
     summary: Register a new user
     operationId: register
+    security: []
     requestBody:
       required: true
       content:
@@ -32,6 +33,7 @@ login:
       - Authentication
     summary: Login with email and password
     operationId: login
+    security: []
     requestBody:
       required: true
       content:

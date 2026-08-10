@@ -6,7 +6,9 @@ import { assertContract, CONTRACT_PUBLISHED } from "./docs/contract-check.js";
 
 const startServer = async () => {
     try {
-        assertContract({ app, contractDir: CONTRACT_PUBLISHED });
+        if (process.env.NODE_ENV !== "production") {
+            assertContract({ app, contractDir: CONTRACT_PUBLISHED });
+        }
 
         if (process.env.NODE_ENV !== "test") {
             try {

@@ -18,6 +18,7 @@ liveness:
       - Health
     summary: Liveness probe - the process is alive and serving requests
     operationId: getLiveness
+    security: []
     responses:
       '200':
         description: Process is alive
@@ -51,6 +52,7 @@ readiness:
       - Health
     summary: Readiness probe - reports critical dependency status (FR-032, SC-018)
     operationId: getReadiness
+    security: []
     responses:
       '200':
         description: All critical dependencies are reachable

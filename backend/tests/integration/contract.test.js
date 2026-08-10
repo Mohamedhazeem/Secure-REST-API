@@ -10,6 +10,7 @@ import {
     collectContractRoutes,
     collectImplementedRoutes,
     loadContract,
+    resolveRef,
 } from "../../src/docs/contract-check.js";
 
 const listFiles = (dir, out = []) => {
@@ -76,6 +77,44 @@ describe("API contract completeness (US1)", () => {
                 true
             );
             expect(future.task).toMatch(/^T(\d{3}|BD)/);
+        }
+    });
+
+    it("keeps every FUTURE_PATHS task tracked in tasks.md", () => {
+        const tasksMd = readFileSync(
+            join(CONTRACT_CANONICAL, "../tasks.md"),
+            "utf8"
+        );
+        const knownTasks = new Set(
+            [...tasksMd.matchAll(/\bT\d{3}\b/g)].map((match) => match[0])
+        );
+        for (const future of FUTURE_PATHS) {
+            if (future.task === "TBD") continue;
+            expect(knownTasks.has(future.task), `FUTURE_PATHS task ${future.task} missing from tasks.md`).toBe(true);
+        }
+    });
+
+    it("gives every shared response component the standard correlation and CORS headers", () => {
+        const doc = loadContract(join(CONTRACT_CANONICAL, "openapi.yaml"));
+        const responses = resolveRef(
+            join(CONTRACT_CANONICAL, "openapi.yaml"),
+            doc,
+            { $ref: "./components/responses.yaml" }
+        );
+        const standardHeaders = [
+            "X-Correlation-Id",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials",
+            "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Headers",
+        ];
+        const names = Object.keys(responses ?? {});
+        expect(names.length).toBeGreaterThan(0);
+        for (const name of names) {
+            const headers = Object.keys(responses[name].headers ?? {});
+            for (const header of standardHeaders) {
+                expect(headers, `${name} missing header ${header}`).toContain(header);
+            }
         }
     });
 });
