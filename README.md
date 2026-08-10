@@ -1,6 +1,6 @@
 # TrustFeed API
 
-A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. Designed around clean architecture, SOLID principles, role-based access control, and defense-in-depth security. The codebase is the contract: a published machine-readable OpenAPI specification, layered separation of concerns, and a documented extension pattern that lets a developer add a new resource without touching existing code.
+A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. Demonstrates clean architecture with repository pattern, JWT authentication with HTTP-only cookies, token refresh/rotation with Redis blacklist, RBAC + ABAC authorization, ownership-based access control, Zod request validation, idempotency, Redis-backed rate limiting, correlation IDs, structured logging, metrics, and asynchronous notifications via BullMQ. Backend-only by design — no UI.
 
 > Backend only. No UI by design. The API is consumed by clients built from the OpenAPI contract.
 
@@ -45,6 +45,7 @@ Most portfolio REST APIs stop at "register, login, CRUD". That proves the obviou
 - Add a feature without rewriting or risking existing endpoints.
 - Give consumers a stable, machine-readable contract they can code against.
 - Fail predictably when dependencies misbehave.
+- Deliver asynchronous side effects (notifications) with bounded retry and dead-letter handling.
 
 This project does. It is structured so a technical evaluator can verify the architecture from the directory layout alone.
 
@@ -52,13 +53,14 @@ This project does. It is structured so a technical evaluator can verify the arch
 
 ## Project Goals
 
- 1. **Clean Architecture & SOLID.** Domain logic is isolated from transport (Express), persistence (Mongoose), and external services (Redis). Dependencies point inward.
+ 1. **Clean Architecture & SOLID.** Domain logic is isolated from transport (Express), persistence (Mongoose), and external services (Redis, BullMQ). Dependencies point inward.
 2. **Extensibility without regression.** Adding a new resource means creating new files in a documented pattern. Existing handlers, services, and routes are not modified.
 3. **Defense-in-depth security.** JWT with HTTP-only cookies, rotating refresh tokens with a Redis-backed blacklist, bcrypt-hashed passwords, per-caller rate limiting, RBAC, and ownership checks on every mutating operation.
 4. **Stable, machine-readable API contract.** Every public endpoint is documented in a versioned OpenAPI YAML. The contract is the source of truth for integration.
 5. **Testable at every layer.** Unit, integration, performance, and end-to-end tests cover the domain rules, the HTTP boundary, the rate limiter, and the contract.
 6. **Predictable failure.** A flat error envelope with stable codes and trace references. No hidden retries, no silent fallbacks, no category fields.
 7. **CORS-ready for browser clients.** Environment-driven origin allowlist with credentials and preflight handled correctly.
+8. **Durable background processing.** Social events (follow, like, comment) are delivered asynchronously via BullMQ with bounded retry, exponential backoff, and dead-letter queuing.
 
 ---
 
@@ -72,13 +74,15 @@ This project does. It is structured so a technical evaluator can verify the arch
 | Token theft via XSS                            | Tokens stored in HTTP-only cookies; never readable from JavaScript                                   |
 | Stale refresh tokens reused after theft        | Refresh tokens are rotated and added to a Redis blacklist with TTL                                   |
 | A user modifying someone else's data           | Ownership is enforced in the service layer on every mutating operation                               |
-| All-or-nothing admin access                    | Role-based access control with configurable roles and permissions, evaluated per-request             |
+| All-or-nothing admin access                    | Runtime-configurable RBAC with role and permission CRUD                                              |
 | Consumers integrating against outdated docs    | OpenAPI YAML is the contract; it is updated alongside the implementation                             |
 | Undiagnosable errors for callers               | Flat error envelope: `code`, `message`, `traceId`. Stable codes, no retry guidance baked in          |
 | Silent failures when MongoDB or Redis is down  | Fail-fast: dependency errors are detected and returned as `DEPENDENCY_FAILURE` with a 503            |
 | N+1 queries degrading list endpoints           | Repositories batch their lookups; pagination is enforced at the service boundary                     |
 | Slow APIs under load                           | Sub-second p95 target under 1000 concurrent authenticated requests; performance tests gate the build |
 | Browser clients blocked by CORS                | Environment-driven origin allowlist with credentials and preflight handling                          |
+| Lost notifications when queue backends fail    | Inline fallback preserves bounded retry and dead-letter semantics                                    |
+| No audit trail for security events            | Audit events are persisted via the AuditLog repository with correlation IDs                           |
 
 ---
 
@@ -87,12 +91,12 @@ This project does. It is structured so a technical evaluator can verify the arch
 **Architecture**
 
 - Clean architecture: `routes → controllers → services → repositories → models`
-- Repository pattern with Mongoose and in-memory implementations
+- Repository pattern with Mongoose implementations
 - Centralized configuration (`src/configs/config.js`) — no scattered `process.env`
 - Zod-based request validation at the HTTP boundary
 - Documented extension pattern (`src/docs/extension-pattern.md`) for adding new resources without modifying existing files
 - Hot-path Big-O complexity documented in code comments
-- Idempotency via `Idempotency-Key` header (Redis-backed dedup)
+- Idempotency via `Idempotency-Key` header (Redis-backed dedup, 7-day TTL)
 - Correlation IDs via `X-Correlation-Id` header (AsyncLocalStorage propagation)
 - In-memory metrics (request volume, duration histograms, auth outcomes)
 
@@ -101,14 +105,29 @@ This project does. It is structured so a technical evaluator can verify the arch
 - JWT authentication (HTTP-only cookies, never exposed to JS)
 - Refresh token rotation with Redis-backed blacklist and TTL
 - Session revocation via `sid` claim in access tokens
+- Session model with idle TTL and periodic sweep
 - bcrypt password hashing; secrets excluded from responses and logs
 - Per-caller rate limiting (authenticated by `userId`, public by IP)
 - Strict login limiter to deter credential stuffing
-- RBAC middleware (`requirePermission`)
-- ABAC middleware (`requireAttributes`) for arbitrary policy predicates
+- Social mutation limiter for follow/like/comment endpoints
+- RBAC middleware (`requirePermission`) with optional inline ABAC attributes
+- ABAC policy predicates evaluated per request via `requirePermission(..., { attributes })`
 - Ownership checks in the service layer on every mutating operation
 - Structured logger that redacts secrets and PII
+- Audit logging for security-relevant events (token reuse, mutations)
 - Dev seed data for roles and permissions (`configs/seed.js`) bootstrapped in development mode
+- Admin API for runtime role and permission CRUD
+
+**Social Features**
+
+- Follow / unfollow users with atomic operations
+- Like / unlike posts with uniqueness enforcement
+- Cursor-paginated personalized feed of followed users' posts
+- Redis write-fanout cache for hot feed reads
+- Comments on posts with optimistic locking
+- Asynchronous notifications for follow, like, and comment events
+- BullMQ worker with bounded retry, exponential backoff, and dead-letter queue
+- Inline fallback runner when queue backend is unavailable
 
 **API Quality**
 
@@ -116,19 +135,19 @@ This project does. It is structured so a technical evaluator can verify the arch
 - Flat error model with stable codes and trace references
 - Fail-fast behavior on dependency failures (no silent retries)
 - CORS with environment-driven origin allowlist and credentials
+- Graceful shutdown with bounded timeouts for HTTP and background jobs
 
 **Data**
 
 - MongoDB via Mongoose for application data
 - Pagination on list endpoints
-- Indexes declared at the repository layer
+- Indexes declared at the repository layer and built explicitly at startup
 - N+1 queries audited and prevented on post list endpoints; population is batched
 
 **Testing**
 
-- Vitest integration tests against `mongodb-memory-server` + Supertest (architecture, contract, CORS, errors, RBAC)
-- Performance tests for pagination and rate-limit latency (p95 < 950ms)
-- End-to-end Newman (Postman collections in `backend/postman/`) for auth flows and post CRUD
+- Vitest integration tests against `mongodb-memory-server` + Supertest (architecture, contract, CORS, errors, RBAC, auth, sessions, follow, like, notifications, rate limit)
+- Performance tests for pagination, rate-limit latency, feed cache hit rate, and load (p95 < 950ms)
 - `tests/unit/` reserved for future pure unit tests (services against in-memory repositories, validators, pure functions)
 
 ---
@@ -153,7 +172,7 @@ services ──► business rules; depend only on repository interfaces
 repositories ──► persistence boundary; Mongoose today, anything tomorrow
     │
     ▼
-models / Redis
+models / Redis / BullMQ
 ```
 
 ### Dependency rules
@@ -163,6 +182,7 @@ models / Redis
 - **Repositories** isolate persistence and own indexes and query batching.
 - **Middleware** handles cross-cutting concerns (auth, RBAC, rate limit, CORS, validation, error mapping).
 - **Models** are pure schemas; no service logic.
+- **Workers** handle durable background processing; services publish jobs through a queue facade.
 
 The result: you can swap Mongoose for SQL, replace Redis with another store, or move from Express to another framework without rewriting business rules.
 
@@ -178,6 +198,7 @@ See [`backend/src/docs/extension-pattern.md`](backend/src/docs/extension-pattern
 | HTTP framework               | Express 5                                                                     |
 | Application database         | MongoDB via Mongoose 9 (app data)                                             |
 | Cache / rate-limit store     | Redis via ioredis                                                             |
+| Background queue             | BullMQ with Redis backend (notifications, bounded retry, dead-letter)         |
 | Rate limiting                | `express-rate-limit` + `rate-limit-redis` (per-caller keys: `userId` or IP)   |
 | Authentication               | `jsonwebtoken` (access + refresh), HTTP-only cookies                          |
 | Password hashing             | `bcrypt`                                                                      |
@@ -185,8 +206,8 @@ See [`backend/src/docs/extension-pattern.md`](backend/src/docs/extension-pattern
 | Logging                      | Custom structured logger (`src/utils/logger.js`)                              |
 | Configuration                | Centralized env access (`src/configs/config.js`) — no scattered `process.env` |
 | Testing — unit & integration | Vitest + Supertest + `mongodb-memory-server`                                  |
-| Testing — performance        | Vitest (pagination throughput, rate-limit fairness)                           |
-| Testing — end-to-end         | Newman running Postman collections (`backend/postman/`)                       |
+| Testing — performance        | Vitest (pagination throughput, rate-limit fairness, cache hit rate, load)     |
+| Testing — end-to-end         | Vitest + Supertest (auth flows, post CRUD, social flows)                      |
 
 ---
 
@@ -196,21 +217,27 @@ See [`backend/src/docs/extension-pattern.md`](backend/src/docs/extension-pattern
 backend/
 ├── src/
 │   ├── app.js                      Express app wiring
-│   ├── index.js                    Server entrypoint
+│   ├── index.js                    Server entrypoint + seed bootstrap
 │   ├── configs/
 │   │   ├── config.js               Centralized env access
 │   │   ├── constants.js            Rate-limit & token constants
 │   │   ├── cors.js                 Environment-driven origin allowlist
-│   │   ├── database.js             Mongoose connection
+│   │   ├── database.js             Mongoose connection + index build
 │   │   ├── redis.js                ioredis singleton
 │   │   └── seed.js                 Dev seed for roles & permissions
 │   ├── controller/
-│   │   ├── auth.controller.js
+│   │   ├── auth.controller.js      Session list/revoke
+│   │   ├── comment.controller.js   Comment CRUD
 │   │   ├── error.controller.js     404 handler
+│   │   ├── follow.controller.js    Follow/unollow
 │   │   ├── health.controller.js    Liveness & readiness probes
-│   │   ├── post.controller.js
-│   │   ├── refresh_token.controller.js
-│   │   └── user.controller.js
+│   │   ├── like.controller.js      Like/unlike
+│   │   ├── notification.controller.js  Notification list/read
+│   │   ├── post.controller.js      Post CRUD + feed
+│   │   ├── refresh_token.controller.js — token rotation
+│   │   └── user.controller.js      Registration, login, logout, delete
+│   ├── controllers/
+│   │   └── admin.controller.js     Role & permission CRUD
 │   ├── docs/
 │   │   ├── extension-pattern.md    How to add a new resource
 │   │   └── openapi/
@@ -222,56 +249,89 @@ backend/
 │   │   ├── cors.middleware.js
 │   │   ├── error.middleware.js     Fail-fast + envelope shaping
 │   │   ├── idempotency.middleware.js  Redis-backed dedup via Idempotency-Key
-│   │   ├── ratelimiter.middleware.js   Global API limiter
-│   │   ├── role.middleware.js      RBAC (requirePermission) + ABAC (requireAttributes)
+│   │   ├── ratelimiter.middleware.js   Global API limiter + social mutation limiter
+│   │   ├── role.middleware.js      RBAC (requirePermission) + inline ABAC
 │   │   └── validate.middleware.js  Zod validation
 │   ├── models/
+│   │   ├── audit-log.model.js
+│   │   ├── comment.model.js
+│   │   ├── follow.model.js
+│   │   ├── like.model.js
+│   │   ├── notification.model.js
 │   │   ├── permission.model.js
 │   │   ├── post.model.js
-│   │   ├── refresh-token.model.js
 │   │   ├── role.model.js
+│   │   ├── session.model.js
 │   │   └── user.model.js
 │   ├── repositories/
 │   │   ├── interfaces/             Pure abstract contracts (no ORM)
+│   │   │   ├── audit-log.repository.js
+│   │   │   ├── comment.repository.js
+│   │   │   ├── follow.repository.js
+│   │   │   ├── like.repository.js
+│   │   │   ├── notification.repository.js
 │   │   │   ├── permission.repository.js
 │   │   │   ├── post.repository.js
-│   │   │   ├── refresh.repository.js
 │   │   │   ├── role.repository.js
+│   │   │   ├── session.repository.js
 │   │   │   └── user.repository.js
 │   │   └── implementations/
 │   │       └── mongoose/           Production Mongoose-backed implementations
+│   │           ├── audit-log.repository.js
+│   │           ├── comment.repository.js
+│   │           ├── follow.repository.js
+│   │           ├── like.repository.js
+│   │           ├── notification.repository.js
 │   │           ├── permission.repository.js
 │   │           ├── post.repository.js
-│   │           ├── refresh.repository.js
 │   │           ├── role.repository.js
+│   │           ├── session.repository.js
 │   │           └── user.repository.js
 │   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── post.routes.js
-│   │   └── user.routes.js
+│   │   ├── admin.routes.js         Role & permission management
+│   │   ├── auth.routes.js          Register, login, refresh, session management
+│   │   ├── comment.routes.js       Comments on posts
+│   │   ├── follow.routes.js        Follow / unfollow users
+│   │   ├── like.routes.js          Like / unlike posts
+│   │   ├── notification.routes.js  Notifications
+│   │   ├── post.routes.js          Post CRUD
+│   │   └── user.routes.js          Account management
 │   ├── service/
-│   │   ├── audit.service.js        Audit event writer (not yet wired in app.js)
+│   │   ├── audit.service.js        Audit event writer (wired in app.js)
+│   │   ├── auth.service.js         Registration, login, delete, JTI generation
+│   │   ├── comment.service.js      Comment CRUD with optimistic locking
 │   │   ├── error.service.js        Classifies errors, generates traceId
-│   │   ├── post.service.js         Post CRUD with ownership checks
-│   │   └── user.service.js         Registration, login, delete, JTI generation
+│   │   ├── feed.service.js         Cursor-paginated feed with Redis write-fanout cache
+│   │   ├── follow.service.js       Atomic follow/unfollow with notification dispatch
+│   │   ├── like.service.js         Like/unlike with uniqueness enforcement
+│   │   ├── notification.queue.js   Queue facade for notification jobs
+│   │   ├── notification.service.js Notification delivery
+│   │   ├── post.service.js         Post CRUD with ownership checks + audit
+│   │   └── session.service.js      Session management + idle sweep
 │   ├── utils/
 │   │   ├── errors.js               Stable error codes & envelope definitions
 │   │   ├── generateToken.js        JWT access + refresh generation
 │   │   ├── logger.js               Structured JSON logger (redacts secrets/PII)
 │   │   ├── metrics.js              In-memory counters + duration histograms
 │   │   └── response.js             JSON envelope helper
-│   └── validators/
-│       ├── auth.validator.js
-│       ├── post.validator.js
-│       └── user.validator.js
+│   ├── validators/
+│   │   ├── admin.validator.js      Role & permission schemas
+│   │   ├── auth.validator.js       Register, login schemas
+│   │   ├── comment.validator.js    Comment schemas
+│   │   ├── follow.validator.js     Follow schemas
+│   │   ├── like.validator.js       Like schemas
+│   │   ├── notification.validator.js  Notification schemas
+│   │   ├── post.validator.js       Create, update schemas
+│   │   ├── session.validator.js    Session schemas
+│   │   └── user.validator.js       Assign roles schema
+│   └── workers/
+│       └── notification.worker.js  BullMQ worker + inline fallback for notifications
 ├── tests/
+│   ├── global-setup.js             mongodb-memory-server bootstrap
 │   ├── helpers/                    Shared test utilities (fixtures, request helper)
-│   ├── unit/                       Reserved for future pure unit tests
-│   ├── integration/                API + DB integration (architecture, contract, CORS, errors, RBAC)
-│   ├── performance/                Pagination & rate-limit latency (p95 < 950ms)
-│   ├── e2e/                        End-to-end flows (auth flows, post CRUD)
-│   └── global-setup.js             mongodb-memory-server bootstrap
-├── postman/                        Newman collections for e2e
+│   ├── integration/                API + DB integration (auth, RBAC, ownership, errors, CORS, contract, sessions, follow, like, notifications, rate limit)
+│   ├── performance/                Feed cache, pagination, rate-limit latency, load (p95 < 950ms)
+│   └── e2e/                        End-to-end flows (auth flows, post CRUD, social flows)
 ├── vitest.config.js
 ├── package.json
 └── .env                            (not committed)
@@ -285,13 +345,23 @@ All routes are prefixed with `/api/v1`.
 
 ### Auth
 
-| Method   | Path            | Description              |
-| -------- | --------------- | ------------------------ |
-| `POST`   | `/auth/`        | Register a new user      |
-| `POST`   | `/auth/login`   | Login (rate-limited)     |
-| `POST`   | `/auth/logout`  | Invalidate refresh token |
-| `POST`   | `/auth/refresh` | Rotate refresh token     |
-| `DELETE` | `/auth/me`      | Delete own account       |
+| Method   | Path                     | Description                      |
+| -------- | ------------------------ | -------------------------------- |
+| `POST`   | `/auth/`                 | Register a new user              |
+| `POST`   | `/auth/login`            | Login (rate-limited)             |
+| `POST`   | `/auth/logout`           | Invalidate refresh token         |
+| `POST`   | `/auth/refresh`          | Rotate refresh token             |
+| `DELETE` | `/auth/me`               | Delete own account               |
+| `GET`    | `/auth/sessions`         | List own sessions                |
+| `DELETE` | `/auth/sessions/:id`     | Revoke a single session          |
+
+### Users
+
+| Method   | Path                  | Description                  |
+| -------- | --------------------- | ---------------------------- |
+| `GET`    | `/users/`             | List users (admin)           |
+| `GET`    | `/users/:id`          | Get user by ID (admin)       |
+| `POST`   | `/users/:id/roles`    | Assign roles to user (admin) |
 
 ### Posts (authenticated)
 
@@ -302,6 +372,56 @@ All routes are prefixed with `/api/v1`.
 | `GET`    | `/posts`     | List all posts  |
 | `PATCH`  | `/posts/:id` | Update own post |
 | `DELETE` | `/posts/:id` | Delete own post |
+
+### Comments (authenticated)
+
+| Method   | Path                          | Description              |
+| -------- | ---------------------------- | ------------------------ |
+| `POST`   | `/posts/:id/comments`        | Comment on a post        |
+| `GET`    | `/posts/:id/comments`        | List comments on a post  |
+
+### Follows (authenticated)
+
+| Method   | Path                  | Description          |
+| -------- | --------------------- | -------------------- |
+| `POST`   | `/users/:id/follow`   | Follow a user        |
+| `DELETE` | `/users/:id/unfollow` | Unfollow a user      |
+
+### Likes (authenticated)
+
+| Method   | Path                     | Description          |
+| -------- | ------------------------ | -------------------- |
+| `POST`   | `/posts/:id/likes`       | Like a post          |
+| `DELETE` | `/posts/:id/likes`       | Unlike a post        |
+| `GET`    | `/posts/:id/likes/me`    | Check if post liked  |
+
+### Feed (authenticated)
+
+| Method | Path   | Description                          |
+| ------ | ------ | ------------------------------------ |
+| `GET`  | `/feed` | Cursor-paginated personalized feed   |
+
+### Notifications (authenticated)
+
+| Method   | Path                    | Description                      |
+| -------- | ----------------------- | -------------------------------- |
+| `GET`    | `/notifications`        | List own notifications           |
+| `PATCH`  | `/notifications/:id/read` | Mark notification as read      |
+
+### Admin (authenticated, admin role required)
+
+| Method   | Path                        | Description                  |
+| -------- | --------------------------- | ---------------------------- |
+| `GET`    | `/admin/roles`              | List roles                   |
+| `GET`    | `/admin/roles/:id`          | Get role                     |
+| `POST`   | `/admin/roles`              | Create role                  |
+| `PATCH`  | `/admin/roles/:id`          | Update role                  |
+| `DELETE` | `/admin/roles/:id`          | Delete role                  |
+| `GET`    | `/admin/permissions`        | List permissions             |
+| `GET`    | `/admin/permissions/:id`    | Get permission               |
+| `POST`   | `/admin/permissions`        | Create permission            |
+| `PATCH`  | `/admin/permissions/:id`    | Update permission            |
+| `DELETE` | `/admin/permissions/:id`    | Delete permission            |
 
 ### Health (unprotected)
 
@@ -320,15 +440,16 @@ The full contract — parameters, schemas, security schemes, error responses, an
 
 - **Access token** — short-lived (default 5m), HTTP-only cookie (`access_token`), validated on every protected request.
 - **Refresh token** — longer-lived (default 15m), HTTP-only cookie (`refresh_token`), rotated on every refresh. Old refresh tokens are blacklisted in Redis with TTL = remaining lifetime.
+- **Session model**: each refresh token is tracked as a `Session` document with `jti`, `expiresAt`, and idle TTL. A background sweep removes inactive sessions per `SESSION_IDLE_TTL_SECONDS`.
 - **Session revocation**: access tokens carry a `sid` claim; revoking a session writes `session:revoked:<sid>` in Redis.
 - **Multi-session support**: each refresh token gets a unique `jti`.
 
-**Authorization** is RBAC + ABAC:
+**Authorization** is RBAC + inline ABAC:
 
-- `Role` is a named collection of `Permission` codes (e.g. `posts:create`, `posts:delete`).
-- Permissions and roles are stored in the database and seeded on boot in development.
-- **RBAC middleware**: `requirePermission("posts:delete")` checks `req.user.permissions`. Supports an optional `attributes` parameter for inline ABAC.
-- **ABAC middleware**: `requireAttributes(evaluate)` evaluates arbitrary predicates against user/params/query/body independently of roles.
+- `Role` is a named collection of `Permission` codes (e.g. `posts:create`, `posts:delete`, `follows:create`, `likes:create`, `comments:create`, `feed:read`, `notifications:read`).
+- Permissions and roles are stored in the database, seeded on boot in development, and manageable at runtime via the `/admin` API.
+- **RBAC middleware**: `requirePermission("posts:delete")` checks `req.user.permissions`.
+- **Inline ABAC**: `requirePermission("posts:update", { attributes: ctx => ctx.user._id === ctx.params.id })` evaluates arbitrary predicates per request.
 - Adding a new role or permission does not require touching endpoint code.
 
 **Ownership** is enforced in the service layer:
@@ -348,6 +469,7 @@ Rate limits are enforced per caller using `express-rate-limit` with a Redis stor
 | Global API (authenticated) | 200 requests | 15 min | `user:<id>` |
 | Global API (public)        | 200 requests | 15 min | IP         |
 | Login (`POST /auth/login`) | 5 requests   | 5 min  | IP         |
+| Social mutations           | 60 requests  | 15 min | `user:<id>` |
 
 When a caller exceeds their limit, the API returns `429` with a `RATE_LIMITED` error code. Limiter state is shared across processes because the store is Redis, so the system stays correct behind a load balancer.
 
@@ -400,8 +522,8 @@ Credentials are enabled and preflight (`OPTIONS`) is handled correctly, so brows
 **Contract** — `specs/002-trustfeed-social-api/contracts/` is the canonical, machine-readable API description and the source of truth for integration; `backend/src/docs/openapi/` is the published copy, kept byte-identical via `npm run contract:sync`. It is a multi-file OpenAPI specification split into grouped files for maintainability:
 
 - `openapi.yaml` — root document (info, servers, security, tags, and `$ref`s to the rest)
-- `paths/auth.yaml`, `paths/posts.yaml` — per-resource path definitions
-- `components/schemas.yaml`, `components/responses.yaml`, `components/security.yaml` — reusable components
+- `paths/auth.yaml`, `paths/posts.yaml`, `paths/comments.yaml`, `paths/follows.yaml`, `paths/likes.yaml`, `paths/feed.yaml`, `paths/notifications.yaml`, `paths/users.yaml`, `paths/health.yaml` — per-resource path definitions
+- `components/schemas.yaml`, `components/responses.yaml`, `components/security.yaml`, `components/headers.yaml` — reusable components
 
 After editing, sync and validate it:
 
@@ -428,9 +550,9 @@ A memory implementation can be added at `repositories/implementations/memory/` f
 
 | Layer | Tooling | Scope |
 |---|---|---|
-| Integration | Vitest + Supertest + mongodb-memory-server | API + DB: architecture, contract, CORS, errors, RBAC |
-| Performance | Vitest | Pagination throughput, rate-limit latency (p95 < 950ms) |
-| End-to-end | Newman (Postman collections in `backend/postman/`) | Auth flows, post CRUD flows |
+| Integration | Vitest + Supertest + mongodb-memory-server | API + DB: auth, RBAC, ownership, errors, CORS, contract, sessions, follow, like, notifications, rate limit |
+| Performance | Vitest | Feed cache hit rate, pagination throughput, rate-limit latency, load (p95 < 950ms) |
+| End-to-end | Vitest + Supertest | Auth flows, post CRUD, social flows |
 
 The `tests/unit/` directory is reserved for future pure unit tests (services against in-memory repositories, validators, pure functions).
 
@@ -445,9 +567,6 @@ npm run test:watch
 
 # Coverage
 npm run test:coverage
-
-# End-to-end (Postman collections)
-npm run e2e
 ```
 
 Coverage targets are tracked by the test suite itself; the full suite must pass before any change is merged.
@@ -480,12 +599,25 @@ API_RATE_WINDOW_MS=900000
 API_RATE_LIMIT=200
 LOGIN_RATE_WINDOW_MS=300000
 LOGIN_RATE_LIMIT=5
+API_SOCIAL_RATE_WINDOW_MS=900000
+API_SOCIAL_RATE_LIMIT=60
 
 # CORS (comma-separated; required for CORS)
 ALLOWED_ORIGINS="http://localhost:3000,https://app.example.com"
+
+# Social features
+BULLMQ_URL="redis://127.0.0.1:6379"
+FEED_CACHE_TTL_SECONDS=300
+SESSION_IDLE_TTL_SECONDS=2592000
+IDEMPOTENCY_TTL_DAYS=7
+HEALTH_TIMEOUT_MS=5000
+
+# Graceful shutdown
+GRACEFUL_SHUTDOWN_HTTP_TIMEOUT_MS=10000
+GRACEFUL_SHUTDOWN_JOBS_TIMEOUT_MS=30000
 ```
 
-See `backend/README` and the inline comments in `src/configs/config.js` for the canonical list.
+See `backend/src/configs/config.js` for the canonical list.
 
 ---
 
@@ -506,10 +638,9 @@ npm run dev-watch      # node --watch
 
 # 4. Verify
 npm test
-npm run e2e
 ```
 
-The server expects local Redis at startup; it will retry connection if Redis is temporarily unavailable.
+The server expects local Redis at startup; it will retry connection if Redis is temporarily unavailable. BullMQ uses the same Redis instance by default (`BULLMQ_URL` falls back to `REDIS_DB_URI`).
 
 ---
 
@@ -520,13 +651,12 @@ Follow the documented pattern in [`backend/src/docs/extension-pattern.md`](backe
 1. **Model** — `src/models/widget.model.js`
 2. **Repository interface** — `src/repositories/interfaces/widget.repository.js`
 3. **Mongoose implementation** — `src/repositories/implementations/mongoose/widget.repository.js`
-4. **In-memory implementation** — `src/repositories/implementations/memory/widget.repository.js`
-5. **Validator** — `src/validators/widget.validator.js`
-6. **Service** — `src/service/widget.service.js`
-7. **Controller** — `src/controller/widget.controller.js`
-8. **Routes** — `src/routes/widget.routes.js`
-9. **Permissions & seed** — add codes to `configs/seed.js`; gate with `requirePermission(...)`
-10. **Contract** — add the new resource's paths to `specs/002-trustfeed-social-api/contracts/paths/<resource>.yaml` and reference it from the canonical root `openapi.yaml`; add shared schemas to `contracts/components/schemas.yaml`. Then run `npm run contract:sync` and `npm run contract:lint`.
+4. **Validator** — `src/validators/widget.validator.js`
+5. **Service** — `src/service/widget.service.js`
+6. **Controller** — `src/controller/widget.controller.js`
+7. **Routes** — `src/routes/widget.routes.js`
+8. **Permissions & seed** — add codes to `configs/seed.js`; gate with `requirePermission(...)`
+9. **Contract** — add the new resource's paths to `specs/002-trustfeed-social-api/contracts/paths/<resource>.yaml` and reference it from the canonical root `openapi.yaml`; add shared schemas to `contracts/components/schemas.yaml`. Then run `npm run contract:sync` and `npm run contract:lint`.
 
 No existing file is modified.
 
@@ -540,6 +670,7 @@ Measured and enforced by `tests/performance/`:
 - Rate limiting is per-caller; one abusive source cannot monopolize capacity.
 - No N+1 queries on list endpoints; population is batched at the repository layer.
 - Pagination is enforced at the service boundary.
+- Feed cache hit rate for hot post reads meets target (verified by `cache-hit-rate.test.js`).
 
 ---
 
