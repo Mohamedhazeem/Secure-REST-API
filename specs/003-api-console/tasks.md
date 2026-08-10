@@ -26,7 +26,7 @@
 
 **Purpose**: Project initialization and dependency verification
 
-- [ ] T001 Verify Scalar CDN availability and OpenAPI 3.0.3 compatibility for console.html
+- [x] T001 Verify Scalar CDN availability and OpenAPI 3.0.3 compatibility for console.html
 
 ---
 
@@ -36,11 +36,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 [P] Add `/console` GET route serving static console.html in backend/src/app.js
-- [ ] T003 [P] Add `/console/openapi.json` GET route resolving multi-file YAML contract to JSON in backend/src/app.js
-- [ ] T004 Create backend/src/docs/console.html with Scalar initialization pointing to `/console/openapi.json`
-- [ ] T005 [P] Add TrustFeed branded introduction and capability overview to backend/src/docs/console.html
-- [ ] T006 [P] Configure Scalar cookie authentication with `credentials: 'include'` in backend/src/docs/console.html
+- [x] T002 [P] Add `/console` GET route serving static console.html in backend/src/app.js
+- [x] T003 [P] Add `/console/openapi.json` GET route resolving multi-file YAML contract to JSON in backend/src/app.js
+- [x] T004 Create backend/src/docs/console.html with Scalar initialization pointing to `/console/openapi.json`
+- [x] T005 [P] Add TrustFeed branded introduction and capability overview to backend/src/docs/console.html
+- [x] T006 [P] Configure Scalar cookie authentication with `credentials: 'include'` in backend/src/docs/console.html
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -54,8 +54,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Configure Scalar tag grouping to display endpoints by domain (Auth, Posts, Comments, Follows, Likes, Feed, Notifications, Admin, Health) in backend/src/docs/console.html
-- [ ] T008 [US1] Verify endpoint entries show HTTP method, path, description, and auth requirement indicators in console.html
+- [x] T007 [US1] Configure Scalar tag grouping to display endpoints by domain (Auth, Posts, Comments, Follows, Likes, Feed, Notifications, Admin, Health) in backend/src/docs/console.html
+- [x] T008 [US1] Verify endpoint entries show HTTP method, path, description, and auth requirement indicators in console.html
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

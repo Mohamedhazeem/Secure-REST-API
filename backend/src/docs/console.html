@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustFeed API Console</title>
+  <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  <style>
+    body { margin: 0; background: #0b0c0e; }
+    .trustfeed-intro {
+      padding: 24px;
+      color: #e7e7e7;
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .trustfeed-intro h1 { margin: 0 0 8px; font-size: 24px; }
+    .trustfeed-intro p { margin: 0 0 12px; line-height: 1.5; opacity: 0.85; }
+    .trustfeed-intro ul { margin: 8px 0; padding-left: 20px; opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="trustfeed-intro">
+    <h1>TrustFeed API Console</h1>
+    <p>
+      TrustFeed is a secure, production-style social REST API demonstrating clean architecture,
+      JWT authentication with HTTP-only cookies, RBAC + ABAC authorization, cursor-paginated feeds,
+      and asynchronous notifications. This console lets you browse the full API contract and
+      execute real requests against a running backend.
+    </p>
+    <ul>
+      <li>Authenticate with your real TrustFeed session — cookies are sent automatically.</li>
+      <li>Explore endpoints grouped by domain: Auth, Posts, Comments, Follows, Likes, Feed, Notifications, Admin, Health.</li>
+      <li>Test advanced behaviors: idempotency, optimistic concurrency, pagination, and rate limiting.</li>
+    </ul>
+  </div>
+
+  <scalar-api-reference
+    id="scalar"
+    url="/console/openapi.json"
+    layout="modern"
+    dark-mode="true"
+    tags-sections="true"
+  ></scalar-api-reference>
+
+  <script>
+    document.getElementById('scalar').scalar = {
+      spec: {
+        url: '/console/openapi.json',
+      },
+      authentication: {
+        cookie: {
+          name: 'access_token',
+        },
+      },
+      metaData: {
+        title: 'TrustFeed API Console',
+      },
+      theme: 'dark',
+      layout: {
+        tags: {
+          sections: [
+            { title: 'Authentication', items: ['auth', 'auth/login', 'auth/logout', 'auth/refresh', 'auth/me', 'auth/sessions', 'auth/sessions/{id}'] },
+            { title: 'Users', items: ['users/me'] },
+            { title: 'Posts', items: ['posts', 'posts/me', 'posts/{id}', 'posts/{id}/comments', 'posts/{id}/likes', 'posts/{id}/likes/me'] },
+            { title: 'Follows', items: ['users/{id}/follow', 'users/{id}/unfollow'] },
+            { title: 'Likes', items: ['posts/{id}/likes', 'posts/{id}/likes/me'] },
+            { title: 'Feed', items: ['feed'] },
+            { title: 'Notifications', items: ['notifications', 'notifications/{id}/read'] },
+            { title: 'Admin', items: ['admin/roles', 'admin/roles/{id}', 'admin/permissions', 'admin/permissions/{id}'] },
+            { title: 'Health', items: ['health', 'health/ready'] },
+          ],
+        },
+      },
+      responsive: {
+        enabled: true,
+        minWidth: 1024,
+      },
+    };
+  </script>
+</body>
+</html>

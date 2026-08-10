@@ -1,3 +1,4 @@
+import { join } from "path";
 import express from "express";
 import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
@@ -20,6 +21,7 @@ import { liveness, readiness } from "./controller/health.controller.js";
 import { setAuditWriter } from "./service/audit.service.js";
 import AuditLogRepository from "./repositories/interfaces/audit-log.repository.js";
 import { registerNotificationDispatcher } from "./workers/notification.worker.js";
+import { resolveOpenApiContract } from "./docs/resolve-openapi.js";
 import "./configs/database.js";
 import { API_VERSION } from "./configs/constants.js";
 
@@ -52,7 +54,28 @@ app.use(`${API_VERSION}/feed`, authMiddleWare, apiLimiter, feedRouter);
 app.use(`${API_VERSION}/notifications`, authMiddleWare, apiLimiter, notificationRouter);
 app.use(`${API_VERSION}/admin`, authMiddleWare, adminRouter);
 
+app.get("/console/openapi.json", (req, res) => {
+  try {
+    const doc = resolveOpenApiContract();
+    res.setHeader("Content-Type", "application/json");
+    res.send(JSON.stringify(doc, null, 2));
+  } catch (error) {
+    res.status(503).json({
+      code: "DEPENDENCY_FAILURE",
+      message: "Failed to resolve OpenAPI contract",
+      traceId: req.traceId,
+    });
+  }
+});
+
+app.get("/", (req, res) => res.redirect(302, "/console"));
+
+app.get("/console", (req, res) => {
+  res.sendFile(join(__dirname, "docs", "console.html"));
+});
+
 app.use(notFoundHandler);
 app.use(errorHandler);
+
 
 
