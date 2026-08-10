@@ -11,12 +11,6 @@ export const CONTRACT_PUBLISHED = join(__dirname, "openapi");
 export const FUTURE_PATHS = [
     { method: "GET", path: "users/me", task: "TBD" },
     { method: "PATCH", path: "users/me", task: "TBD" },
-    { method: "POST", path: "users/{id}/follow", task: "T055" },
-    { method: "DELETE", path: "users/{id}/unfollow", task: "T055" },
-    { method: "POST", path: "posts/{id}/likes", task: "T056" },
-    { method: "DELETE", path: "posts/{id}/likes", task: "T056" },
-    { method: "GET", path: "posts/{id}/likes/me", task: "T056" },
-    { method: "GET", path: "feed", task: "T057" },
     { method: "GET", path: "posts/{id}/comments", task: "T083" },
     { method: "POST", path: "posts/{id}/comments", task: "T083" },
     { method: "GET", path: "notifications", task: "T084" },

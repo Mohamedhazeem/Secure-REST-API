@@ -136,27 +136,27 @@
 
 ### Tests for User Story 4
 
-- [ ] T041 [P] [US4] Integration test: follow→feed contains posts, unfollow excludes in `backend/tests/integration/follow.test.js`
-- [ ] T042 [P] [US4] Integration test: like uniqueness, duplicate returns 409 in `backend/tests/integration/like.test.js`
-- [ ] T043 [P] [US4] Performance test: cursor pagination no dup/skip under mid-pagination inserts in `backend/tests/performance/feed.test.js`
+- [X] T041 [P] [US4] Integration test: follow→feed contains posts, unfollow excludes in `backend/tests/integration/follow.test.js`
+- [X] T042 [P] [US4] Integration test: like uniqueness, duplicate returns 409 in `backend/tests/integration/like.test.js`
+- [X] T043 [P] [US4] Performance test: cursor pagination no dup/skip under mid-pagination inserts in `backend/tests/performance/feed.test.js`
 
 ### Implementation for User Story 4
 
-- [ ] T044 [P] [US4] Create Follow model in `backend/src/models/follow.model.js`
-- [ ] T045 [P] [US4] Create Like model in `backend/src/models/like.model.js`
-- [ ] T046 [P] [US4] Create Follow repository interface in `backend/src/repositories/interfaces/follow.repository.js`
-- [ ] T047 [P] [US4] Create Like repository interface in `backend/src/repositories/interfaces/like.repository.js`
-- [ ] T048 [P] [US4] Create Follow mongoose implementation in `backend/src/repositories/implementations/mongoose/follow.repository.js`
-- [ ] T049 [P] [US4] Create Like mongoose implementation in `backend/src/repositories/implementations/mongoose/like.repository.js`
-- [ ] T050 [P] [US4] Create Follow validator in `backend/src/validators/follow.validator.js`
-- [ ] T051 [P] [US4] Create Like validator in `backend/src/validators/like.validator.js`
-- [ ] T052 [US4] Create Follow service with atomic follow/unfollow and dispatch a follow notification via the notification queue in `backend/src/service/follow.service.js` (FR-027)
-- [ ] T053 [US4] Create Like service with uniqueness enforcement and dispatch a like notification via the notification queue in `backend/src/service/like.service.js` (FR-027)
-- [ ] T054 [US4] Create Feed service with cursor pagination, visibility filtering, and Redis write-fanout cache in `backend/src/service/feed.service.js` (Decision 2, SC-020)
-- [ ] T055 [P] [US4] Create Follow routes in `backend/src/routes/follow.routes.js`
-- [ ] T056 [P] [US4] Create Like routes in `backend/src/routes/like.routes.js`
-- [ ] T057 [US4] Create Feed routes in `backend/src/routes/post.routes.js`
-- [ ] T058 [US4] Wire follow, like, and feed controllers in `backend/src/controller/follow.controller.js`, `backend/src/controller/like.controller.js`, and `backend/src/controller/post.controller.js`
+- [X] T044 [P] [US4] Create Follow model in `backend/src/models/follow.model.js`
+- [X] T045 [P] [US4] Create Like model in `backend/src/models/like.model.js`
+- [X] T046 [P] [US4] Create Follow repository interface in `backend/src/repositories/interfaces/follow.repository.js`
+- [X] T047 [P] [US4] Create Like repository interface in `backend/src/repositories/interfaces/like.repository.js`
+- [X] T048 [P] [US4] Create Follow mongoose implementation in `backend/src/repositories/implementations/mongoose/follow.repository.js`
+- [X] T049 [P] [US4] Create Like mongoose implementation in `backend/src/repositories/implementations/mongoose/like.repository.js`
+- [X] T050 [P] [US4] Create Follow validator in `backend/src/validators/follow.validator.js`
+- [X] T051 [P] [US4] Create Like validator in `backend/src/validators/like.validator.js`
+- [X] T052 [US4] Create Follow service with atomic follow/unfollow and dispatch a follow notification via the notification queue in `backend/src/service/follow.service.js` (FR-027)
+- [X] T053 [US4] Create Like service with uniqueness enforcement and dispatch a like notification via the notification queue in `backend/src/service/like.service.js` (FR-027)
+- [X] T054 [US4] Create Feed service with cursor pagination, visibility filtering, and Redis write-fanout cache in `backend/src/service/feed.service.js` (Decision 2, SC-020)
+- [X] T055 [P] [US4] Create Follow routes in `backend/src/routes/follow.routes.js`
+- [X] T056 [P] [US4] Create Like routes in `backend/src/routes/like.routes.js`
+- [X] T057 [US4] Create Feed routes in `backend/src/routes/post.routes.js`
+- [X] T058 [US4] Wire follow, like, and feed controllers in `backend/src/controller/follow.controller.js`, `backend/src/controller/like.controller.js`, and `backend/src/controller/post.controller.js`
 
 **Checkpoint**: At this point, User Stories 1, 2, 3, and 4 should all work independently.
 

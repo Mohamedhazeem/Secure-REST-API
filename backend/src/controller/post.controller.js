@@ -1,4 +1,5 @@
 import * as postService from "../service/post.service.js";
+import { getFeed as getPersonalizedFeed } from "../service/feed.service.js";
 import { sendSuccess } from "../utils/response.js";
 
 export const createPost = async (req, res, next) => {
@@ -54,6 +55,23 @@ export const deletePost = async (req, res, next) => {
     try {
         await postService.deletePost(req.params.id, req.user._id);
         return sendSuccess(res, 204);
+    } catch (err) {
+        next(err);
+    }
+};
+
+/**
+ * Cursor-paginated personalized feed of followed users' posts (US4,
+ * FR-026/FR-036). The cursor is opaque; ordering is deterministic by
+ * creation time with an id tiebreaker.
+ */
+export const getFeed = async (req, res, next) => {
+    try {
+        const feed = await getPersonalizedFeed(req.user._id, {
+            cursor: req.query.cursor,
+            limit: req.query.limit,
+        });
+        return sendSuccess(res, 200, feed);
     } catch (err) {
         next(err);
     }

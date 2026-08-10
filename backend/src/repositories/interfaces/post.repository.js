@@ -82,4 +82,15 @@ export default class PostRepositoryInterface {
      * @returns {Promise<number>} Number of posts updated.
      */
     async reassignAuthor(fromAuthorId, toAuthorId) {}
+
+    /**
+     * Retrieve posts matching a filter using deterministic cursor pagination
+     * (feed, FR-026): ordered by createdAt descending with an _id tiebreaker,
+     * resuming after `after` (the last seen { createdAt, id }). New inserts
+     * during pagination never duplicate or skip already-visible posts.
+     * @param {PostFilter} filter - Filter criteria.
+     * @param {Object} [options] - { limit, after } where after = { createdAt, id }.
+     * @returns {Promise<Object>} { data, nextCursor, hasNextPage }.
+     */
+    async findManyCursor(filter, options) {}
 }

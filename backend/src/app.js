@@ -1,7 +1,9 @@
 import express from "express";
 import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
-import {postRouter} from "./routes/post.routes.js";
+import {postRouter, feedRouter} from "./routes/post.routes.js";
+import { followRouter } from "./routes/follow.routes.js";
+import { likeRouter } from "./routes/like.routes.js";
 import cookieParser  from "cookie-parser";
 import { apiLimiter } from "./middleware/ratelimiter.middleware.js";
 import { authMiddleWare } from "./middleware/auth.middleware.js";
@@ -26,7 +28,9 @@ app.get("/api/v1/health", liveness);
 app.get("/api/v1/health/ready", readiness);
 
 app.use("/api/v1/auth", authRouter, userRouter);
-app.use("/api/v1/posts",authMiddleWare, apiLimiter, postRouter);
+app.use("/api/v1/posts",authMiddleWare, apiLimiter, postRouter, likeRouter);
+app.use("/api/v1/users", authMiddleWare, apiLimiter, followRouter);
+app.use("/api/v1/feed", authMiddleWare, apiLimiter, feedRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

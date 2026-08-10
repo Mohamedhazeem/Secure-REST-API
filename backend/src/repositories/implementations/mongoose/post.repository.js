@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Post from "../../../models/post.model.js";
 
 export default class PostRepository {
@@ -96,5 +97,47 @@ export default class PostRepository {
             { $set: { author: toAuthorId } }
         ).exec();
         return result.modifiedCount ?? 0;
+    }
+
+    /**
+     * Deterministic cursor pagination for the personalized feed (FR-026).
+     *
+     * Keyset condition on (createdAt desc, _id desc): the resume predicate
+     * `createdAt < c OR (createdAt = c AND _id < id)` guarantees that posts
+     * inserted mid-pagination neither duplicate nor skip already-seen items,
+     * and the ObjectId tiebreaker makes equal-timestamp ordering stable.
+     *
+     * Complexity: O(limit + 1) via index (visibility/author + createdAt);
+     * one extra row fetches `hasNextPage` without a countDocuments scan.
+     * @param {Object} filter - Mongoose query filter.
+     * @param {Object} [options] - { limit, after = { createdAt, id } }.
+     * @returns {Promise<Object>} { data, nextCursor, hasNextPage }.
+     */
+    async findManyCursor(filter = {}, options = {}) {
+        const { limit = 20, after = null } = options;
+        const query = { ...filter };
+        if (after?.createdAt && after?.id) {
+            query.$or = [
+                { createdAt: { $lt: new Date(after.createdAt) } },
+                { createdAt: new Date(after.createdAt), _id: { $lt: new mongoose.Types.ObjectId(after.id) } },
+            ];
+        }
+        const rows = await Post.find(query)
+            .populate("author", "username email")
+            .sort({ createdAt: -1, _id: -1 })
+            .limit(limit + 1)
+            .lean()
+            .exec();
+
+        const hasNextPage = rows.length > limit;
+        const data = hasNextPage ? rows.slice(0, limit) : rows;
+        const last = data[data.length - 1];
+        const nextCursor =
+            hasNextPage && last
+                ? Buffer.from(
+                      JSON.stringify({ createdAt: last.createdAt.toISOString(), id: last._id.toString() })
+                  ).toString("base64url")
+                : null;
+        return { data, nextCursor, hasNextPage };
     }
 }

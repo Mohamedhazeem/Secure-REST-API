@@ -1,5 +1,6 @@
 import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
 import { auditService } from "./audit.service.js";
+import { fanoutPostToFollowers, invalidateFollowerFeedCaches } from "./feed.service.js";
 import { createError } from "../utils/errors.js";
 
 const postRepository = new PostRepository();
@@ -16,6 +17,7 @@ const recordAudit = (action, actorId, resourceId) =>
 export const createPost = async ({ content, visibility = "public", authorId }) => {
     const post = await postRepository.create({ content, visibility, author: authorId });
     await recordAudit("post.create", authorId, post._id.toString());
+    await fanoutPostToFollowers({ authorId, postId: post._id });
     return post;
 };
 
@@ -49,6 +51,7 @@ export const updatePost = async (id, authorId, { content, visibility, version })
         throw createError("CONFLICT", "Post was modified by another request; refresh and retry", 409);
     }
     await recordAudit("post.update", authorId, updated._id.toString());
+    await invalidateFollowerFeedCaches(authorId);
     return updated;
 };
 
@@ -62,5 +65,6 @@ export const deletePost = async (id, authorId) => {
     }
     await postRepository.deleteById(id);
     await recordAudit("post.delete", authorId, post._id.toString());
+    await invalidateFollowerFeedCaches(authorId);
     return { id };
 };

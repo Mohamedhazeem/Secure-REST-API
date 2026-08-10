@@ -8,6 +8,12 @@ const PERMISSION_CODES = [
   "posts:delete",
   "users:read",
   "users:delete",
+  "follows:create",
+  "follows:delete",
+  "likes:create",
+  "likes:delete",
+  "likes:read",
+  "feed:read",
 ];
 
 const PERMISSION_DESCRIPTIONS = {
@@ -17,6 +23,12 @@ const PERMISSION_DESCRIPTIONS = {
   "posts:delete": "Delete own posts",
   "users:read": "View user profiles",
   "users:delete": "Delete user accounts",
+  "follows:create": "Follow users",
+  "follows:delete": "Unfollow users",
+  "likes:create": "Like posts",
+  "likes:delete": "Unlike posts",
+  "likes:read": "View like status",
+  "feed:read": "Read the personalized feed",
 };
 
 const ROLES = [
