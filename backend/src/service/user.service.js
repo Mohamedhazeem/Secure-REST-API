@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import mongoose from "mongoose";
-import UserRepository from "../repositories/implementations/mongoose/user.repository.js";
-import RoleRepository from "../repositories/implementations/mongoose/role.repository.js";
-import PermissionRepository from "../repositories/implementations/mongoose/permission.repository.js";
-import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
+import UserRepository from "../repositories/interfaces/user.repository.js";
+import RoleRepository from "../repositories/interfaces/role.repository.js";
+import PermissionRepository from "../repositories/interfaces/permission.repository.js";
+import PostRepository from "../repositories/interfaces/post.repository.js";
 import { revokeAllSessions } from "./session.service.js";
 import { createError } from "../utils/errors.js";
 
@@ -137,3 +137,4 @@ export const deleteUserAccount = async (userId) => {
     await userRepository.permanentlyDelete(userId);
     return user;
 };
+

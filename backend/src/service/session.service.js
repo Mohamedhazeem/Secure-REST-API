@@ -1,4 +1,4 @@
-import SessionRepository from "../repositories/implementations/mongoose/session.repository.js";
+import SessionRepository from "../repositories/interfaces/session.repository.js";
 import { redisClient } from "../configs/redis.js";
 import { config } from "../configs/config.js";
 import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE } from "../configs/constants.js";
@@ -152,3 +152,4 @@ export const sweepInactiveSessions = async () => {
     const deleted = await sessionRepository.deleteExpired({ cutoff: idleBefore });
     return { revoked: matchedIds.length, deleted };
 };
+

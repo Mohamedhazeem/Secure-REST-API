@@ -1,5 +1,5 @@
-import NotificationRepository from "../repositories/implementations/mongoose/notification.repository.js";
-import UserRepository from "../repositories/implementations/mongoose/user.repository.js";
+import NotificationRepository from "../repositories/interfaces/notification.repository.js";
+import UserRepository from "../repositories/interfaces/user.repository.js";
 import { notificationJobSchema } from "../validators/notification.validator.js";
 import { createError } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
@@ -122,3 +122,4 @@ export const markNotificationRead = async (id, recipientId) => {
     }
     return updated;
 };
+

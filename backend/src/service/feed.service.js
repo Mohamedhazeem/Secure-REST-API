@@ -1,8 +1,9 @@
-import FollowRepository from "../repositories/implementations/mongoose/follow.repository.js";
-import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
+import FollowRepository from "../repositories/interfaces/follow.repository.js";
+import PostRepository from "../repositories/interfaces/post.repository.js";
 import { redisClient } from "../configs/redis.js";
 import { config } from "../configs/config.js";
 import { logger } from "../utils/logger.js";
+import { metrics } from "../utils/metrics.js";
 
 const followRepository = new FollowRepository();
 const postRepository = new PostRepository();
@@ -50,7 +51,16 @@ const cacheSet = async (key, value) => {
  * mutation bumps the affected followers' version counters, and cache keys
  * embed that version, so stale pages are never served.
  */
-const cacheEnabled = () => config.nodeEnv !== "test";
+let _cacheEnabledOverride = null;
+
+export const __setCacheEnabledForTests = (enabled) => {
+    _cacheEnabledOverride = enabled;
+};
+
+const cacheEnabled = () => {
+    if (_cacheEnabledOverride !== null) return _cacheEnabledOverride;
+    return config.nodeEnv !== "test";
+};
 
 const bumpFeedVersion = async (userId) => {
     try {
@@ -138,11 +148,14 @@ export const getFeed = async (userId, { cursor, limit = 20 } = {}) => {
         cacheKey = `feed:cache:${userId}:${version}:${pageSize}:${after ? encodeCursor(after) : "start"}`;
         const cached = await cacheGet(cacheKey);
         if (cached) {
+            metrics.recordCacheHit("feed");
             try {
                 return JSON.parse(cached);
             } catch {
                 /* stale payload: fall through to the database */
             }
+        } else {
+            metrics.recordCacheMiss("feed");
         }
     }
 
@@ -163,3 +176,4 @@ export const getFeed = async (userId, { cursor, limit = 20 } = {}) => {
     }
     return result;
 };
+

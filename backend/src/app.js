@@ -6,6 +6,7 @@ import { followRouter } from "./routes/follow.routes.js";
 import { likeRouter } from "./routes/like.routes.js";
 import { commentRouter } from "./routes/comment.routes.js";
 import { notificationRouter } from "./routes/notification.routes.js";
+import { adminRouter } from "./routes/admin.routes.js";
 import cookieParser  from "cookie-parser";
 import { apiLimiter, socialMutationLimiter } from "./middleware/ratelimiter.middleware.js";
 import { authMiddleWare } from "./middleware/auth.middleware.js";
@@ -17,7 +18,7 @@ import { correlationMiddleware } from "./middleware/correlation.middleware.js";
 import { metricsMiddleware } from "./utils/metrics.js";
 import { liveness, readiness } from "./controller/health.controller.js";
 import { setAuditWriter } from "./service/audit.service.js";
-import AuditLogRepository from "./repositories/implementations/mongoose/audit-log.repository.js";
+import AuditLogRepository from "./repositories/interfaces/audit-log.repository.js";
 import { registerNotificationDispatcher } from "./workers/notification.worker.js";
 import "./configs/database.js";
 import { API_VERSION } from "./configs/constants.js";
@@ -49,6 +50,9 @@ app.use(`${API_VERSION}/posts`, authMiddleWare, apiLimiter, postRouter, commentR
 app.use(`${API_VERSION}/users`, authMiddleWare, socialMutationLimiter, followRouter);
 app.use(`${API_VERSION}/feed`, authMiddleWare, apiLimiter, feedRouter);
 app.use(`${API_VERSION}/notifications`, authMiddleWare, apiLimiter, notificationRouter);
+app.use(`${API_VERSION}/admin`, authMiddleWare, adminRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+

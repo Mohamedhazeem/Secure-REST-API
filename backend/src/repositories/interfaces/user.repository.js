@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 
 /**
  * @typedef {Object} UserFilter
@@ -28,64 +27,5 @@ import mongoose from "mongoose";
  * The interface is framework-agnostic; implementations may use
  * Mongoose, an in-memory store, or any other persistence mechanism.
  */
-export default class UserRepositoryInterface {
-    /**
-     * Retrieve a user by their unique identifier.
-     * @param {string} id - The user's MongoDB ObjectId.
-     * @returns {Promise<Object|null>} The user document, or null if not found.
-     */
-    async findById(id) {}
+export { default } from "../implementations/mongoose/user.repository.js";
 
-    /**
-     * Retrieve a single user matching the provided filter.
-     * @param {UserFilter} filter - Filter criteria (e.g. { username }, { email }).
-     * @returns {Promise<Object|null>} The matching user document, or null if not found.
-     */
-    async findOne(filter) {}
-
-    /**
-     * Persist a new user.
-     * @param {Object} data - The user data to persist.
-     * @returns {Promise<Object>} The created user document.
-     */
-    async create(data) {}
-
-    /**
-     * Update an existing user.
-     * @param {string} id - The user's unique identifier.
-     * @param {Object} data - Partial fields to update.
-     * @returns {Promise<Object|null>} The updated user document, or null if not found.
-     */
-    async update(id, data) {}
-
-    /**
-     * Soft-delete a user by marking deletedAt.
-     * @param {string} id - The user's unique identifier.
-     * @returns {Promise<Object|null>} The updated user document, or null if not found.
-     */
-    async delete(id) {}
-
-    /**
-     * Permanently delete a user and all personal data (account deletion,
-     * FR-038). Used after content attribution is anonymized.
-     * @param {string} id - The user's unique identifier.
-     * @returns {Promise<Object|null>} The deleted user document, or null if not found.
-     */
-    async permanentlyDelete(id) {}
-
-    /**
-     * Retrieve users matching an optional filter, with pagination.
-     * @param {UserFilter} [filter={}] - Filter criteria.
-     * @param {PaginationOptions} [pagination] - Pagination options.
-     * @returns {Promise<PaginatedResult>} Paginated result set.
-     */
-    async findMany(filter = {}, pagination) {}
-
-    /**
-     * Retrieve a user by their email address.
-     * Excludes soft-deleted users.
-     * @param {string} email - The user's email address.
-     * @returns {Promise<Object|null>} The matching user document, or null if not found.
-     */
-    async findByEmail(email) {}
-}

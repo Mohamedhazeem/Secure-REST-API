@@ -6,7 +6,7 @@ import { redisClient } from "../configs/redis.js";
 import { REFRESH_TOKEN_MAX_AGE } from "../configs/constants.js";
 import { createError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
-import UserRepository from "../repositories/implementations/mongoose/user.repository.js";
+import UserRepository from "../repositories/interfaces/user.repository.js";
 import {
     hashToken,
     issueSession,
@@ -180,3 +180,4 @@ export const blacklistAccessToken = async (token) => {
         // Ignore undecodable tokens.
     }
 };
+

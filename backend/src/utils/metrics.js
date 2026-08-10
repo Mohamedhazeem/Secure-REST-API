@@ -34,6 +34,8 @@ const createMetrics = () => {
     },
     recordAuthOutcome: (outcome) => inc(`auth.${outcome}`),
     recordQueueEvent: (type) => inc(`queue.${type}`),
+    recordCacheHit: (cache) => inc(`feed.cache.hit:${cache}`),
+    recordCacheMiss: (cache) => inc(`feed.cache.miss:${cache}`),
     increment: (name) => inc(name),
     snapshot: () => ({
       counters: Object.fromEntries(counters),

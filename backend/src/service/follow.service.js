@@ -1,5 +1,5 @@
-import UserRepository from "../repositories/implementations/mongoose/user.repository.js";
-import FollowRepository from "../repositories/implementations/mongoose/follow.repository.js";
+import UserRepository from "../repositories/interfaces/user.repository.js";
+import FollowRepository from "../repositories/interfaces/follow.repository.js";
 import { auditService } from "./audit.service.js";
 import { notificationQueue } from "./notification.queue.js";
 import { invalidateFeedCacheFor } from "./feed.service.js";
@@ -71,3 +71,4 @@ export const unfollowUser = async ({ followerId, followingId }) => {
 
 export const isFollowing = (followerId, followingId) =>
     followRepository.isFollowing(followerId, followingId);
+

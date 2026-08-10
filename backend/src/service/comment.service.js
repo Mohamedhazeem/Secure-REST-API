@@ -1,5 +1,5 @@
-import CommentRepository from "../repositories/implementations/mongoose/comment.repository.js";
-import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
+import CommentRepository from "../repositories/interfaces/comment.repository.js";
+import PostRepository from "../repositories/interfaces/post.repository.js";
 import { auditService } from "./audit.service.js";
 import { isFollowing } from "./follow.service.js";
 import { notificationQueue } from "./notification.queue.js";
@@ -122,3 +122,4 @@ export const listComments = async ({ postId, callerId, page = 1, limit = 20 }) =
         limit: Math.min(Math.max(parseInt(limit, 10) || 20, 1), MAX_PAGE_SIZE),
     });
 };
+

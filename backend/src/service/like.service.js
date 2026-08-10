@@ -1,5 +1,5 @@
-import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
-import LikeRepository from "../repositories/implementations/mongoose/like.repository.js";
+import PostRepository from "../repositories/interfaces/post.repository.js";
+import LikeRepository from "../repositories/interfaces/like.repository.js";
 import { auditService } from "./audit.service.js";
 import { notificationQueue } from "./notification.queue.js";
 import { createError } from "../utils/errors.js";
@@ -73,3 +73,4 @@ export const isPostLiked = async ({ userId, postId }) => {
     }
     return { liked: await likeRepository.isLiked(userId, postId) };
 };
+

@@ -17,7 +17,7 @@ describe("clean architecture layering", () => {
 
   it("post service depends on a repository, not on models", () => {
     const srcCode = read("service/post.service.js");
-    expect(srcCode).toMatch(/repositories\/implementations\/mongoose\/post\.repository\.js/);
+    expect(srcCode).toMatch(/repositories\/interfaces\/post\.repository\.js/);
     expect(srcCode).not.toMatch(/from "\.\.\/models\//);
   });
 
@@ -29,7 +29,7 @@ describe("clean architecture layering", () => {
 
   it("user service depends on repositories, not on models", () => {
     const srcCode = read("service/user.service.js");
-    expect(srcCode).toMatch(/repositories\/implementations\/mongoose\//);
+    expect(srcCode).toMatch(/repositories\/interfaces\//);
     expect(srcCode).not.toMatch(/from "\.\.\/models\//);
   });
 

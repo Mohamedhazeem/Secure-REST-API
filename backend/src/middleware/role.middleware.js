@@ -1,21 +1,6 @@
 import { createError } from "../utils/errors.js";
 
 /**
- * Endpoint-level ABAC (Decision 4): evaluates a predicate against request
- * attributes (user, params, query, body) per request, independent of roles.
- */
-export const requireAttributes = (evaluate) => (req, res, next) => {
-    if (!req.user) {
-        return next(createError("UNAUTHORIZED", "Authentication is required", 401));
-    }
-    const allowed = evaluate({ user: req.user, params: req.params, query: req.query, body: req.body });
-    if (!allowed) {
-        return next(createError("FORBIDDEN", "You do not meet the policy conditions for this operation", 403));
-    }
-    next();
-};
-
-/**
  * Role/permission gate with optional attribute conditions (FR-016, FR-023).
  *
  * Permissions are loaded per request by the auth middleware, so policy

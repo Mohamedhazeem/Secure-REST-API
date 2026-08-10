@@ -1,4 +1,4 @@
-import PostRepository from "../repositories/implementations/mongoose/post.repository.js";
+import PostRepository from "../repositories/interfaces/post.repository.js";
 import { auditService } from "./audit.service.js";
 import { fanoutPostToFollowers, invalidateFollowerFeedCaches } from "./feed.service.js";
 import { createError } from "../utils/errors.js";
@@ -68,3 +68,4 @@ export const deletePost = async (id, authorId) => {
     await invalidateFollowerFeedCaches(authorId);
     return { id };
 };
+

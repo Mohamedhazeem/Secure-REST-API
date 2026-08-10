@@ -26,9 +26,9 @@
 
 **Purpose**: Project initialization, cleanup of legacy scaffolding, and structure validation.
 
-- [X] T001 Remove legacy memory repository implementations under `backend/src/repositories/implementations/memory/`
-- [X] T002 Remove legacy unit test scaffolding under `backend/tests/unit/` and coverage artifacts
-- [X] T003 Validate existing project structure matches the implementation plan layout
+- [x] T001 Remove legacy memory repository implementations under `backend/src/repositories/implementations/memory/`
+- [x] T002 Remove legacy unit test scaffolding under `backend/tests/unit/` and coverage artifacts
+- [x] T003 Validate existing project structure matches the implementation plan layout
 
 ---
 
@@ -38,17 +38,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [X] T004 [P] Add idempotency middleware in `backend/src/middleware/idempotency.middleware.js` with Redis key TTL = 7 days per FR-028
-- [X] T005 [P] Add correlation ID middleware in `backend/src/middleware/correlation.middleware.js`
-- [X] T006 [P] Add audit logging service in `backend/src/service/audit.service.js` exposing `record(event)`; consumed by auth (token reuse), follow (T052), like (T053), comment (T080), and post (T038) services to persist security-relevant events (FR-030)
-- [X] T007 [P] Add error codes for social features in `backend/src/utils/errors.js` (names: `AUTH_REUSE_DETECTED`, `FORBIDDEN`, `CONFLICT`, `IDEMPOTENCY_CONFLICT`, `SELF_FOLLOW`, `VALIDATION_ERROR`, `DEPENDENCY_FAILURE`, `RATE_LIMITED`)
-- [X] T008 [P] Add health check endpoints (liveness + readiness) in `backend/src/controller/health.controller.js`
-- [X] T009 [P] Update `backend/src/configs/config.js` with new env vars: `BULLMQ_URL`, `FEED_CACHE_TTL_SECONDS`, `SESSION_IDLE_TTL_SECONDS`, `IDEMPOTENCY_TTL_DAYS=7`, `HEALTH_TIMEOUT_MS`
-- [X] T010 [P] Update `backend/src/middleware/auth.middleware.js` for multi-session and token reuse detection
-- [X] T011 [P] Update `backend/src/middleware/role.middleware.js` for runtime-configurable ABAC
-- [X] T012 [P] Add structured logger integration with secret-redaction rules in `backend/src/utils/logger.js`
-- [X] T013 [P] Add metrics collection (single source) in `backend/src/utils/metrics.js`
-- [X] T014 [P] Add test infrastructure: `backend/vitest.config.js`, `backend/tests/global-setup.js` using mongodb-memory-server, and `backend/tests/helpers/` fixtures per Constitution VI
+- [x] T004 [P] Add idempotency middleware in `backend/src/middleware/idempotency.middleware.js` with Redis key TTL = 7 days per FR-028
+- [x] T005 [P] Add correlation ID middleware in `backend/src/middleware/correlation.middleware.js`
+- [x] T006 [P] Add audit logging service in `backend/src/service/audit.service.js` exposing `record(event)`; consumed by auth (token reuse), follow (T052), like (T053), comment (T080), and post (T038) services to persist security-relevant events (FR-030)
+- [x] T007 [P] Add error codes for social features in `backend/src/utils/errors.js` (names: `AUTH_REUSE_DETECTED`, `FORBIDDEN`, `CONFLICT`, `IDEMPOTENCY_CONFLICT`, `SELF_FOLLOW`, `VALIDATION_ERROR`, `DEPENDENCY_FAILURE`, `RATE_LIMITED`)
+- [x] T008 [P] Add health check endpoints (liveness + readiness) in `backend/src/controller/health.controller.js`
+- [x] T009 [P] Update `backend/src/configs/config.js` with new env vars: `BULLMQ_URL`, `FEED_CACHE_TTL_SECONDS`, `SESSION_IDLE_TTL_SECONDS`, `IDEMPOTENCY_TTL_DAYS=7`, `HEALTH_TIMEOUT_MS`
+- [x] T010 [P] Update `backend/src/middleware/auth.middleware.js` for multi-session and token reuse detection
+- [x] T011 [P] Update `backend/src/middleware/role.middleware.js` for runtime-configurable ABAC
+- [x] T012 [P] Add structured logger integration with secret-redaction rules in `backend/src/utils/logger.js`
+- [x] T013 [P] Add metrics collection (single source) in `backend/src/utils/metrics.js`
+- [x] T014 [P] Add test infrastructure: `backend/vitest.config.js`, `backend/tests/global-setup.js` using mongodb-memory-server, and `backend/tests/helpers/` fixtures per Constitution VI
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel.
 
@@ -62,14 +62,14 @@
 
 ### Tests for User Story 1
 
-- [X] T015 [P] [US1] Contract test asserting every path in `specs/002-trustfeed-social-api/contracts/openapi.yaml` has a matching implementation route in `backend/src/app.js`
+- [x] T015 [P] [US1] Contract test asserting every path in `specs/002-trustfeed-social-api/contracts/openapi.yaml` has a matching implementation route in `backend/src/app.js`
 
 ### Implementation for User Story 1
 
-- [X] T016 [P] [US1] Validate all existing endpoints are documented in `specs/002-trustfeed-social-api/contracts/openapi.yaml`
-- [X] T017 [P] [US1] Add CORS, security scheme, and error schema documentation to `specs/002-trustfeed-social-api/contracts/components/`
-- [X] T018 [P] [US1] Add response schema definitions to `specs/002-trustfeed-social-api/contracts/components/responses.yaml`
-- [X] T019 [US1] Publish contract path in `backend/src/docs/openapi/` and wire contract validation into startup
+- [x] T016 [P] [US1] Validate all existing endpoints are documented in `specs/002-trustfeed-social-api/contracts/openapi.yaml`
+- [x] T017 [P] [US1] Add CORS, security scheme, and error schema documentation to `specs/002-trustfeed-social-api/contracts/components/`
+- [x] T018 [P] [US1] Add response schema definitions to `specs/002-trustfeed-social-api/contracts/components/responses.yaml`
+- [x] T019 [US1] Publish contract path in `backend/src/docs/openapi/` and wire contract validation into startup
 
 **Checkpoint**: At this point, the published contract accurately describes every endpoint.
 
@@ -83,22 +83,22 @@
 
 ### Tests for User Story 2
 
-- [X] T020 [P] [US2] Integration test: auth lifecycle register→login→list sessions→refresh→logout in `backend/tests/integration/auth.test.js`
-- [X] T021 [P] [US2] Integration test: reused refresh token triggers global revocation in `backend/tests/integration/auth.test.js`
-- [X] T022 [P] [US2] Integration test: session revocation (single + all) in `backend/tests/integration/session.test.js`
+- [x] T020 [P] [US2] Integration test: auth lifecycle register→login→list sessions→refresh→logout in `backend/tests/integration/auth.test.js`
+- [x] T021 [P] [US2] Integration test: reused refresh token triggers global revocation in `backend/tests/integration/auth.test.js`
+- [x] T022 [P] [US2] Integration test: session revocation (single + all) in `backend/tests/integration/session.test.js`
 
 ### Implementation for User Story 2
 
-- [X] T023 [P] [US2] Create Session model in `backend/src/models/session.model.js`
-- [X] T024 [P] [US2] Create Session repository interface in `backend/src/repositories/interfaces/session.repository.js`
-- [X] T025 [P] [US2] Create Session mongoose implementation in `backend/src/repositories/implementations/mongoose/session.repository.js`
-- [X] T026 [P] [US2] Create Session validator in `backend/src/validators/session.validator.js`
-- [X] T027 [US2] Update auth service for multi-session creation and metadata storage in `backend/src/service/auth.service.js`
-- [X] T028 [US2] Implement token reuse detection and global revocation, and emit an audit entry in `backend/src/service/auth.service.js` (FR-030)
-- [X] T029 [US2] Create session routes in `backend/src/routes/auth.routes.js`
-- [X] T030 [US2] Wire session endpoints to controller and middleware in `backend/src/controller/auth.controller.js`
-- [X] T031 [US2] Implement account deletion in `backend/src/service/user.service.js`: anonymize posts & comments (attribution → "[deleted]"), remove likes & follows, permanently delete credentials and personal data (FR-038)
-- [X] T032 [US2] Add inactive-session expiry/cleanup sweep (honors `SESSION_IDLE_TTL_SECONDS`) in `backend/src/service/session.service.js` (FR-013)
+- [x] T023 [P] [US2] Create Session model in `backend/src/models/session.model.js`
+- [x] T024 [P] [US2] Create Session repository interface in `backend/src/repositories/interfaces/session.repository.js`
+- [x] T025 [P] [US2] Create Session mongoose implementation in `backend/src/repositories/implementations/mongoose/session.repository.js`
+- [x] T026 [P] [US2] Create Session validator in `backend/src/validators/session.validator.js`
+- [x] T027 [US2] Update auth service for multi-session creation and metadata storage in `backend/src/service/auth.service.js`
+- [x] T028 [US2] Implement token reuse detection and global revocation, and emit an audit entry in `backend/src/service/auth.service.js` (FR-030)
+- [x] T029 [US2] Create session routes in `backend/src/routes/auth.routes.js`
+- [x] T030 [US2] Wire session endpoints to controller and middleware in `backend/src/controller/auth.controller.js`
+- [x] T031 [US2] Implement account deletion in `backend/src/service/user.service.js`: anonymize posts & comments (attribution → "[deleted]"), remove likes & follows, permanently delete credentials and personal data (FR-038)
+- [x] T032 [US2] Add inactive-session expiry/cleanup sweep (honors `SESSION_IDLE_TTL_SECONDS`) in `backend/src/service/session.service.js` (FR-013)
 
 **Checkpoint**: At this point, User Story 2 should be fully functional and testable independently.
 
@@ -112,17 +112,17 @@
 
 ### Tests for User Story 3
 
-- [X] T033 [P] [US3] Integration test: post CRUD + ownership denial in `backend/tests/integration/post.test.js`
-- [X] T034 [P] [US3] Concurrency test: two simultaneous updates → one 200, one 409 in `backend/tests/integration/post.test.js`
+- [x] T033 [P] [US3] Integration test: post CRUD + ownership denial in `backend/tests/integration/post.test.js`
+- [x] T034 [P] [US3] Concurrency test: two simultaneous updates → one 200, one 409 in `backend/tests/integration/post.test.js`
 
 ### Implementation for User Story 3
 
-- [X] T035 [P] [US3] Update Post model with visibility enum and optimistic lock version in `backend/src/models/post.model.js`
-- [X] T036 [P] [US3] Update Post repository interface for visibility filters and version checks in `backend/src/repositories/interfaces/post.repository.js`
-- [X] T037 [P] [US3] Update Post mongoose implementation for visibility queries and optimistic locking in `backend/src/repositories/implementations/mongoose/post.repository.js`
-- [X] T038 [US3] Update Post service for visibility enforcement and optimistic locking, and emit audit entries on create/update/delete in `backend/src/service/post.service.js` (FR-030)
-- [X] T039 [P] [US3] Create Post validator for visibility and content constraints in `backend/src/validators/post.validator.js`
-- [X] T040 [US3] Update Post controller to return 409 on version mismatch in `backend/src/controller/post.controller.js`
+- [x] T035 [P] [US3] Update Post model with visibility enum and optimistic lock version in `backend/src/models/post.model.js`
+- [x] T036 [P] [US3] Update Post repository interface for visibility filters and version checks in `backend/src/repositories/interfaces/post.repository.js`
+- [x] T037 [P] [US3] Update Post mongoose implementation for visibility queries and optimistic locking in `backend/src/repositories/implementations/mongoose/post.repository.js`
+- [x] T038 [US3] Update Post service for visibility enforcement and optimistic locking, and emit audit entries on create/update/delete in `backend/src/service/post.service.js` (FR-030)
+- [x] T039 [P] [US3] Create Post validator for visibility and content constraints in `backend/src/validators/post.validator.js`
+- [x] T040 [US3] Update Post controller to return 409 on version mismatch in `backend/src/controller/post.controller.js`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently.
 
@@ -136,27 +136,27 @@
 
 ### Tests for User Story 4
 
-- [X] T041 [P] [US4] Integration test: follow→feed contains posts, unfollow excludes in `backend/tests/integration/follow.test.js`
-- [X] T042 [P] [US4] Integration test: like uniqueness, duplicate returns 409 in `backend/tests/integration/like.test.js`
-- [X] T043 [P] [US4] Performance test: cursor pagination no dup/skip under mid-pagination inserts in `backend/tests/performance/feed.test.js`
+- [x] T041 [P] [US4] Integration test: follow→feed contains posts, unfollow excludes in `backend/tests/integration/follow.test.js`
+- [x] T042 [P] [US4] Integration test: like uniqueness, duplicate returns 409 in `backend/tests/integration/like.test.js`
+- [x] T043 [P] [US4] Performance test: cursor pagination no dup/skip under mid-pagination inserts in `backend/tests/performance/feed.test.js`
 
 ### Implementation for User Story 4
 
-- [X] T044 [P] [US4] Create Follow model in `backend/src/models/follow.model.js`
-- [X] T045 [P] [US4] Create Like model in `backend/src/models/like.model.js`
-- [X] T046 [P] [US4] Create Follow repository interface in `backend/src/repositories/interfaces/follow.repository.js`
-- [X] T047 [P] [US4] Create Like repository interface in `backend/src/repositories/interfaces/like.repository.js`
-- [X] T048 [P] [US4] Create Follow mongoose implementation in `backend/src/repositories/implementations/mongoose/follow.repository.js`
-- [X] T049 [P] [US4] Create Like mongoose implementation in `backend/src/repositories/implementations/mongoose/like.repository.js`
-- [X] T050 [P] [US4] Create Follow validator in `backend/src/validators/follow.validator.js`
-- [X] T051 [P] [US4] Create Like validator in `backend/src/validators/like.validator.js`
-- [X] T052 [US4] Create Follow service with atomic follow/unfollow and dispatch a follow notification via the notification queue in `backend/src/service/follow.service.js` (FR-027)
-- [X] T053 [US4] Create Like service with uniqueness enforcement and dispatch a like notification via the notification queue in `backend/src/service/like.service.js` (FR-027)
-- [X] T054 [US4] Create Feed service with cursor pagination, visibility filtering, and Redis write-fanout cache in `backend/src/service/feed.service.js` (Decision 2, SC-020)
-- [X] T055 [P] [US4] Create Follow routes in `backend/src/routes/follow.routes.js`
-- [X] T056 [P] [US4] Create Like routes in `backend/src/routes/like.routes.js`
-- [X] T057 [US4] Create Feed routes in `backend/src/routes/post.routes.js`
-- [X] T058 [US4] Wire follow, like, and feed controllers in `backend/src/controller/follow.controller.js`, `backend/src/controller/like.controller.js`, and `backend/src/controller/post.controller.js`
+- [x] T044 [P] [US4] Create Follow model in `backend/src/models/follow.model.js`
+- [x] T045 [P] [US4] Create Like model in `backend/src/models/like.model.js`
+- [x] T046 [P] [US4] Create Follow repository interface in `backend/src/repositories/interfaces/follow.repository.js`
+- [x] T047 [P] [US4] Create Like repository interface in `backend/src/repositories/interfaces/like.repository.js`
+- [x] T048 [P] [US4] Create Follow mongoose implementation in `backend/src/repositories/implementations/mongoose/follow.repository.js`
+- [x] T049 [P] [US4] Create Like mongoose implementation in `backend/src/repositories/implementations/mongoose/like.repository.js`
+- [x] T050 [P] [US4] Create Follow validator in `backend/src/validators/follow.validator.js`
+- [x] T051 [P] [US4] Create Like validator in `backend/src/validators/like.validator.js`
+- [x] T052 [US4] Create Follow service with atomic follow/unfollow and dispatch a follow notification via the notification queue in `backend/src/service/follow.service.js` (FR-027)
+- [x] T053 [US4] Create Like service with uniqueness enforcement and dispatch a like notification via the notification queue in `backend/src/service/like.service.js` (FR-027)
+- [x] T054 [US4] Create Feed service with cursor pagination, visibility filtering, and Redis write-fanout cache in `backend/src/service/feed.service.js` (Decision 2, SC-020)
+- [x] T055 [P] [US4] Create Follow routes in `backend/src/routes/follow.routes.js`
+- [x] T056 [P] [US4] Create Like routes in `backend/src/routes/like.routes.js`
+- [x] T057 [US4] Create Feed routes in `backend/src/routes/post.routes.js`
+- [x] T058 [US4] Wire follow, like, and feed controllers in `backend/src/controller/follow.controller.js`, `backend/src/controller/like.controller.js`, and `backend/src/controller/post.controller.js`
 
 **Checkpoint**: At this point, User Stories 1, 2, 3, and 4 should all work independently.
 
@@ -170,20 +170,20 @@
 
 ### Tests for User Story 6
 
-- [X] T059 [P] [US6] Integration test: health readiness reflects dependency failure within `HEALTH_TIMEOUT_MS` in `backend/tests/integration/health.test.js`
-- [X] T060 [P] [US6] Integration test: rate-limit brute-force protection in `backend/tests/integration/ratelimit.test.js`
+- [x] T059 [P] [US6] Integration test: health readiness reflects dependency failure within `HEALTH_TIMEOUT_MS` in `backend/tests/integration/health.test.js`
+- [x] T060 [P] [US6] Integration test: rate-limit brute-force protection in `backend/tests/integration/ratelimit.test.js`
 
 ### Implementation for User Story 6
 
-- [X] T061 [P] [US6] Create Audit Log model in `backend/src/models/audit-log.model.js`
-- [X] T062 [P] [US6] Create Audit Log repository interface in `backend/src/repositories/interfaces/audit-log.repository.js`
-- [X] T063 [P] [US6] Create Audit Log mongoose implementation in `backend/src/repositories/implementations/mongoose/audit-log.repository.js`
-- [X] T064 [US6] Implement rate limiting for new social endpoints in `backend/src/middleware/ratelimiter.middleware.js`
-- [X] T065 [US6] Add dependency readiness checks in `backend/src/controller/health.controller.js`
-- [X] T066 [US6] Wire correlation ID and audit logging into request lifecycle orchestration in `backend/src/app.js` (middleware added in T005/T006; this task performs app-level composition only)
-- [X] T067 [US6] Add CORS origin allowlist enforcement in `backend/src/middleware/cors.middleware.js`
-- [X] T068 [US6] Add explicit structured dependency-failure error path in `backend/src/middleware/error.middleware.js` (FR-017, Principle IX)
-- [X] T069 [US6] Implement graceful shutdown handlers (SIGTERM/SIGINT) in `backend/src/index.js` with 10s in-flight HTTP / 30s background-job bounds (FR-034, SC-019, Decision 7)
+- [x] T061 [P] [US6] Create Audit Log model in `backend/src/models/audit-log.model.js`
+- [x] T062 [P] [US6] Create Audit Log repository interface in `backend/src/repositories/interfaces/audit-log.repository.js`
+- [x] T063 [P] [US6] Create Audit Log mongoose implementation in `backend/src/repositories/implementations/mongoose/audit-log.repository.js`
+- [x] T064 [US6] Implement rate limiting for new social endpoints in `backend/src/middleware/ratelimiter.middleware.js`
+- [x] T065 [US6] Add dependency readiness checks in `backend/src/controller/health.controller.js`
+- [x] T066 [US6] Wire correlation ID and audit logging into request lifecycle orchestration in `backend/src/app.js` (middleware added in T005/T006; this task performs app-level composition only)
+- [x] T067 [US6] Add CORS origin allowlist enforcement in `backend/src/middleware/cors.middleware.js`
+- [x] T068 [US6] Add explicit structured dependency-failure error path in `backend/src/middleware/error.middleware.js` (FR-017, Principle IX)
+- [x] T069 [US6] Implement graceful shutdown handlers (SIGTERM/SIGINT) in `backend/src/index.js` with 10s in-flight HTTP / 30s background-job bounds (FR-034, SC-019, Decision 7)
 
 **Checkpoint**: At this point, User Stories 1 through 4 and 6 should all work independently.
 
@@ -197,27 +197,27 @@
 
 ### Tests for User Story 5
 
-- [X] T070 [P] [US5] Integration test: comment, follow, and like events each create a notification for the target user in `backend/tests/integration/notification.test.js` (FR-027)
-- [X] T071 [P] [US5] Integration test: repeated comment/follow/like events (same idempotency key) produce exactly one notification each, no duplicates in `backend/tests/integration/notification.test.js` (FR-027)
+- [x] T070 [P] [US5] Integration test: comment, follow, and like events each create a notification for the target user in `backend/tests/integration/notification.test.js` (FR-027)
+- [x] T071 [P] [US5] Integration test: repeated comment/follow/like events (same idempotency key) produce exactly one notification each, no duplicates in `backend/tests/integration/notification.test.js` (FR-027)
 
 ### Implementation for User Story 5
 
-- [X] T072 [P] [US5] Create Comment model in `backend/src/models/comment.model.js`
-- [X] T073 [P] [US5] Create Notification model in `backend/src/models/notification.model.js`
-- [X] T074 [P] [US5] Create Comment repository interface in `backend/src/repositories/interfaces/comment.repository.js`
-- [X] T075 [P] [US5] Create Notification repository interface in `backend/src/repositories/interfaces/notification.repository.js`
-- [X] T076 [P] [US5] Create Comment mongoose implementation in `backend/src/repositories/implementations/mongoose/comment.repository.js`
-- [X] T077 [P] [US5] Create Notification mongoose implementation in `backend/src/repositories/implementations/mongoose/notification.repository.js`
-- [X] T078 [P] [US5] Create Comment validator in `backend/src/validators/comment.validator.js`
-- [X] T079 [P] [US5] Create Notification validator in `backend/src/validators/notification.validator.js`
-- [X] T080 [US5] Create Comment service with optimistic locking and emit an audit entry on create in `backend/src/service/comment.service.js` (FR-030)
-- [X] T081 [US5] Create Notification service in `backend/src/service/notification.service.js`
-- [X] T082 [US5] Create notification queue and worker with bounded retry + dead-letter queue in `backend/src/workers/notification.worker.js` (FR-027, SC-017, Decision 6)
-- [X] T083 [P] [US5] Create Comment routes in `backend/src/routes/comment.routes.js`
-- [X] T084 [P] [US5] Create Notification routes in `backend/src/routes/notification.routes.js`
-- [X] T085 [US5] Wire comment and notification controllers in `backend/src/controller/comment.controller.js` and `backend/src/controller/notification.controller.js`
-- [X] T086 [US5] Wire comment and notification routes into `backend/src/app.js`
-- [X] T087 [US5] Seed default roles and permissions via `backend/src/configs/seed.js` for the runtime-configurable ABAC admin API (FR-015)
+- [x] T072 [P] [US5] Create Comment model in `backend/src/models/comment.model.js`
+- [x] T073 [P] [US5] Create Notification model in `backend/src/models/notification.model.js`
+- [x] T074 [P] [US5] Create Comment repository interface in `backend/src/repositories/interfaces/comment.repository.js`
+- [x] T075 [P] [US5] Create Notification repository interface in `backend/src/repositories/interfaces/notification.repository.js`
+- [x] T076 [P] [US5] Create Comment mongoose implementation in `backend/src/repositories/implementations/mongoose/comment.repository.js`
+- [x] T077 [P] [US5] Create Notification mongoose implementation in `backend/src/repositories/implementations/mongoose/notification.repository.js`
+- [x] T078 [P] [US5] Create Comment validator in `backend/src/validators/comment.validator.js`
+- [x] T079 [P] [US5] Create Notification validator in `backend/src/validators/notification.validator.js`
+- [x] T080 [US5] Create Comment service with optimistic locking and emit an audit entry on create in `backend/src/service/comment.service.js` (FR-030)
+- [x] T081 [US5] Create Notification service in `backend/src/service/notification.service.js`
+- [x] T082 [US5] Create notification queue and worker with bounded retry + dead-letter queue in `backend/src/workers/notification.worker.js` (FR-027, SC-017, Decision 6)
+- [x] T083 [P] [US5] Create Comment routes in `backend/src/routes/comment.routes.js`
+- [x] T084 [P] [US5] Create Notification routes in `backend/src/routes/notification.routes.js`
+- [x] T085 [US5] Wire comment and notification controllers in `backend/src/controller/comment.controller.js` and `backend/src/controller/notification.controller.js`
+- [x] T086 [US5] Wire comment and notification routes into `backend/src/app.js`
+- [x] T087 [US5] Seed default roles and permissions via `backend/src/configs/seed.js` for the runtime-configurable ABAC admin API (FR-015)
 
 **Checkpoint**: At this point, all user stories should be independently functional.
 
@@ -235,6 +235,16 @@
 - [x] T093 Verify server boots cleanly and all health endpoints return expected status
 - [x] T094 [P] Run full test suite (unit/integration/e2e/performance) via `npm test` and ensure it passes before merge (Constitution VI)
 - [x] T095 [P] Add p95 latency load test under 1000 concurrent users asserting p95 < 950ms in `backend/tests/performance/load.test.js` (SC-005)
+
+---
+
+## Phase 10: Convergence
+
+- [x] T096 Refactor all services in `backend/src/service/` to import repository interfaces from `repositories/interfaces/` instead of concrete Mongoose implementations from `repositories/implementations/mongoose/`, per Constitution Principle V (Swappable Persistence) (contradicts)
+- [x] T097 Add admin API endpoints for runtime role and permission CRUD in `backend/src/routes/` (e.g., `admin.routes.js`), wired through `backend/src/app.js`, per FR-015 (missing)
+- [x] T098 Apply `requireAttributes` ABAC middleware to at least one protected route, or remove the unused middleware from `backend/src/middleware/role.middleware.js` to satisfy FR-023 without dead code (partial)
+- [x] T099 Remove unused `backend/src/models/refresh-token.model.js` and `backend/src/repositories/implementations/mongoose/refresh.repository.js`, or integrate them into the auth flow to replace the current Session-based refresh token storage (unrequested)
+- [x] T100 Add a metric or performance test verifying SC-020's 80% cache hit rate for hot post reads served from the Redis feed cache (partial)
 
 ---
 
