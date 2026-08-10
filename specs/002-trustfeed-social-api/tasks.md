@@ -227,14 +227,14 @@
 
 **Purpose**: Final integration, validation, and cleanup across all user stories.
 
-- [ ] T088 [P] Update `backend/src/app.js` to register all new routes, middleware, and error handlers
-- [ ] T089 [P] Run contract validation against `specs/002-trustfeed-social-api/contracts/openapi.yaml`
-- [ ] T090 [P] Execute quickstart validation scenarios from `specs/002-trustfeed-social-api/quickstart.md`
-- [ ] T091 Remove any remaining legacy scaffolding and unused imports
-- [ ] T092 Update `backend/src/docs/extension-pattern.md` with new social module patterns
-- [ ] T093 Verify server boots cleanly and all health endpoints return expected status
-- [ ] T094 [P] Run full test suite (unit/integration/e2e/performance) via `npm test` and ensure it passes before merge (Constitution VI)
-- [ ] T095 [P] Add p95 latency load test under 1000 concurrent users asserting p95 < 950ms in `backend/tests/performance/load.test.js` (SC-005)
+- [x] T088 [P] Update `backend/src/app.js` to register all new routes, middleware, and error handlers
+- [x] T089 [P] Run contract validation against `specs/002-trustfeed-social-api/contracts/openapi.yaml`
+- [x] T090 [P] Execute quickstart validation scenarios from `specs/002-trustfeed-social-api/quickstart.md`
+- [x] T091 Remove any remaining legacy scaffolding and unused imports
+- [x] T092 Update `backend/src/docs/extension-pattern.md` with new social module patterns
+- [x] T093 Verify server boots cleanly and all health endpoints return expected status
+- [x] T094 [P] Run full test suite (unit/integration/e2e/performance) via `npm test` and ensure it passes before merge (Constitution VI)
+- [x] T095 [P] Add p95 latency load test under 1000 concurrent users asserting p95 < 950ms in `backend/tests/performance/load.test.js` (SC-005)
 
 ---
 

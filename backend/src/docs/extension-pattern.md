@@ -16,32 +16,49 @@ routes  ──>  controllers  ──>  services  ──>  repositories  ──> 
 ## Steps to add a resource `widgets`
 
 1. **Model** — `src/models/widget.model.js`
-    Register the schema on the shared default Mongoose connection (`mongoose.model("Widget", widgetSchema)`). Keep the model file free of infrastructure imports; no service logic.
+   Register the schema on the shared default Mongoose connection (`mongoose.model("Widget", widgetSchema)`). Keep the model file free of infrastructure imports; no service logic.
 
 2. **Repository interface** — `src/repositories/interfaces/widget.repository.js`
    Declare the methods the service needs (e.g. `create`, `findById`, `findMany`, `update`, `deleteById`). No implementation.
 
 3. **Mongoose implementation** — `src/repositories/implementations/mongoose/widget.repository.js`
-   Implement the interface against the Mongoose model. Add indexes here; keep queries batched (no N+1).
+   Implement the interface against the Mongoose model. Add indexes here; keep queries batched (no N+1). In-memory implementations are retired (Research Decision 9): tests use `mongodb-memory-server` for real store behavior.
 
-4. **In-memory implementation (tests)** — `src/repositories/implementations/memory/widget.repository.js`
-   Mirror the interface for unit tests. Not used in production.
-
-5. **Validator** — `src/validators/widget.validator.js`
+4. **Validator** — `src/validators/widget.validator.js`
    Zod schemas (`createWidgetSchema`, `updateWidgetSchema`).
 
-6. **Service** — `src/service/widget.service.js`
+5. **Service** — `src/service/widget.service.js`
    Import the concrete Mongoose repository, instantiate it, implement business rules, throw domain errors from `utils/errors.js`.
 
-7. **Controller** — `src/controller/widget.controller.js`
-   Thin handlers: validate via middleware, call the service, return `201/200/204`. Delegate auth/session concerns to `auth.controller.js`.
+6. **Controller** — `src/controller/widget.controller.js`
+   Thin handlers: validate via middleware, call the service, return `201/200/204`.
 
-8. **Routes** — `src/routes/widget.routes.js`
+7. **Routes** — `src/routes/widget.routes.js`
    Wire `validate(...)`, `requirePermission(...)`, and the controller. Mount under `/api/v1/widgets` in `app.js` with `authMiddleWare` + `apiLimiter`.
 
-9. **Permissions & seed** — add codes (e.g. `widgets:create`) to `configs/seed.js` and reference them from `role.middleware.js` via `requirePermission("widgets:create")`.
+8. **Permissions & seed** — add codes (e.g. `widgets:create`) to `configs/seed.js` and reference them via `requirePermission("widgets:create")` in the routes.
 
-10. **Contract** — add the paths to `specs/001-secure-clean-arch/contracts/openapi.yaml`.
+9. **Contract** — add the paths to `specs/002-trustfeed-social-api/contracts/` (paths/ plus schemas/responses components), then run `npm run contract:sync` to publish the byte-identical copy under `backend/src/docs/openapi/`. `npm run contract:lint` and `npm run contract:check` gate the merge.
+
+## Social module patterns (follows, likes, comments, notifications, feed)
+
+Resources with cross-user effects follow the same skeleton plus these conventions:
+
+- **Audit logging** — security-relevant events (auth failures, token reuse, resource mutations) are recorded via `auditService.record({ action, actorId, targetType, targetId, metadata, ip, userAgent })` in `src/service/audit.service.js` (FR-030). The writer is injected at app composition (`app.js`), and every entry is correlated via the correlation middleware (FR-031). Audit failures are logged, never thrown.
+
+- **Notification dispatch** — follow/like/comment services publish jobs through the notification queue (`src/service/notification.queue.js`, `notificationQueue.add(...)`) instead of writing notifications directly. The BullMQ worker (`src/workers/notification.worker.js`) applies bounded retries and a dead-letter queue (FR-027, SC-017). Register the dispatcher with `registerNotificationDispatcher()` at app composition; the queue falls back to an in-process runner when the backend is unreachable.
+
+- **Idempotency** — mutating endpoints that must be safe against duplicate delivery (comments, likes, follows) mount `idempotencyMiddleware` on their routes; clients send an `Idempotency-Key` header and duplicates are deduplicated via Redis (FR-028).
+
+- **Rate limiting** — three limiters exist in `src/middleware/ratelimiter.middleware.js` / `authlimiter.middleware.js`:
+  - `apiLimiter` — global authenticated endpoints (keyed `user:<id>`; IP for public routes).
+  - `socialMutationLimiter` — stricter budget for follow/like write endpoints (social-spam vectors).
+  - `authLimiter` — strict per-IP budget on login.
+  Add new social write routes under `socialMutationLimiter`, plain reads under `apiLimiter`. New limiters are created with the `createRateLimiter({ windowMs, limit })` factory — do not duplicate the options block.
+
+- **Optimistic locking** — mutable resources (posts, comments) carry a `version`; update paths verify it and return `CONFLICT` on mismatch (Constitution XI).
+
+- **Ownership & ABAC** — mutations verify ownership in the service layer (`OWNERSHIP_REQUIRED`); permission checks live in route middleware (`requirePermission`); attribute-based checks use `requireAttributes(evaluate)`.
 
 ## Swapping persistence
 

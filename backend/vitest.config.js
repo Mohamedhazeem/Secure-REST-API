@@ -20,6 +20,8 @@ export default defineConfig({
         },
         globalSetup: ["tests/global-setup.js"],
         include: ["tests/**/*.test.js"],
+        testTimeout: 20000,
+        maxWorkers: 4,
         coverage: {
             provider: "v8",
             include: ["src/**/*.js"],

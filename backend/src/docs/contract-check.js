@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { load } from "js-yaml";
-import { API_VERSION } from "../../configs/constants.js";
+import { API_VERSION } from "../../src/configs/constants.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

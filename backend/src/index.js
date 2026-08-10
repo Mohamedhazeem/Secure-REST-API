@@ -88,6 +88,19 @@ const closeBackgroundJobs = async () => {
 };
 
 /**
+ * Race a promise against a hard bound so a stuck dependency (e.g. ioredis
+ * `quit()` while the client is in a reconnect loop) cannot hang shutdown.
+ * @param {Promise<unknown>} promise
+ * @param {number} boundMs
+ * @returns {Promise<unknown>}
+ */
+const withBound = (promise, boundMs) =>
+    Promise.race([
+        promise,
+        new Promise((resolve) => setTimeout(resolve, boundMs).unref?.()),
+    ]);
+
+/**
  * Graceful shutdown (FR-034, SC-019, Decision 7).
  *
  * Stops accepting new connections, lets in-flight HTTP requests finish
@@ -107,32 +120,31 @@ export const shutdown = async (signal) => {
     if (server) {
         const httpBound = config.gracefulShutdownHttpTimeoutMs;
         const closed = new Promise((resolve) => server.close(resolve));
+        let forcedTimer = null;
         const forced = new Promise((resolve) => {
-            const timer = setTimeout(() => {
+            forcedTimer = setTimeout(() => {
                 logger.error("shutdown.http.timeout", { boundMs: httpBound });
                 server.closeAllConnections?.();
                 resolve();
             }, httpBound);
-            timer.unref?.();
+            forcedTimer.unref?.();
         });
         await Promise.race([closed, forced]);
+        clearTimeout(forcedTimer);
     }
 
     const jobsBound = config.gracefulShutdownJobsTimeoutMs;
-    await Promise.race([
-        closeBackgroundJobs(),
-        new Promise((resolve) => setTimeout(resolve, jobsBound).unref?.()),
-    ]);
+    await withBound(closeBackgroundJobs(), jobsBound);
 
     try {
-        await mongoose.disconnect();
+        await withBound(mongoose.disconnect(), jobsBound);
     } catch (error) {
         logger.error("shutdown.mongo.failed", { error: error.message });
     }
 
     if (typeof redisClient.quit === "function") {
         try {
-            await redisClient.quit();
+            await withBound(redisClient.quit(), 5000);
         } catch (error) {
             logger.error("shutdown.redis.failed", { error: error.message });
         }
