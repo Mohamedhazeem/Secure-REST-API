@@ -145,13 +145,13 @@
 
 **Purpose**: Improvements that affect multiple user stories and final validation
 
-- [ ] T030 [P] Add API Console section to README.md with URL, usage instructions, authentication flow, and explanation that OpenAPI remains the source of truth
-- [ ] T031 [P] Create `backend/tests/integration/console.test.js` with test setup and helpers
-- [ ] T032 [P] Add smoke test for `/console` route in `backend/tests/integration/console.test.js`
-- [ ] T033 [P] Add smoke test for `/console/openapi.json` route in `backend/tests/integration/console.test.js`
-- [ ] T034 Verify `backend/src/docs/console.html` contains no secrets, tokens, or hardcoded credentials
-- [ ] T035 Run `quickstart.md` validation scenarios and confirm all pass
-- [ ] T036 [P] Configure Scalar responsive layout options for desktop/tablet screen sizes in backend/src/docs/console.html
+- [x] T030 [P] Add API Console section to README.md with URL, usage instructions, authentication flow, and explanation that OpenAPI remains the source of truth
+- [x] T031 [P] Create `backend/tests/integration/console.test.js` with test setup and helpers
+- [x] T032 [P] Add smoke test for `/console` route in `backend/tests/integration/console.test.js`
+- [x] T033 [P] Add smoke test for `/console/openapi.json` route in `backend/tests/integration/console.test.js`
+- [x] T034 Verify `backend/src/docs/console.html` contains no secrets, tokens, or hardcoded credentials
+- [x] T035 Run `quickstart.md` validation scenarios and confirm all pass
+- [x] T036 [P] Configure Scalar responsive layout options for desktop/tablet screen sizes in backend/src/docs/console.html
 
 ---
 

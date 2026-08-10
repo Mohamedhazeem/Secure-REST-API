@@ -583,6 +583,19 @@ Coverage targets are tracked by the test suite itself; the full suite must pass 
 
 ---
 
+## API Console
+
+An interactive API Console is served at `/console` when the backend is running. It renders the published OpenAPI contract using Scalar, letting reviewers browse endpoints, inspect schemas, authenticate with their real TrustFeed cookie-based session, and execute requests without leaving the browser.
+
+- **URL**: `http://localhost:1430/console`
+- **OpenAPI source of truth**: `/console/openapi.json` (resolved from the canonical multi-file contract at runtime)
+- **Authentication**: Uses the same HTTP-only cookies as the API (`access_token`, `refresh_token`). No demo credentials or auth bypasses are provided.
+- **CORS**: Because the console is served from the same origin as the API, no cross-origin configuration is required for local development.
+
+The console is a thin developer documentation surface served from the existing backend. It does not introduce a frontend framework, build step, or separate application, and it does not weaken the existing security model.
+
+---
+
 ## Environment Variables
 
 Create `backend/.env`:
