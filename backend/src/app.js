@@ -1,4 +1,5 @@
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import express from "express";
 import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
@@ -26,6 +27,10 @@ import "./configs/database.js";
 import { API_VERSION } from "./configs/constants.js";
 
 export const app = express();
+
+// ES modules do not provide `__dirname`; resolve it from the module URL so the
+// console asset path is correct under `node src/index.js` (US2, T009/T010).
+const moduleDir = dirname(fileURLToPath(import.meta.url));
 
 // App-level composition (US6, T066): audit events (FR-030) are persisted
 // through the AuditLog repository; every entry is correlated via the
@@ -71,7 +76,7 @@ app.get("/console/openapi.json", (req, res) => {
 app.get("/", (req, res) => res.redirect(302, "/console"));
 
 app.get("/console", (req, res) => {
-  res.sendFile(join(__dirname, "docs", "console.html"));
+  res.sendFile(join(moduleDir, "docs", "console.html"));
 });
 
 app.use(notFoundHandler);

@@ -8,6 +8,16 @@ A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. 
   <img src="assets/cover.svg" alt="TrustFeed API — Clean architecture, defense-in-depth security, stable API contract" width="100%">
 </p>
 
+<p align="center">
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-63D168?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=8BC34A" />
+  <img alt="Express" src="https://img.shields.io/badge/Express-005915?style=flat-square&logo=express&logoColor=white&labelColor=096ddb" />
+  <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white&labelColor=13aa8b" />
+  <img alt="Redis" src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white&labelColor=ff6b35" />
+  <img alt="JWT" src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=JSON%20web%20token&logoColor=white&labelColor=ea232b" />
+  <img alt="BullMQ" src="https://img.shields.io/badge/BullMQ-646CE9?style=flat-square&logoColor=white&labelColor=4e4ea6" />
+  <img alt="Zod" src="https://img.shields.io/badge/Zod-10BEFF?style=flat-square&logo=zod&logoColor=white&labelColor=2563eb" />
+</p>
+
 ---
 
 ## Table of Contents

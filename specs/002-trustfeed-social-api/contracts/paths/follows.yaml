@@ -6,6 +6,7 @@ follow:
     operationId: followUser
     security:
       - cookieAuth: []
+    description: Follow another user. Re-following or self-following returns `409 Conflict`. Requires `follows:create` permission.
     parameters:
       - name: id
         in: path
@@ -42,6 +43,7 @@ unfollow:
     operationId: unfollowUser
     security:
       - cookieAuth: []
+    description: Unfollow a user the authenticated user is currently following. Requires `follows:delete` permission.
     parameters:
       - name: id
         in: path

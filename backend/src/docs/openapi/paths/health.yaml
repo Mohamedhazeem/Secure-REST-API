@@ -19,6 +19,7 @@ liveness:
     summary: Liveness probe - the process is alive and serving requests
     operationId: getLiveness
     security: []
+    description: Simple liveness check. Returns `200` if the process is running. No authentication required.
     responses:
       '200':
         description: Process is alive
@@ -53,6 +54,7 @@ readiness:
     summary: Readiness probe - reports critical dependency status (FR-032, SC-018)
     operationId: getReadiness
     security: []
+    description: Readiness check that verifies connectivity to MongoDB and Redis. Returns `200` if both dependencies are reachable, `503` if either is down. No authentication required.
     responses:
       '200':
         description: All critical dependencies are reachable

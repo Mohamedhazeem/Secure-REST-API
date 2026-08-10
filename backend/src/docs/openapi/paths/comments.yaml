@@ -11,6 +11,7 @@ collection:
       - Comments
     summary: List comments for a post
     operationId: listComments
+    description: Retrieve a paginated list of comments for a specific post. No authentication required.
     parameters:
       - name: page
         in: query
@@ -40,6 +41,7 @@ collection:
     operationId: createComment
     security:
       - cookieAuth: []
+    description: Create a comment on a post. Supports an optional `idempotencyKey` in the body for safe retries; replaying the same key returns the original comment with `409`. Requires `comments:create` permission.
     requestBody:
       required: true
       content:

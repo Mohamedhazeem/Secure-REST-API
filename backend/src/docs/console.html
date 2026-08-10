@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrustFeed API Console</title>
-  <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
   <style>
     body { margin: 0; background: #0b0c0e; }
     .trustfeed-intro {
@@ -17,6 +16,16 @@
     .trustfeed-intro h1 { margin: 0 0 8px; font-size: 24px; }
     .trustfeed-intro p { margin: 0 0 12px; line-height: 1.5; opacity: 0.85; }
     .trustfeed-intro ul { margin: 8px 0; padding-left: 20px; opacity: 0.85; }
+    .trustfeed-error {
+      display: none;
+      padding: 16px 24px;
+      margin: 0 auto 24px;
+      max-width: 900px;
+      color: #ffb4b4;
+      font-family: system-ui, -apple-system, sans-serif;
+      border: 1px solid #5a2b2b;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
@@ -35,48 +44,48 @@
     </ul>
   </div>
 
-  <scalar-api-reference
-    id="scalar"
-    url="/console/openapi.json"
-    layout="modern"
-    dark-mode="true"
-    tags-sections="true"
-  ></scalar-api-reference>
+  <div id="trustfeed-error" class="trustfeed-error">
+    The API reference renderer could not be loaded. Check your network connection and reload
+    <code>/console</code>. The OpenAPI contract is still available at
+    <a href="/console/openapi.json">/console/openapi.json</a>.
+  </div>
 
+  <div id="app"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
   <script>
-    document.getElementById('scalar').scalar = {
-      spec: {
+    (function () {
+      if (typeof Scalar === 'undefined' || typeof Scalar.createApiReference !== 'function') {
+        document.getElementById('trustfeed-error').style.display = 'block';
+        return;
+      }
+
+      Scalar.createApiReference('#app', {
+        // The OpenAPI contract is the single source of truth (FR-012, FR-016).
         url: '/console/openapi.json',
-      },
-      authentication: {
-        cookie: {
-          name: 'access_token',
+        // The contract declares a relative server (`/api/v1`). Prefixing it with
+        // the current origin makes requests same-origin against the running
+        // backend, so no CORS handling or proxy is needed (R4).
+        baseServerURL: window.location.origin,
+        // TrustFeed issues HTTP-only access/refresh cookies that JavaScript can
+        // never read. Sending credentials lets the browser attach them
+        // automatically to executed requests (FR-009, R3).
+        customFetch: function (input, init) {
+          return window.fetch(input, Object.assign({}, init, { credentials: 'include' }));
         },
-      },
-      metaData: {
-        title: 'TrustFeed API Console',
-      },
-      theme: 'dark',
-      layout: {
-        tags: {
-          sections: [
-            { title: 'Authentication', items: ['auth', 'auth/login', 'auth/logout', 'auth/refresh', 'auth/me', 'auth/sessions', 'auth/sessions/{id}'] },
-            { title: 'Users', items: ['users/me'] },
-            { title: 'Posts', items: ['posts', 'posts/me', 'posts/{id}', 'posts/{id}/comments', 'posts/{id}/likes', 'posts/{id}/likes/me'] },
-            { title: 'Follows', items: ['users/{id}/follow', 'users/{id}/unfollow'] },
-            { title: 'Likes', items: ['posts/{id}/likes', 'posts/{id}/likes/me'] },
-            { title: 'Feed', items: ['feed'] },
-            { title: 'Notifications', items: ['notifications', 'notifications/{id}/read'] },
-            { title: 'Admin', items: ['admin/roles', 'admin/roles/{id}', 'admin/permissions', 'admin/permissions/{id}'] },
-            { title: 'Health', items: ['health', 'health/ready'] },
-          ],
+        metaData: {
+          title: 'TrustFeed API Console',
+          description: 'Interactive console for the TrustFeed social REST API',
         },
-      },
-      responsive: {
-        enabled: true,
-        minWidth: 1024,
-      },
-    };
+        theme: 'default',
+        layout: 'modern',
+        forceDarkModeState: 'dark',
+        documentDownloadType: 'json',
+        // Open the documented response sections so status codes and schemas are
+        // visible without extra clicks while browsing the reference.
+        expandAllResponses: true,
+      });
+    })();
   </script>
 </body>
 </html>

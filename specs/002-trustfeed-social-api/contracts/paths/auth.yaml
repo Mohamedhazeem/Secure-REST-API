@@ -5,6 +5,7 @@ register:
     summary: Register a new user
     operationId: register
     security: []
+    description: Register a new user account. On success, access and refresh tokens are set as HTTP-only cookies. Rate limited to prevent abuse.
     requestBody:
       required: true
       content:
@@ -34,6 +35,7 @@ login:
     summary: Login with email and password
     operationId: login
     security: []
+    description: Authenticate with email and password. On success, access and refresh tokens are set as HTTP-only cookies. Rate limited to prevent credential stuffing.
     requestBody:
       required: true
       content:
@@ -62,6 +64,7 @@ logout:
     operationId: logout
     security:
       - cookieAuth: []
+    description: Invalidate the current session by clearing the refresh token and revoking the access token.
     responses:
       '200':
         $ref: '../components/responses.yaml#/SuccessMessage'
@@ -78,6 +81,7 @@ refresh:
     operationId: refreshAccessToken
     security:
       - refreshCookieAuth: []
+    description: Obtain a new access token using the valid refresh token cookie. The old refresh token is rotated; reusing a revoked refresh token returns `403`.
     responses:
       '200':
         $ref: '../components/responses.yaml#/SuccessMessage'
@@ -102,6 +106,7 @@ me:
     operationId: deleteAccount
     security:
       - cookieAuth: []
+    description: Permanently delete the authenticated user's account and all associated data. This action is irreversible.
     responses:
       '200':
         $ref: '../components/responses.yaml#/SuccessMessage'
@@ -118,6 +123,7 @@ sessions:
     operationId: listSessions
     security:
       - cookieAuth: []
+    description: List all active refresh-token sessions for the authenticated user, including device metadata and expiration.
     responses:
       '200':
         description: Active sessions with device metadata
@@ -145,6 +151,7 @@ sessionsById:
     operationId: revokeSession
     security:
       - cookieAuth: []
+    description: Revoke a specific refresh-token session by its ID. Subsequent requests using that session's access token will be rejected.
     parameters:
       - name: id
         in: path

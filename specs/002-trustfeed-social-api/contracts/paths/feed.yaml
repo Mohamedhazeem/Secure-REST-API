@@ -6,6 +6,7 @@ feed:
     operationId: getFeed
     security:
       - cookieAuth: []
+    description: Retrieve a cursor-paginated feed of posts from users the authenticated user follows. Use the `cursor` from a previous response to fetch the next page. Requires `feed:read` permission.
     parameters:
       - name: cursor
         in: query

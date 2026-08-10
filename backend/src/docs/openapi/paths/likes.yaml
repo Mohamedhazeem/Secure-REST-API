@@ -6,6 +6,7 @@ collection:
     operationId: likePost
     security:
       - cookieAuth: []
+    description: Like a post on behalf of the authenticated user. Supports an optional `Idempotency-Key` header for safe retries. Re-liking an already liked post returns `409 Conflict`. Requires `likes:create` permission.
     parameters:
       - name: id
         in: path
@@ -13,6 +14,12 @@ collection:
         schema:
           type: string
         description: Post ID
+      - name: Idempotency-Key
+        in: header
+        description: Client-generated key for idempotent like creation
+        schema:
+          type: string
+          maxLength: 255
     requestBody:
       required: true
       content:
@@ -49,6 +56,7 @@ collection:
     operationId: unlikePost
     security:
       - cookieAuth: []
+    description: Remove the authenticated user's like from a post. Requires `likes:delete` permission.
     parameters:
       - name: id
         in: path
@@ -76,6 +84,7 @@ currentUser:
     operationId: isPostLiked
     security:
       - cookieAuth: []
+    description: Returns whether the authenticated user has liked the specified post. Requires `likes:read` permission.
     parameters:
       - name: id
         in: path

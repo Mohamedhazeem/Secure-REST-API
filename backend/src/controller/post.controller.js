@@ -44,7 +44,8 @@ export const getPosts = async (req, res, next) => {
 
 export const updatePost = async (req, res, next) => {
     try {
-        const post = await postService.updatePost(req.params.id, req.user._id, req.body);
+        const version = req.body.version ?? req.header("If-Match");
+        const post = await postService.updatePost(req.params.id, req.user._id, { ...req.body, version });
         return sendSuccess(res, 200, { post });
     } catch (err) {
         next(err);

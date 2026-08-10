@@ -6,6 +6,7 @@ collection:
     operationId: listPosts
     security:
       - cookieAuth: []
+    description: Returns public posts and the caller's own posts. Requires `posts:read` permission.
     parameters:
       - name: page
         in: query
@@ -39,6 +40,14 @@ collection:
     operationId: createPost
     security:
       - cookieAuth: []
+    description: Create a new post as the authenticated user. Supports an optional `Idempotency-Key` header for safe retries. Requires `posts:create` permission.
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        description: Client-generated key for idempotent request replay
+        schema:
+          type: string
+          maxLength: 255
     requestBody:
       required: true
       content:
@@ -71,6 +80,7 @@ me:
     operationId: listMyPosts
     security:
       - cookieAuth: []
+    description: List posts authored by the authenticated user. Requires `posts:read` permission.
     parameters:
       - name: page
         in: query
@@ -106,12 +116,18 @@ byId:
     operationId: updatePost
     security:
       - cookieAuth: []
+    description: Update a post owned by the authenticated user. Supports optimistic concurrency via the `If-Match` header (or `version` in the body). A stale version returns `409 Conflict`. Requires `posts:update` permission.
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+      - name: If-Match
+        in: header
+        description: Expected post version for optimistic concurrency
+        schema:
+          type: integer
     requestBody:
       required: true
       content:
@@ -146,6 +162,7 @@ byId:
     operationId: deletePost
     security:
       - cookieAuth: []
+    description: Permanently delete a post owned by the authenticated user. Requires `posts:delete` permission.
     parameters:
       - name: id
         in: path

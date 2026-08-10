@@ -6,6 +6,7 @@ notifications:
     operationId: listNotifications
     security:
       - cookieAuth: []
+    description: Retrieve a paginated list of notifications for the authenticated user. Requires `notifications:read` permission.
     parameters:
       - name: page
         in: query
@@ -37,6 +38,7 @@ markRead:
     operationId: markNotificationRead
     security:
       - cookieAuth: []
+    description: Mark a specific notification as read. Requires `notifications:update` permission and ownership of the notification.
     parameters:
       - name: id
         in: path

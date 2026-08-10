@@ -6,6 +6,7 @@ me:
     operationId: getMyProfile
     security:
       - cookieAuth: []
+    description: Retrieve the authenticated user's profile information.
     responses:
       '200':
         description: Current user profile
@@ -24,6 +25,7 @@ me:
     operationId: updateMyProfile
     security:
       - cookieAuth: []
+    description: Update the authenticated user's profile fields such as display name, bio, avatar URL, and privacy settings.
     requestBody:
       required: true
       content:

@@ -69,8 +69,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Verify GET /health executes from console and displays formatted JSON response with status in backend/src/docs/console.html
-- [ ] T010 [US2] Verify GET /health/ready executes from console and displays MongoDB/Redis dependency status in backend/src/docs/console.html
+- [x] T009 [US2] Verify GET /health executes from console and displays formatted JSON response with status in backend/src/docs/console.html
+- [x] T010 [US2] Verify GET /health/ready executes from console and displays MongoDB/Redis dependency status in backend/src/docs/console.html
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -84,10 +84,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T011 [US3] Ensure POST /auth/register executes from console, returns 201 with user data, and stores cookies in backend/src/docs/console.html
-- [ ] T012 [US3] Ensure POST /auth/login executes from console, returns tokens, and stores cookies in backend/src/docs/console.html
-- [ ] T013 [US3] Ensure POST /posts creates a post using stored cookies after authentication in backend/src/docs/console.html
-- [ ] T014 [US3] Ensure error responses display HTTP status, TrustFeed error code, message, and trace ID in backend/src/docs/console.html
+- [x] T011 [US3] Ensure POST /auth/register executes from console, returns 201 with user data, and stores cookies in backend/src/docs/console.html
+- [x] T012 [US3] Ensure POST /auth/login executes from console, returns tokens, and stores cookies in backend/src/docs/console.html
+- [x] T013 [US3] Ensure POST /posts creates a post using stored cookies after authentication in backend/src/docs/console.html
+- [x] T014 [US3] Ensure error responses display HTTP status, TrustFeed error code, message, and trace ID in backend/src/docs/console.html
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently
 
@@ -101,10 +101,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T015 [US4] Ensure POST /auth/refresh rotates tokens correctly in console in backend/src/docs/console.html
-- [ ] T016 [US4] Ensure GET /auth/sessions lists active sessions in console in backend/src/docs/console.html
-- [ ] T017 [US4] Ensure DELETE /auth/sessions/:id revokes session and blocks subsequent requests in console in backend/src/docs/console.html
-- [ ] T018 [US4] Ensure POST /auth/logout invalidates session in console in backend/src/docs/console.html
+- [x] T015 [US4] Ensure POST /auth/refresh rotates tokens correctly in console in backend/src/docs/console.html
+- [x] T016 [US4] Ensure GET /auth/sessions lists active sessions in console in backend/src/docs/console.html
+- [x] T017 [US4] Ensure DELETE /auth/sessions/:id revokes session and blocks subsequent requests in console in backend/src/docs/console.html
+- [x] T018 [US4] Ensure POST /auth/logout invalidates session in console in backend/src/docs/console.html
 
 **Checkpoint**: At this point, User Stories 1-4 should all work independently
 
@@ -118,10 +118,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T019 [US5] Ensure Idempotency-Key header input works for POST /posts and like endpoints in console in backend/src/docs/console.html
-- [ ] T020 [US5] Ensure If-Match header input works for PATCH /posts/:id optimistic concurrency in backend/src/docs/console.html
-- [ ] T021 [US5] Ensure cursor/limit pagination inputs work for feed and list endpoints in backend/src/docs/console.html
-- [ ] T022 [US5] Ensure rate-limit 429 response displays RATE_LIMITED code and Retry-After header in console in backend/src/docs/console.html
+- [x] T019 [US5] Ensure Idempotency-Key header input works for POST /posts and like endpoints in console in backend/src/docs/console.html
+- [x] T020 [US5] Ensure If-Match header input works for PATCH /posts/:id optimistic concurrency in backend/src/docs/console.html
+- [x] T021 [US5] Ensure cursor/limit pagination inputs work for feed and list endpoints in backend/src/docs/console.html
+- [x] T022 [US5] Ensure rate-limit 429 response displays RATE_LIMITED code and Retry-After header in console in backend/src/docs/console.html
 
 **Checkpoint**: At this point, User Stories 1-5 should all work independently
 
@@ -131,13 +131,13 @@
 
 **Purpose**: Improve the OpenAPI contract with examples and descriptions so the console renders useful request/response examples.
 
-- [ ] T023 [P] Add example values to request schemas in specs/002-trustfeed-social-api/contracts/components/schemas.yaml
-- [ ] T024 [P] Add example values to response schemas in specs/002-trustfeed-social-api/contracts/components/schemas.yaml
-- [ ] T025 [P] Enhance endpoint descriptions in specs/002-trustfeed-social-api/contracts/paths/*.yaml
-- [ ] T026 [P] Document Idempotency-Key, If-Match, and Retry-After headers in specs/002-trustfeed-social-api/contracts/components/headers.yaml
-- [ ] T027 [P] Add error response examples to specs/002-trustfeed-social-api/contracts/components/responses.yaml
-- [ ] T028 [P] Regenerate published OpenAPI contract via `npm run contract:sync`
-- [ ] T029 Validate updated contract via `npm run contract:lint`
+- [x] T023 [P] Add example values to request schemas in specs/002-trustfeed-social-api/contracts/components/schemas.yaml
+- [x] T024 [P] Add example values to response schemas in specs/002-trustfeed-social-api/contracts/components/schemas.yaml
+- [x] T025 [P] Enhance endpoint descriptions in specs/002-trustfeed-social-api/contracts/paths/*.yaml
+- [x] T026 [P] Document Idempotency-Key, If-Match, and Retry-After headers in specs/002-trustfeed-social-api/contracts/components/headers.yaml
+- [x] T027 [P] Add error response examples to specs/002-trustfeed-social-api/contracts/components/responses.yaml
+- [x] T028 [P] Regenerate published OpenAPI contract via `npm run contract:sync`
+- [x] T029 Validate updated contract via `npm run contract:lint`
 
 ---
 
