@@ -11,7 +11,7 @@ import {
     updatePermission,
     deletePermission,
     requireAdmin,
-} from "../controllers/admin.controller.js";
+} from "../controller/admin.controller.js";
 import { authMiddleWare } from "../middleware/auth.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
 import {
