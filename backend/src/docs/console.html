@@ -5,10 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrustFeed API Console</title>
   <style>
-    body { margin: 0; background: #0b0c0e; }
+    :root {
+      --tf-bg: #0b0c0e;
+      --tf-text: #e7e7e7;
+      --tf-error-text: #ffb4b4;
+      --tf-error-border: #5a2b2b;
+      --tf-btn-bg: #2a2a2e;
+      --tf-btn-text: #e7e7e7;
+      --tf-btn-border: #444;
+      --tf-btn-hover: #3a3a3e;
+    }
+    body {
+      margin: 0;
+      background: var(--tf-bg);
+      color: var(--tf-text);
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-mode {
+      --tf-bg: #f7f8fa;
+      --tf-text: #1a1a1a;
+      --tf-error-text: #8b1c1c;
+      --tf-error-border: #f5c6c6;
+      --tf-btn-bg: #ffffff;
+      --tf-btn-text: #1a1a1a;
+      --tf-btn-border: #d0d0d0;
+      --tf-btn-hover: #e5e5e5;
+      color-scheme: light;
+    }
+    body:not(.light-mode) {
+      color-scheme: dark;
+    }
     .trustfeed-intro {
       padding: 24px;
-      color: #e7e7e7;
+      color: var(--tf-text);
       font-family: system-ui, -apple-system, sans-serif;
       max-width: 900px;
       margin: 0 auto;
@@ -21,10 +50,43 @@
       padding: 16px 24px;
       margin: 0 auto 24px;
       max-width: 900px;
-      color: #ffb4b4;
+      color: var(--tf-error-text);
       font-family: system-ui, -apple-system, sans-serif;
-      border: 1px solid #5a2b2b;
+      border: 1px solid var(--tf-error-border);
       border-radius: 8px;
+    }
+    #theme-toggle-btn {
+      background: var(--tf-btn-bg);
+      color: var(--tf-btn-text);
+      border: 1px solid var(--tf-btn-border);
+      border-radius: 20px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    #theme-toggle-btn:hover {
+      background: var(--tf-btn-hover);
+    }
+    #theme-toggle-btn.floating {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      z-index: 9999;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    #app {
+      background: var(--tf-bg);
+      min-height: 100vh;
+      color: var(--tf-text);
+    }
+    body.light-mode #app {
+      background: #f7f8fa;
+      color: #1a1a1a;
     }
   </style>
 </head>
@@ -60,16 +122,110 @@
         return;
       }
 
-      Scalar.createApiReference('#app', {
-        // The OpenAPI contract is the single source of truth (FR-012, FR-016).
+      var scalarApi = null;
+      var isDark = true;
+      var toggleBtn = null;
+      var themeIcon = null;
+      var themeLabel = null;
+      var scalarToggleBtn = null;
+
+      function createThemeButton() {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-btn';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Toggle light/dark theme');
+
+        var icon = document.createElement('span');
+        icon.id = 'theme-icon';
+        icon.textContent = '\u2600\uFE0F';
+
+        var label = document.createElement('span');
+        label.id = 'theme-label';
+        label.textContent = 'Light Mode';
+
+        btn.appendChild(icon);
+        btn.appendChild(label);
+        return btn;
+      }
+
+      function findScalarToggleButton() {
+        var candidates = document.querySelectorAll('button, [role="button"]');
+        for (var i = 0; i < candidates.length; i++) {
+          var btn = candidates[i];
+          if (btn.id === 'theme-toggle-btn') continue;
+          var ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+          var text = (btn.textContent || '').toLowerCase();
+          if (ariaLabel.indexOf('theme') !== -1 || ariaLabel.indexOf('dark') !== -1 || ariaLabel.indexOf('light') !== -1 || text.indexOf('theme') !== -1 || text.indexOf('dark') !== -1 || text.indexOf('light') !== -1) {
+            return btn;
+          }
+        }
+        return null;
+      }
+
+      function injectThemeToggle() {
+        if (document.getElementById('theme-toggle-btn')) return;
+
+        var app = document.getElementById('app');
+        if (!app) return;
+
+        var sidebar = app.querySelector('[class*="sidebar"], .sidebar, nav, [role="navigation"]');
+        var btn = createThemeButton();
+
+        if (sidebar) {
+          sidebar.appendChild(btn);
+        } else {
+          btn.classList.add('floating');
+          document.body.appendChild(btn);
+        }
+
+        toggleBtn = document.getElementById('theme-toggle-btn');
+        themeIcon = document.getElementById('theme-icon');
+        themeLabel = document.getElementById('theme-label');
+      }
+
+      function clickScalarToggle() {
+        if (scalarToggleBtn && document.body.contains(scalarToggleBtn)) {
+          scalarToggleBtn.click();
+          return true;
+        }
+        scalarToggleBtn = findScalarToggleButton();
+        if (scalarToggleBtn) {
+          scalarToggleBtn.click();
+          return true;
+        }
+        return false;
+      }
+
+      function applyTheme(dark) {
+        isDark = dark;
+        document.body.classList.toggle('light-mode', !dark);
+        var appEl = document.getElementById('app');
+        if (appEl) {
+          appEl.classList.toggle('light-mode', !dark);
+        }
+        if (themeIcon) {
+          themeIcon.textContent = dark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+        }
+        if (themeLabel) {
+          themeLabel.textContent = dark ? 'Light Mode' : 'Dark Mode';
+        }
+        if (scalarApi && typeof scalarApi.setTheme === 'function') {
+          scalarApi.setTheme(dark ? 'dark' : 'light');
+          return;
+        }
+        clickScalarToggle();
+      }
+
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('#theme-toggle-btn');
+        if (btn) {
+          applyTheme(!isDark);
+        }
+      });
+
+      scalarApi = Scalar.createApiReference('#app', {
         url: '/console/openapi.json',
-        // The contract declares a relative server (`/api/v1`). Prefixing it with
-        // the current origin makes requests same-origin against the running
-        // backend, so no CORS handling or proxy is needed (R4).
         baseServerURL: window.location.origin,
-        // TrustFeed issues HTTP-only access/refresh cookies that JavaScript can
-        // never read. Sending credentials lets the browser attach them
-        // automatically to executed requests (FR-009, R3).
         customFetch: function (input, init) {
           return window.fetch(input, Object.assign({}, init, { credentials: 'include' }));
         },
@@ -77,17 +233,24 @@
           title: 'TrustFeed API Console',
           description: 'Interactive console for the TrustFeed social REST API',
         },
-        theme: 'default',
+        theme: 'dark',
         layout: 'modern',
-        forceDarkModeState: 'dark',
         documentDownloadType: 'json',
-        // Open the documented response sections so status codes and schemas are
-        // visible without extra clicks while browsing the reference.
         expandAllResponses: true,
-        // Let reviewers toggle dark/light mode depending on their environment
-        // and screen size (desktop vs tablet).
         darkModeToggle: true,
       });
+
+      var observer = new MutationObserver(function () {
+        var app = document.getElementById('app');
+        if (app && app.children.length > 0 && !document.getElementById('theme-toggle-btn')) {
+          injectThemeToggle();
+          scalarToggleBtn = findScalarToggleButton();
+          observer.disconnect();
+        }
+      });
+      observer.observe(document.getElementById('app') || document.body, { childList: true, subtree: true });
+
+      setTimeout(injectThemeToggle, 2000);
     })();
   </script>
 </body>
