@@ -1,0 +1,748 @@
+Error:
+  type: object
+  required:
+    - code
+    - message
+    - traceId
+  properties:
+    code:
+      type: string
+      enum:
+        - VALIDATION_ERROR
+        - UNAUTHORIZED
+        - INVALID_CREDENTIALS
+        - AUTH_REUSE_DETECTED
+        - FORBIDDEN
+        - ROLE_DENIED
+        - OWNERSHIP_REQUIRED
+        - NOT_FOUND
+        - CONFLICT
+        - IDEMPOTENCY_CONFLICT
+        - SELF_FOLLOW
+        - RATE_LIMITED
+        - DEPENDENCY_FAILURE
+        - INTERNAL_ERROR
+      description: Stable error code for programmatic handling
+    message:
+      type: string
+      description: Human-readable explanation
+    traceId:
+      type: string
+      description: Unique identifier for support investigation; echoes the X-Correlation-Id header
+  example:
+    code: VALIDATION_ERROR
+    message: "content must not be empty"
+    traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+User:
+  type: object
+  required:
+    - _id
+    - username
+    - email
+  properties:
+    _id:
+      type: string
+    id:
+      type: string
+      description: Alias of _id kept for client convenience
+    username:
+      type: string
+    email:
+      type: string
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+    id: "64f7c2b5e4b0c2a5f8d9e1c3"
+    username: "alice"
+    email: "alice@example.com"
+
+MessageResponse:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+  example:
+    message: "Operation completed successfully"
+
+RegisterResponse:
+  type: object
+  required:
+    - message
+    - user
+  properties:
+    message:
+      type: string
+    user:
+      $ref: '#/User'
+  example:
+    message: "User registered successfully"
+    user:
+      _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+      id: "64f7c2b5e4b0c2a5f8d9e1c3"
+      username: "alice"
+      email: "alice@example.com"
+
+LoginResponse:
+  type: object
+  required:
+    - message
+    - user
+  properties:
+    message:
+      type: string
+    user:
+      $ref: '#/User'
+  example:
+    message: "Login successful"
+    user:
+      _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+      id: "64f7c2b5e4b0c2a5f8d9e1c3"
+      username: "alice"
+      email: "alice@example.com"
+
+Post:
+  type: object
+  required:
+    - _id
+    - content
+    - author
+    - visibility
+    - version
+    - createdAt
+  properties:
+    _id:
+      type: string
+    content:
+      type: string
+      minLength: 1
+      maxLength: 2000
+    author:
+      oneOf:
+        - type: string
+          description: Author id (single-document responses)
+        - $ref: '#/AuthorSummary'
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+    version:
+      type: integer
+      minimum: 0
+      description: Optimistic lock counter; every update must present the version it read
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c4"
+    content: "Hello TrustFeed! This is my first post."
+    author:
+      _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+      username: "alice"
+      email: "alice@example.com"
+    visibility: "public"
+    version: 1
+    createdAt: "2026-08-10T12:00:00.000Z"
+    updatedAt: "2026-08-10T12:00:00.000Z"
+
+AuthorSummary:
+  type: object
+  required:
+    - _id
+    - username
+    - email
+  properties:
+    _id:
+      type: string
+    username:
+      type: string
+    email:
+      type: string
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+    username: "alice"
+    email: "alice@example.com"
+
+PostResponse:
+  type: object
+  required:
+    - post
+  properties:
+    post:
+      $ref: '#/Post'
+
+Comment:
+  type: object
+  required:
+    - _id
+    - postId
+    - authorId
+    - content
+    - createdAt
+  properties:
+    _id:
+      type: string
+    postId:
+      type: string
+    authorId:
+      type: string
+    content:
+      type: string
+    parentCommentId:
+      type: string
+      nullable: true
+    createdAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c5"
+    postId: "64f7c2b5e4b0c2a5f8d9e1c4"
+    authorId: "64f7c2b5e4b0c2a5f8d9e1c3"
+    content: "Great post!"
+    parentCommentId: null
+    createdAt: "2026-08-10T12:05:00.000Z"
+
+Follow:
+  type: object
+  required:
+    - _id
+    - followerId
+    - followingId
+    - createdAt
+  properties:
+    _id:
+      type: string
+    followerId:
+      type: string
+    followingId:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c6"
+    followerId: "64f7c2b5e4b0c2a5f8d9e1c3"
+    followingId: "64f7c2b5e4b0c2a5f8d9e1c7"
+    createdAt: "2026-08-10T12:10:00.000Z"
+
+Notification:
+  type: object
+  required:
+    - _id
+    - recipientId
+    - actorId
+    - actorName
+    - action
+    - targetSummary
+    - deepLink
+    - type
+    - resourceId
+    - read
+    - createdAt
+  properties:
+    _id:
+      type: string
+    recipientId:
+      type: string
+    actorId:
+      type: string
+    actorName:
+      type: string
+    action:
+      type: string
+    targetSummary:
+      type: string
+    deepLink:
+      type: string
+      format: uri
+    type:
+      type: string
+      enum:
+        - follow
+        - comment
+        - like
+    resourceId:
+      type: string
+    read:
+      type: boolean
+    createdAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c8"
+    recipientId: "64f7c2b5e4b0c2a5f8d9e1c3"
+    actorId: "64f7c2b5e4b0c2a5f8d9e1c7"
+    actorName: "bob"
+    action: "followed you"
+    targetSummary: "bob started following you"
+    deepLink: "https://trustfeed.example.com/users/64f7c2b5e4b0c2a5f8d9e1c7"
+    type: "follow"
+    resourceId: "64f7c2b5e4b0c2a5f8d9e1c6"
+    read: false
+    createdAt: "2026-08-10T12:15:00.000Z"
+
+Like:
+  type: object
+  required:
+    - _id
+    - userId
+    - postId
+    - createdAt
+  properties:
+    _id:
+      type: string
+    userId:
+      type: string
+    postId:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1c9"
+    userId: "64f7c2b5e4b0c2a5f8d9e1c3"
+    postId: "64f7c2b5e4b0c2a5f8d9e1c4"
+    createdAt: "2026-08-10T12:20:00.000Z"
+
+Session:
+  type: object
+  required:
+    - id
+    - userId
+    - deviceFingerprint
+    - ipAddress
+    - userAgent
+    - createdAt
+    - expiresAt
+  properties:
+    id:
+      type: string
+    userId:
+      type: string
+    deviceFingerprint:
+      type: string
+    ipAddress:
+      type: string
+    userAgent:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+    expiresAt:
+      type: string
+      format: date-time
+  example:
+    id: "64f7c2b5e4b0c2a5f8d9e1ca"
+    userId: "64f7c2b5e4b0c2a5f8d9e1c3"
+    deviceFingerprint: "abc123def456"
+    ipAddress: "192.168.1.1"
+    userAgent: "Mozilla/5.0"
+    createdAt: "2026-08-10T12:00:00.000Z"
+    expiresAt: "2026-08-10T12:15:00.000Z"
+
+RegisterRequest:
+  type: object
+  required:
+    - username
+    - email
+    - password
+  properties:
+    username:
+      type: string
+      minLength: 3
+      maxLength: 30
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      minLength: 8
+      format: password
+  example:
+    username: "alice"
+    email: "alice@example.com"
+    password: "securePassword1!"
+
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+  example:
+    email: "alice@example.com"
+    password: "securePassword1!"
+
+UserUpdateRequest:
+  type: object
+  properties:
+    displayName:
+      type: string
+    bio:
+      type: string
+    avatarUrl:
+      type: string
+      nullable: true
+    privacy:
+      type: object
+      properties:
+        profilePublic:
+          type: boolean
+        showFollows:
+          type: boolean
+  example:
+    displayName: "Alice Smith"
+    bio: "Building TrustFeed"
+    avatarUrl: null
+    privacy:
+      profilePublic: true
+      showFollows: true
+
+PostCreateRequest:
+  type: object
+  required:
+    - content
+  properties:
+    content:
+      type: string
+      minLength: 1
+      maxLength: 2000
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+      default: public
+  example:
+    content: "Hello TrustFeed! This is my first post."
+    visibility: "public"
+
+PostUpdateRequest:
+  type: object
+  required:
+    - version
+  properties:
+    content:
+      type: string
+      minLength: 1
+      maxLength: 2000
+    visibility:
+      type: string
+      enum:
+        - public
+        - followers-only
+        - private
+    version:
+      type: integer
+      minimum: 0
+      description: Version read from the last post response; a stale version returns 409
+  example:
+    content: "Updated post content"
+    visibility: "public"
+    version: 1
+
+LikeCreateRequest:
+  type: object
+  required:
+    - idempotencyKey
+  properties:
+    idempotencyKey:
+      type: string
+      description: Client-generated key for idempotent like creation
+  example:
+    idempotencyKey: "like-64f7c2b5e4b0c2a5f8d9e1c4-64f7c2b5e4b0c2a5f8d9e1c3"
+
+CommentCreateRequest:
+  type: object
+  required:
+    - content
+  properties:
+    content:
+      type: string
+      maxLength: 1000
+    parentCommentId:
+      type: string
+      nullable: true
+    idempotencyKey:
+      type: string
+      description: Client-generated key for idempotent creation
+  example:
+    content: "Great post!"
+    parentCommentId: null
+    idempotencyKey: "comment-64f7c2b5e4b0c2a5f8d9e1c4-64f7c2b5e4b0c2a5f8d9e1c3"
+
+PaginatedPosts:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Post'
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer
+  example:
+    data:
+      - _id: "64f7c2b5e4b0c2a5f8d9e1c4"
+        content: "Hello TrustFeed!"
+        author:
+          _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+          username: "alice"
+          email: "alice@example.com"
+        visibility: "public"
+        version: 1
+        createdAt: "2026-08-10T12:00:00.000Z"
+        updatedAt: "2026-08-10T12:00:00.000Z"
+    page: 1
+    limit: 20
+    total: 1
+
+PaginatedComments:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Comment'
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer
+  example:
+    data:
+      - _id: "64f7c2b5e4b0c2a5f8d9e1c5"
+        postId: "64f7c2b5e4b0c2a5f8d9e1c4"
+        authorId: "64f7c2b5e4b0c2a5f8d9e1c3"
+        content: "Great post!"
+        parentCommentId: null
+        createdAt: "2026-08-10T12:05:00.000Z"
+    page: 1
+    limit: 20
+    total: 1
+
+PaginatedNotifications:
+  type: object
+  required:
+    - data
+    - page
+    - limit
+    - total
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Notification'
+    page:
+      type: integer
+    limit:
+      type: integer
+    total:
+      type: integer
+  example:
+    data:
+      - _id: "64f7c2b5e4b0c2a5f8d9e1c8"
+        recipientId: "64f7c2b5e4b0c2a5f8d9e1c3"
+        actorId: "64f7c2b5e4b0c2a5f8d9e1c7"
+        actorName: "bob"
+        action: "followed you"
+        targetSummary: "bob started following you"
+        deepLink: "https://trustfeed.example.com/users/64f7c2b5e4b0c2a5f8d9e1c7"
+        type: "follow"
+        resourceId: "64f7c2b5e4b0c2a5f8d9e1c6"
+        read: false
+        createdAt: "2026-08-10T12:15:00.000Z"
+    page: 1
+    limit: 20
+    total: 1
+
+FeedPage:
+  type: object
+  required:
+    - data
+    - cursor
+    - hasNextPage
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Post'
+    cursor:
+      type: string
+      description: Opaque cursor for the next page
+    hasNextPage:
+      type: boolean
+  example:
+    data:
+      - _id: "64f7c2b5e4b0c2a5f8d9e1c4"
+        content: "Hello TrustFeed!"
+        author:
+          _id: "64f7c2b5e4b0c2a5f8d9e1c3"
+          username: "alice"
+          email: "alice@example.com"
+        visibility: "public"
+        version: 1
+        createdAt: "2026-08-10T12:00:00.000Z"
+        updatedAt: "2026-08-10T12:00:00.000Z"
+    cursor: "eyJjcmVhdGVkIjogIjIwMjYtMDgtMTBUMTI6MDA6MDAuMDAwWiJ9"
+    hasNextPage: false
+
+Role:
+  type: object
+  required:
+    - _id
+    - name
+  properties:
+    _id:
+      type: string
+    id:
+      type: string
+      description: Alias of _id kept for client convenience
+    name:
+      type: string
+      maxLength: 50
+    permissionCodes:
+      type: array
+      description: Resolved permission codes granted by this role
+      items:
+        type: string
+    permissions:
+      type: array
+      description: Permission objects referenced by this role
+      items:
+        $ref: '#/Permission'
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1d0"
+    id: "64f7c2b5e4b0c2a5f8d9e1d0"
+    name: "moderator"
+    permissionCodes: ["posts:read", "comments:read"]
+    createdAt: "2026-08-10T12:00:00.000Z"
+    updatedAt: "2026-08-10T12:00:00.000Z"
+
+Permission:
+  type: object
+  required:
+    - _id
+    - code
+  properties:
+    _id:
+      type: string
+    id:
+      type: string
+      description: Alias of _id kept for client convenience
+    code:
+      type: string
+      maxLength: 100
+    description:
+      type: string
+      maxLength: 200
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+  example:
+    _id: "64f7c2b5e4b0c2a5f8d9e1d1"
+    id: "64f7c2b5e4b0c2a5f8d9e1d1"
+    code: "posts:read"
+    description: "Read posts"
+    createdAt: "2026-08-10T12:00:00.000Z"
+    updatedAt: "2026-08-10T12:00:00.000Z"
+
+RoleCreateRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 50
+    permissionCodes:
+      type: array
+      items:
+        type: string
+        minLength: 1
+  example:
+    name: "moderator"
+    permissionCodes: ["posts:read", "comments:read"]
+
+RoleUpdateRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 50
+    permissionCodes:
+      type: array
+      items:
+        type: string
+        minLength: 1
+  example:
+    name: "moderator"
+    permissionCodes: ["posts:read", "comments:read", "comments:create"]
+
+PermissionCreateRequest:
+  type: object
+  required:
+    - code
+  properties:
+    code:
+      type: string
+      minLength: 1
+      maxLength: 100
+    description:
+      type: string
+      maxLength: 200
+  example:
+    code: "posts:archive"
+    description: "Archive a post"
+
+PermissionUpdateRequest:
+  type: object
+  properties:
+    code:
+      type: string
+      minLength: 1
+      maxLength: 100
+    description:
+      type: string
+      maxLength: 200
+  example:
+    code: "posts:archive"
+    description: "Archive a post permanently"

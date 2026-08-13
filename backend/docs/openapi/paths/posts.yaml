@@ -1,0 +1,184 @@
+collection:
+  get:
+    tags:
+      - Posts
+    summary: List all posts
+    operationId: listPosts
+    security:
+      - cookieAuth: []
+    description: Returns public posts and the caller's own posts. Requires `posts:read` permission.
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of posts
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedPosts'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  post:
+    tags:
+      - Posts
+    summary: Create a post
+    operationId: createPost
+    security:
+      - cookieAuth: []
+    description: Create a new post as the authenticated user. Supports an optional `Idempotency-Key` header for safe retries. Requires `posts:create` permission.
+    parameters:
+      - name: Idempotency-Key
+        in: header
+        description: Client-generated key for idempotent request replay
+        schema:
+          type: string
+          maxLength: 255
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/PostCreateRequest'
+    responses:
+      '201':
+        description: Post created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PostResponse'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+me:
+  get:
+    tags:
+      - Posts
+    summary: List own posts
+    operationId: listMyPosts
+    security:
+      - cookieAuth: []
+    description: List posts authored by the authenticated user. Requires `posts:read` permission.
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of own posts
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedPosts'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+byId:
+  patch:
+    tags:
+      - Posts
+    summary: Update own post
+    operationId: updatePost
+    security:
+      - cookieAuth: []
+    description: Update a post owned by the authenticated user. Supports optimistic concurrency via the `If-Match` header (or `version` in the body). A stale version returns `409 Conflict`. Requires `posts:update` permission.
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: If-Match
+        in: header
+        description: Expected post version for optimistic concurrency
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/PostUpdateRequest'
+    responses:
+      '200':
+        description: Post updated
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PostResponse'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '409':
+        $ref: '../components/responses.yaml#/Conflict'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  delete:
+    tags:
+      - Posts
+    summary: Delete own post
+    operationId: deletePost
+    security:
+      - cookieAuth: []
+    description: Permanently delete a post owned by the authenticated user. Requires `posts:delete` permission.
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '204':
+        $ref: '../components/responses.yaml#/NoContent'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

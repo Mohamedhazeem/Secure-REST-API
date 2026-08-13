@@ -1,0 +1,34 @@
+X-Correlation-Id:
+  description: |
+    Request correlation identifier. Optional on requests (max 128 characters;
+    control characters are stripped; invalid values are replaced with a
+    generated UUID). Always present on responses; echoed as `traceId` in the
+    error envelope.
+  schema:
+    type: string
+    maxLength: 128
+
+Access-Control-Allow-Origin:
+  description: Echoed when the request origin is on the configured allowlist
+  schema:
+    type: string
+
+Access-Control-Allow-Credentials:
+  description: Always "true" for allowed origins
+  schema:
+    type: string
+
+Access-Control-Allow-Methods:
+  description: Methods permitted for cross-origin requests
+  schema:
+    type: string
+
+Access-Control-Allow-Headers:
+  description: Headers permitted for cross-origin requests
+  schema:
+    type: string
+
+Retry-After:
+  description: Seconds until the rate-limit window resets
+  schema:
+    type: integer

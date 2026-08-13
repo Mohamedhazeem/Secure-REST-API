@@ -1,0 +1,321 @@
+roles:
+  get:
+    tags:
+      - Admin
+    summary: List roles
+    operationId: listRoles
+    security:
+      - cookieAuth: []
+    description: Return all roles with their resolved permission codes. Requires the admin role.
+    responses:
+      '200':
+        description: List of roles
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [data]
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../components/schemas.yaml#/Role'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  post:
+    tags:
+      - Admin
+    summary: Create role
+    operationId: createRole
+    security:
+      - cookieAuth: []
+    description: Create a new role and optionally attach permission codes. Requires the admin role.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/RoleCreateRequest'
+    responses:
+      '201':
+        description: Role created
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: '../components/schemas.yaml#/Role'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '409':
+        $ref: '../components/responses.yaml#/Conflict'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+roleById:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Role ID
+  get:
+    tags:
+      - Admin
+    summary: Get role
+    operationId: getRole
+    security:
+      - cookieAuth: []
+    description: Retrieve a single role by ID. Requires the admin role.
+    responses:
+      '200':
+        description: Role details
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: '../components/schemas.yaml#/Role'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  patch:
+    tags:
+      - Admin
+    summary: Update role
+    operationId: updateRole
+    security:
+      - cookieAuth: []
+    description: Update a role's name or permission codes. Requires the admin role.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/RoleUpdateRequest'
+    responses:
+      '200':
+        description: Role updated
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: '../components/schemas.yaml#/Role'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  delete:
+    tags:
+      - Admin
+    summary: Delete role
+    operationId: deleteRole
+    security:
+      - cookieAuth: []
+    description: Delete a role by ID. Requires the admin role.
+    responses:
+      '200':
+        description: Role deleted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+permissions:
+  get:
+    tags:
+      - Admin
+    summary: List permissions
+    operationId: listPermissions
+    security:
+      - cookieAuth: []
+    description: Return all permissions. Requires the admin role.
+    responses:
+      '200':
+        description: List of permissions
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [data]
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../components/schemas.yaml#/Permission'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  post:
+    tags:
+      - Admin
+    summary: Create permission
+    operationId: createPermission
+    security:
+      - cookieAuth: []
+    description: Create a new permission with a unique code. Requires the admin role.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/PermissionCreateRequest'
+    responses:
+      '201':
+        description: Permission created
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permission]
+              properties:
+                permission:
+                  $ref: '../components/schemas.yaml#/Permission'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '409':
+        $ref: '../components/responses.yaml#/Conflict'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+permissionById:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Permission ID
+  get:
+    tags:
+      - Admin
+    summary: Get permission
+    operationId: getPermission
+    security:
+      - cookieAuth: []
+    description: Retrieve a single permission by ID. Requires the admin role.
+    responses:
+      '200':
+        description: Permission details
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permission]
+              properties:
+                permission:
+                  $ref: '../components/schemas.yaml#/Permission'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  patch:
+    tags:
+      - Admin
+    summary: Update permission
+    operationId: updatePermission
+    security:
+      - cookieAuth: []
+    description: Update a permission's code or description. Requires the admin role.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/PermissionUpdateRequest'
+    responses:
+      '200':
+        description: Permission updated
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permission]
+              properties:
+                permission:
+                  $ref: '../components/schemas.yaml#/Permission'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  delete:
+    tags:
+      - Admin
+    summary: Delete permission
+    operationId: deletePermission
+    security:
+      - cookieAuth: []
+    description: Delete a permission by ID. Requires the admin role.
+    responses:
+      '200':
+        description: Permission deleted
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

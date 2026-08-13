@@ -1,0 +1,33 @@
+feed:
+  get:
+    tags:
+      - Feed
+    summary: Get cursor-paginated personalized feed
+    operationId: getFeed
+    security:
+      - cookieAuth: []
+    description: Retrieve a cursor-paginated feed of posts from users the authenticated user follows. Use the `cursor` from a previous response to fetch the next page. Requires `feed:read` permission.
+    parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Opaque pagination cursor from previous response
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+        description: Maximum number of posts to return
+    responses:
+      '200':
+        description: Paginated feed of posts from followed users
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/FeedPage'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

@@ -1,0 +1,176 @@
+register:
+  post:
+    tags:
+      - Authentication
+    summary: Register a new user
+    operationId: register
+    security: []
+    description: Register a new user account. On success, access and refresh tokens are set as HTTP-only cookies. Rate limited to prevent abuse.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/RegisterRequest'
+    responses:
+      '201':
+        description: User created; access and refresh tokens set as HTTP-only cookies
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/RegisterResponse'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '409':
+        $ref: '../components/responses.yaml#/Conflict'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+login:
+  post:
+    tags:
+      - Authentication
+    summary: Login with email and password
+    operationId: login
+    security: []
+    description: Authenticate with email and password. On success, access and refresh tokens are set as HTTP-only cookies. Rate limited to prevent credential stuffing.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/LoginRequest'
+    responses:
+      '200':
+        description: Login successful; access and refresh tokens set as HTTP-only cookies
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/LoginResponse'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+logout:
+  post:
+    tags:
+      - Authentication
+    summary: Logout and invalidate tokens
+    operationId: logout
+    security:
+      - cookieAuth: []
+    description: Invalidate the current session by clearing the refresh token and revoking the access token.
+    responses:
+      '200':
+        $ref: '../components/responses.yaml#/SuccessMessage'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+refresh:
+  post:
+    tags:
+      - Authentication
+    summary: Refresh access token using refresh token cookie
+    operationId: refreshAccessToken
+    security:
+      - refreshCookieAuth: []
+    description: Obtain a new access token using the valid refresh token cookie. The old refresh token is rotated; reusing a revoked refresh token returns `403`.
+    responses:
+      '200':
+        $ref: '../components/responses.yaml#/SuccessMessage'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        description: Refresh token has been revoked
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Error'
+      '429':
+        $ref: '../components/responses.yaml#/RateLimited'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+me:
+  delete:
+    tags:
+      - Authentication
+    summary: Delete own account
+    operationId: deleteAccount
+    security:
+      - cookieAuth: []
+    description: Permanently delete the authenticated user's account and all associated data. This action is irreversible.
+    responses:
+      '200':
+        $ref: '../components/responses.yaml#/SuccessMessage'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+sessions:
+  get:
+    tags:
+      - Authentication
+    summary: List active sessions
+    operationId: listSessions
+    security:
+      - cookieAuth: []
+    description: List all active refresh-token sessions for the authenticated user, including device metadata and expiration.
+    responses:
+      '200':
+        description: Active sessions with device metadata
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '../components/schemas.yaml#/Session'
+                total:
+                  type: integer
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+
+sessionsById:
+  delete:
+    tags:
+      - Authentication
+    summary: Revoke a single session
+    operationId: revokeSession
+    security:
+      - cookieAuth: []
+    description: Revoke a specific refresh-token session by its ID. Subsequent requests using that session's access token will be rejected.
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Session revoked
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'

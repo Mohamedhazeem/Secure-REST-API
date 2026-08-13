@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: TrustFeed API
+  description: |
+    A secure, production-style social REST API with JWT authentication, role-based
+    and attribute-based authorization, cursor-paginated feeds, comments, follows,
+    notifications, and audit logging. Backend-only by design.
+
+    This is the modular OpenAPI description used for local development and the
+    in-repo API reference. Each feature lives in its own path file under
+    `paths/` and is linked into this main document via `$ref`. The single
+    source of truth for CI contract validation remains the canonical spec under
+    `specs/`.
+  version: 1.0.0
+  contact:
+    name: API Support
+  license:
+    name: ISC
+    url: https://opensource.org/licenses/ISC
+
+servers:
+  - url: http://localhost:1430/api/v1
+    description: Local development server
+
+security:
+  - cookieAuth: []
+
+tags:
+  - name: Authentication
+    description: Registration, login, token refresh, logout, session management, and account deletion
+  - name: Posts
+    description: Post creation, retrieval, update, and deletion
+  - name: Comments
+    description: Comments on posts
+  - name: Likes
+    description: Like and unlike posts, and check like status
+  - name: Follows
+    description: Following and unfollowing users
+  - name: Feed
+    description: Personalized post feed
+  - name: Notifications
+    description: Notification listing and read status
+  - name: Admin
+    description: Runtime role and permission management
+  - name: Health
+    description: Liveness and readiness probes
+
+paths:
+  /auth:
+    $ref: './paths/auth.yaml#/register'
+  /auth/login:
+    $ref: './paths/auth.yaml#/login'
+  /auth/logout:
+    $ref: './paths/auth.yaml#/logout'
+  /auth/refresh:
+    $ref: './paths/auth.yaml#/refresh'
+  /auth/me:
+    $ref: './paths/auth.yaml#/me'
+  /auth/sessions:
+    $ref: './paths/auth.yaml#/sessions'
+  /auth/sessions/{id}:
+    $ref: './paths/auth.yaml#/sessionsById'
+  /posts:
+    $ref: './paths/posts.yaml#/collection'
+  /posts/me:
+    $ref: './paths/posts.yaml#/me'
+  /posts/{id}:
+    $ref: './paths/posts.yaml#/byId'
+  /posts/{id}/comments:
+    $ref: './paths/comments.yaml#/collection'
+  /posts/{id}/likes:
+    $ref: './paths/likes.yaml#/collection'
+  /posts/{id}/likes/me:
+    $ref: './paths/likes.yaml#/currentUser'
+  /users/{id}/follow:
+    $ref: './paths/follows.yaml#/follow'
+  /users/{id}/unfollow:
+    $ref: './paths/follows.yaml#/unfollow'
+  /feed:
+    $ref: './paths/feed.yaml#/feed'
+  /notifications:
+    $ref: './paths/notifications.yaml#/notifications'
+  /notifications/{id}/read:
+    $ref: './paths/notifications.yaml#/markRead'
+  /admin/roles:
+    $ref: './paths/admin.yaml#/roles'
+  /admin/roles/{id}:
+    $ref: './paths/admin.yaml#/roleById'
+  /admin/permissions:
+    $ref: './paths/admin.yaml#/permissions'
+  /admin/permissions/{id}:
+    $ref: './paths/admin.yaml#/permissionById'
+  /health:
+    $ref: './paths/health.yaml#/liveness'
+  /health/ready:
+    $ref: './paths/health.yaml#/readiness'
+
+components:
+  securitySchemes:
+    $ref: './components/security.yaml'
+  schemas:
+    $ref: './components/schemas.yaml'
+  responses:
+    $ref: './components/responses.yaml'
+  headers:
+    $ref: './components/headers.yaml'

@@ -1,0 +1,211 @@
+Unauthorized:
+  description: Missing or invalid authentication
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: UNAUTHORIZED
+        message: "Authentication token is missing"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+Forbidden:
+  description: Authenticated but not authorized
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: FORBIDDEN
+        message: "You can only modify your own posts"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567891"
+
+NotFound:
+  description: Resource not found
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: NOT_FOUND
+        message: "Post not found"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567892"
+
+ValidationError:
+  description: Request validation failed
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: VALIDATION_ERROR
+        message: "content must not be empty"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567893"
+
+Conflict:
+  description: State conflict or duplicate
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: CONFLICT
+        message: "Post was modified by another request; refresh and retry"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567894"
+
+RateLimited:
+  description: Rate limit exceeded for this client
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Retry-After:
+      $ref: './headers.yaml#/Retry-After'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: RATE_LIMITED
+        message: "Rate limit exceeded for this client"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567895"
+
+NoContent:
+  description: Request succeeded; no response body
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+
+SuccessMessage:
+  description: Request succeeded with a human-readable message
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/MessageResponse'
+      example:
+        message: "Operation completed successfully"
+
+InternalError:
+  description: Server error
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: INTERNAL_ERROR
+        message: "An unexpected error occurred"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567896"
+
+DependencyFailure:
+  description: External dependency unavailable
+  headers:
+    X-Correlation-Id:
+      $ref: './headers.yaml#/X-Correlation-Id'
+    Access-Control-Allow-Origin:
+      $ref: './headers.yaml#/Access-Control-Allow-Origin'
+    Access-Control-Allow-Credentials:
+      $ref: './headers.yaml#/Access-Control-Allow-Credentials'
+    Access-Control-Allow-Methods:
+      $ref: './headers.yaml#/Access-Control-Allow-Methods'
+    Access-Control-Allow-Headers:
+      $ref: './headers.yaml#/Access-Control-Allow-Headers'
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/Error'
+      example:
+        code: DEPENDENCY_FAILURE
+        message: "MongoDB is unreachable"
+        traceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567897"

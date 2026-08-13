@@ -1,0 +1,73 @@
+collection:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Post ID
+  get:
+    tags:
+      - Comments
+    summary: List comments for a post
+    operationId: listComments
+    description: Retrieve a paginated list of comments for a specific post. No authentication required.
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Paginated list of comments
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/PaginatedComments'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
+  post:
+    tags:
+      - Comments
+    summary: Create a comment on a post
+    operationId: createComment
+    security:
+      - cookieAuth: []
+    description: Create a comment on a post. Supports an optional `idempotencyKey` in the body for safe retries; replaying the same key returns the original comment with `409`. Requires `comments:create` permission.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/CommentCreateRequest'
+    responses:
+      '201':
+        description: Comment created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Comment'
+      '401':
+        $ref: '../components/responses.yaml#/Unauthorized'
+      '403':
+        $ref: '../components/responses.yaml#/Forbidden'
+      '404':
+        $ref: '../components/responses.yaml#/NotFound'
+      '400':
+        $ref: '../components/responses.yaml#/ValidationError'
+      '409':
+        description: Idempotent replay; same response returned
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas.yaml#/Comment'
+      '500':
+        $ref: '../components/responses.yaml#/InternalError'
