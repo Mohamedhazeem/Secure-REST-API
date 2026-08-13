@@ -37,6 +37,7 @@ A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. 
 - [CORS & API Contract](#cors--api-contract)
 - [Repository Pattern & Persistence Swap](#repository-pattern--persistence-swap)
 - [Testing Strategy](#testing-strategy)
+- [Postman Collections](#postman-collections)
 - [Environment Variables](#environment-variables)
 - [Running Locally](#running-locally)
 - [Adding a New Resource](#adding-a-new-resource)
@@ -355,7 +356,19 @@ backend/
 │   ├── integration/                API + DB integration (auth, RBAC, ownership, errors, CORS, contract, sessions, follow, like, notifications, rate limit)
 │   ├── performance/                Feed cache, pagination, rate-limit latency, load (p95 < 950ms)
 │   └── e2e/                        End-to-end flows (auth flows, post CRUD, social flows)
-├── postman/                        Newman/Postman collections for E2E API validation
+├── postman/                        Postman collections (one per feature) for local exploration and `npm run e2e`
+│   ├── Auth.postman_collection.json
+│   ├── Posts.postman_collection.json
+│   ├── Follows.postman_collection.json
+│   ├── Feed.postman_collection.json
+│   ├── Notifications.postman_collection.json
+│   ├── Admin.postman_collection.json
+│   └── Health.postman_collection.json
+├── docs/
+│   └── openapi/                    Modular per-feature OpenAPI spec for local tooling (independent of the synced contract)
+│       ├── openapi.yaml            Root document linking each feature via $ref
+│       ├── paths/                  One YAML file per feature (auth, posts, comments, likes, follows, feed, notifications, admin, health)
+│       └── components/             schemas.yaml, responses.yaml, security.yaml, headers.yaml
 ├── vitest.config.js
 ├── package.json
 └── .env                            (not committed)
@@ -549,6 +562,8 @@ Credentials are enabled and preflight (`OPTIONS`) is handled correctly, so brows
 - `paths/auth.yaml`, `paths/posts.yaml`, `paths/comments.yaml`, `paths/follows.yaml`, `paths/likes.yaml`, `paths/feed.yaml`, `paths/notifications.yaml`, `paths/users.yaml`, `paths/health.yaml` — per-resource path definitions
 - `components/schemas.yaml`, `components/responses.yaml`, `components/security.yaml`, `components/headers.yaml` — reusable components
 
+There is also a self-contained, per-feature OpenAPI set under `backend/docs/openapi/` (a root `openapi.yaml` linking `paths/<feature>.yaml` and `components/`). It uses the same split but is independent of `specs/` and the synced `src/docs/openapi/`, so it can be opened directly in editors, Scalar, Redoc, or imported into Postman/Insomnia — point the tool at `backend/docs/openapi/openapi.yaml` with that directory as the base so the relative `$ref`s resolve. It does not require the `contract:sync` step and is not part of CI contract validation.
+
 After editing, sync and validate it:
 
 ```bash
@@ -611,6 +626,35 @@ An interactive API Console is served at `/console` when the backend is running. 
 - **CORS**: Because the console is served from the same origin as the API, no cross-origin configuration is required for local development.
 
 The console is a thin developer documentation surface served from the existing backend. It does not introduce a frontend framework, build step, or separate application, and it does not weaken the existing security model.
+
+---
+
+## Postman Collections
+
+Ready-to-use [Postman](https://www.postman.com/) collections live in `backend/postman/`, one per feature, covering every endpoint in the repo:
+
+| Collection                        | Covers                                                    |
+| --------------------------------- | --------------------------------------------------------- |
+| `Auth.postman_collection.json`     | Register, login, refresh, logout, delete account, sessions |
+| `Posts.postman_collection.json`   | Post CRUD, with Comments and Likes subfolders             |
+| `Follows.postman_collection.json` | Follow / unfollow users                                   |
+| `Feed.postman_collection.json`     | Cursor-paginated personalized feed                        |
+| `Notifications.postman_collection.json` | List + mark-read notifications                     |
+| `Admin.postman_collection.json`    | Role & permission CRUD (requires admin role)              |
+| `Health.postman_collection.json`   | Liveness & readiness probes                              |
+
+How to use them:
+
+1. **Import** a collection into Postman (*File → Import → select the `.json` file*).
+2. **Set the base URL**: each collection defines a `baseUrl` variable (default `http://localhost:1430/api/v1`). Override it via a Postman environment if your server runs elsewhere.
+3. **Auth is cookie-based**: tokens are issued as HTTP-only cookies (`access_token`, `refresh_token`). Postman stores and replays cookies for the same origin automatically, so once you run **Register** or **Login**, subsequent authenticated requests just work — no manual token copying.
+4. **Run in order**: create data first (register/login → create post) before exercising dependent calls (comment, like, follow) that reference an id.
+
+Run the full suite headlessly with Newman (a dev dependency):
+
+```bash
+npm run e2e   # runs all seven collections via newman, in sequence
+```
 
 ---
 
@@ -697,7 +741,7 @@ Follow the documented pattern in [`backend/src/docs/extension-pattern.md`](backe
 6. **Controller** — `src/controller/widget.controller.js`
 7. **Routes** — `src/routes/widget.routes.js`
 8. **Permissions & seed** — add codes to `configs/seed.js`; gate with `requirePermission(...)`
-9. **Contract** — add the new resource's paths to `specs/002-trustfeed-social-api/contracts/paths/<resource>.yaml` and reference it from the canonical root `openapi.yaml`; add shared schemas to `contracts/components/schemas.yaml`. Then run `npm run contract:sync` and `npm run contract:lint`.
+9. **Contract** — add the new resource's paths to `specs/002-trustfeed-social-api/contracts/paths/<resource>.yaml` and reference it from the canonical root `openapi.yaml`; add shared schemas to `contracts/components/schemas.yaml`. Then run `npm run contract:sync` and `npm run contract:lint`. Mirror the change in the local set under `backend/docs/openapi/` and add a Postman collection under `backend/postman/`.
 
 No existing file is modified.
 
