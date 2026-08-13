@@ -2,160 +2,216 @@
   "info": {
     "_postman_id": "e4da44e4-fc3c-4658-bcf3-e777e7d3a741",
     "name": "Auth",
+    "description": "Authentication endpoints for TrustFeed. Covers registration, login, token refresh, logout, account deletion, and session management. Tokens are issued as HTTP-only cookies (access_token, refresh_token) and are sent automatically by Postman for the same origin. Run Register or Login first to obtain the cookies used by the authenticated requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "51054906",
-    "_collection_link": "https://insteadbusiness-6908131.postman.co/workspace/mohamed-hazeem's-Workspace~514bc3e6-283b-4266-89df-970735ba5ac7/collection/51054906-e4da44e4-fc3c-4658-bcf3-e777e7d3a741?action=share&source=collection_link&creator=51054906"
+    "_exporter_id": "51054906"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:1430/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "64f7c2b5e4b0c2a5f8d9e1ca",
+      "type": "string"
+    }
+  ],
   "item": [
     {
       "name": "Register",
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"username\": \"jhon whick\",\r\n    \"email\": \"sample@gmail.com\",\r\n    \"password\": \"12345789\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
+          "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"securePassword1!\"\n}",
+          "options": { "raw": { "language": "json" } }
         },
         "url": {
-          "raw": "http://localhost:1430/api/v1/auth/",
+          "raw": "{{baseUrl}}/auth",
           "protocol": "http",
           "host": ["localhost"],
           "port": "1430",
-          "path": ["api", "v1", "auth", ""]
+          "path": ["api", "v1", "auth"]
         }
       },
-      "response": []
+      "response": [
+        {
+          "name": "User created",
+          "status": "Created",
+          "code": 201,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"User registered successfully\",\n  \"user\": {\n    \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n    \"id\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n    \"username\": \"alice\",\n    \"email\": \"alice@example.com\"\n  }\n}"
+        }
+      ]
     },
     {
       "name": "Login",
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"email\": \"sample@gmail.com\",\r\n    \"password\": \"12345789\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"securePassword1!\"\n}",
+          "options": { "raw": { "language": "json" } }
         },
         "url": {
-          "raw": "http://localhost:1430/api/v1/auth/login",
+          "raw": "{{baseUrl}}/auth/login",
           "protocol": "http",
           "host": ["localhost"],
           "port": "1430",
           "path": ["api", "v1", "auth", "login"]
         }
       },
-      "response": []
+      "response": [
+        {
+          "name": "Login successful",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Login successful\",\n  \"user\": {\n    \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n    \"id\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n    \"username\": \"alice\",\n    \"email\": \"alice@example.com\"\n  }\n}"
+        }
+      ]
     },
     {
-      "name": "Logout",
+      "name": "Refresh Token",
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
+          { "key": "Accept", "value": "application/json", "type": "text" }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
         "url": {
-          "raw": "http://localhost:1430/api/v1/auth/logout",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "1430",
-          "path": ["api", "v1", "auth", "logout"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:1430/api/v1/auth/me",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "1430",
-          "path": ["api", "v1", "auth", "me"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Refresh",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:1430/api/v1/auth/refresh",
+          "raw": "{{baseUrl}}/auth/refresh",
           "protocol": "http",
           "host": ["localhost"],
           "port": "1430",
           "path": ["api", "v1", "auth", "refresh"]
         }
       },
-      "response": []
+      "response": [
+        {
+          "name": "Access token refreshed",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Access token refreshed\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/auth/logout",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "logout"]
+        }
+      },
+      "response": [
+        {
+          "name": "Logged out",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Logged out successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete Account",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "me"]
+        }
+      },
+      "response": [
+        {
+          "name": "Account deleted",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Account deleted successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "List Sessions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/sessions",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "sessions"]
+        }
+      },
+      "response": [
+        {
+          "name": "Active sessions",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"data\": [\n    {\n      \"id\": \"64f7c2b5e4b0c2a5f8d9e1ca\",\n      \"userId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n      \"deviceFingerprint\": \"abc123def456\",\n      \"ipAddress\": \"192.168.1.1\",\n      \"userAgent\": \"Mozilla/5.0\",\n      \"createdAt\": \"2026-08-10T12:00:00.000Z\",\n      \"expiresAt\": \"2026-08-10T12:15:00.000Z\"\n    }\n  ],\n  \"total\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "Revoke Session",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/auth/sessions/:sessionId",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "auth", "sessions", ":sessionId"],
+          "variable": [
+            { "key": "sessionId", "value": "64f7c2b5e4b0c2a5f8d9e1ca", "description": "Session id to revoke" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Session revoked",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Session revoked\"\n}"
+        }
+      ]
     }
   ]
 }

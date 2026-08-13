@@ -1,204 +1,333 @@
 {
-	"info": {
-		"_postman_id": "339161c3-ca4e-4f6b-a690-8ecd088dc1ea",
-		"name": "Post",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "51054906",
-		"_collection_link": "https://insteadbusiness-6908131.postman.co/workspace/mohamed-hazeem's-Workspace~514bc3e6-283b-4266-89df-970735ba5ac7/collection/51054906-339161c3-ca4e-4f6b-a690-8ecd088dc1ea?action=share&source=collection_link&creator=51054906"
-	},
-	"item": [
-		{
-			"name": "createPost",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"content\": \"Industry standard flow User logs in JWT issued Auth middleware runs req.user. vailable Post auto-linked to user No userId in request body\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/posts/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"posts",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "deletePost",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"new post\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/posts/:id",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"posts",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": "694e19b96e6b6835f163887c",
-							"description": "id for delete post"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get posts",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/posts/me",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"posts",
-						"me"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get all posts",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/posts/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"posts",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update",
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"content\": \"new post patched\",\r\n    \"version\": 0\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:1430/api/v1/posts/:id",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "1430",
-					"path": [
-						"api",
-						"v1",
-						"posts",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": "694e19b96e6b6835f163887c",
-							"description": "post id to update"
-						}
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "339161c3-ca4e-4f6b-a690-8ecd088dc1ea",
+    "name": "Posts",
+    "description": "Post, comment, and like endpoints for TrustFeed. Posts, comments, and likes are mounted under /api/v1/posts. Authenticated requests require the access_token cookie (set by Login/Register and sent automatically by Postman).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51054906"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:1430/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "64f7c2b5e4b0c2a5f8d9e1c4",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Post",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" },
+          { "key": "Idempotency-Key", "value": "post-64f7c2b5e4b0c2a5f8d9e1c4", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"Hello TrustFeed! This is my first post.\",\n  \"visibility\": \"public\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "posts"]
+        }
+      },
+      "response": [
+        {
+          "name": "Post created",
+          "status": "Created",
+          "code": 201,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"post\": {\n    \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n    \"content\": \"Hello TrustFeed! This is my first post.\",\n    \"author\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n    \"visibility\": \"public\",\n    \"version\": 1,\n    \"createdAt\": \"2026-08-10T12:00:00.000Z\",\n    \"updatedAt\": \"2026-08-10T12:00:00.000Z\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "List All Posts",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "url": {
+          "raw": "{{baseUrl}}/posts?page=1&limit=20",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "posts"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Paginated posts",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"data\": [\n    {\n      \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n      \"content\": \"Hello TrustFeed!\",\n      \"author\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n      \"visibility\": \"public\",\n      \"version\": 1,\n      \"createdAt\": \"2026-08-10T12:00:00.000Z\",\n      \"updatedAt\": \"2026-08-10T12:00:00.000Z\"\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 20,\n  \"total\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "List My Posts",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "url": {
+          "raw": "{{baseUrl}}/posts/me?page=1&limit=20",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "posts", "me"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Paginated own posts",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"data\": [\n    {\n      \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n      \"content\": \"Hello TrustFeed!\",\n      \"author\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n      \"visibility\": \"public\",\n      \"version\": 1,\n      \"createdAt\": \"2026-08-10T12:00:00.000Z\",\n      \"updatedAt\": \"2026-08-10T12:00:00.000Z\"\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 20,\n  \"total\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "Update Post",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" },
+          { "key": "If-Match", "value": "1", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"Updated post content\",\n  \"visibility\": \"public\",\n  \"version\": 1\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posts/:postId",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "posts", ":postId"],
+          "variable": [
+            { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Post id to update" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Post updated",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"post\": {\n    \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n    \"content\": \"Updated post content\",\n    \"author\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n    \"visibility\": \"public\",\n    \"version\": 2,\n    \"createdAt\": \"2026-08-10T12:00:00.000Z\",\n    \"updatedAt\": \"2026-08-10T12:01:00.000Z\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete Post",
+      "request": {
+        "method": "DELETE",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/posts/:postId",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "posts", ":postId"],
+          "variable": [
+            { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Post id to delete" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Post deleted",
+          "status": "No Content",
+          "code": 204,
+          "header": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Create Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great post!\",\n  \"parentCommentId\": null,\n  \"idempotencyKey\": \"comment-64f7c2b5e4b0c2a5f8d9e1c4-64f7c2b5e4b0c2a5f8d9e1c3\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/:postId/comments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "1430",
+              "path": ["api", "v1", "posts", ":postId", "comments"],
+              "variable": [
+                { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Parent post id" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Comment created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c5\",\n  \"postId\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n  \"authorId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n  \"content\": \"Great post!\",\n  \"parentCommentId\": null,\n  \"createdAt\": \"2026-08-10T12:05:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Comments",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+            "url": {
+              "raw": "{{baseUrl}}/posts/:postId/comments?page=1&limit=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "1430",
+              "path": ["api", "v1", "posts", ":postId", "comments"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ],
+              "variable": [
+                { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Parent post id" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Paginated comments",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c5\",\n      \"postId\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n      \"authorId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n      \"content\": \"Great post!\",\n      \"parentCommentId\": null,\n      \"createdAt\": \"2026-08-10T12:05:00.000Z\"\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 20,\n  \"total\": 1\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Likes",
+      "item": [
+        {
+          "name": "Like Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" },
+              { "key": "Idempotency-Key", "value": "like-64f7c2b5e4b0c2a5f8d9e1c4-64f7c2b5e4b0c2a5f8d9e1c3", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idempotencyKey\": \"like-64f7c2b5e4b0c2a5f8d9e1c4-64f7c2b5e4b0c2a5f8d9e1c3\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/:postId/likes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "1430",
+              "path": ["api", "v1", "posts", ":postId", "likes"],
+              "variable": [
+                { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Post id to like" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Post liked",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c9\",\n  \"userId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n  \"postId\": \"64f7c2b5e4b0c2a5f8d9e1c4\",\n  \"createdAt\": \"2026-08-10T12:20:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Unlike Post",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+            "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+            "url": {
+              "raw": "{{baseUrl}}/posts/:postId/likes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "1430",
+              "path": ["api", "v1", "posts", ":postId", "likes"],
+              "variable": [
+                { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Post id to unlike" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Post unliked",
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Check Like Status",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+            "url": {
+              "raw": "{{baseUrl}}/posts/:postId/likes/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "1430",
+              "path": ["api", "v1", "posts", ":postId", "likes", "me"],
+              "variable": [
+                { "key": "postId", "value": "64f7c2b5e4b0c2a5f8d9e1c4", "description": "Post id to check" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Like status",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"liked\": true\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

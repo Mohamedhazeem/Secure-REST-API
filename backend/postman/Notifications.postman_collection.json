@@ -1,0 +1,77 @@
+{
+  "info": {
+    "_postman_id": "c3d5e7f9-a1b2-4c3d-9e4f-3a1b2c5d7e9f",
+    "name": "Notifications",
+    "description": "Notification endpoints for TrustFeed. Lists the authenticated user's notifications and marks them read. Requires the access_token cookie (sent automatically by Postman after Login/Register).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51054906"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:1430/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "64f7c2b5e4b0c2a5f8d9e1c8",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "List Notifications",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "url": {
+          "raw": "{{baseUrl}}/notifications?page=1&limit=20",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "notifications"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Paginated notifications",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"data\": [\n    {\n      \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c8\",\n      \"recipientId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n      \"actorId\": \"64f7c2b5e4b0c2a5f8d9e1c7\",\n      \"actorName\": \"bob\",\n      \"action\": \"followed you\",\n      \"targetSummary\": \"bob started following you\",\n      \"deepLink\": \"https://trustfeed.example.com/users/64f7c2b5e4b0c2a5f8d9e1c7\",\n      \"type\": \"follow\",\n      \"resourceId\": \"64f7c2b5e4b0c2a5f8d9e1c6\",\n      \"read\": false,\n      \"createdAt\": \"2026-08-10T12:15:00.000Z\"\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 20,\n  \"total\": 1\n}"
+        }
+      ]
+    },
+    {
+      "name": "Mark Notification Read",
+      "request": {
+        "method": "PATCH",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/notifications/:notificationId/read",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "notifications", ":notificationId", "read"],
+          "variable": [
+            { "key": "notificationId", "value": "64f7c2b5e4b0c2a5f8d9e1c8", "description": "Notification id to mark read" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Marked read",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c8\",\n  \"recipientId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n  \"actorId\": \"64f7c2b5e4b0c2a5f8d9e1c7\",\n  \"actorName\": \"bob\",\n  \"action\": \"followed you\",\n  \"targetSummary\": \"bob started following you\",\n  \"deepLink\": \"https://trustfeed.example.com/users/64f7c2b5e4b0c2a5f8d9e1c7\",\n  \"type\": \"follow\",\n  \"resourceId\": \"64f7c2b5e4b0c2a5f8d9e1c6\",\n  \"read\": true,\n  \"createdAt\": \"2026-08-10T12:15:00.000Z\"\n}"
+        }
+      ]
+    }
+  ]
+}

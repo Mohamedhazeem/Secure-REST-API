@@ -1,0 +1,77 @@
+{
+  "info": {
+    "_postman_id": "a1f3b9c2-4d6e-4f7a-8b2c-1e9f0a3b5c7d",
+    "name": "Follows",
+    "description": "Follow and unfollow endpoints for TrustFeed. Mounted under /api/v1/users/{id}/follow and /api/v1/users/{id}/unfollow. Requires the access_token cookie (sent automatically by Postman after Login/Register).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51054906"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:1430/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "64f7c2b5e4b0c2a5f8d9e1c7",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Follow User",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/follow",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "users", ":userId", "follow"],
+          "variable": [
+            { "key": "userId", "value": "64f7c2b5e4b0c2a5f8d9e1c7", "description": "User id to follow" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Followed",
+          "status": "Created",
+          "code": 201,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"_id\": \"64f7c2b5e4b0c2a5f8d9e1c6\",\n  \"followerId\": \"64f7c2b5e4b0c2a5f8d9e1c3\",\n  \"followingId\": \"64f7c2b5e4b0c2a5f8d9e1c7\",\n  \"createdAt\": \"2026-08-10T12:10:00.000Z\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Unfollow User",
+      "request": {
+        "method": "DELETE",
+        "header": [ { "key": "Accept", "value": "application/json", "type": "text" } ],
+        "body": { "mode": "raw", "raw": "", "options": { "raw": { "language": "json" } } },
+        "url": {
+          "raw": "{{baseUrl}}/users/:userId/unfollow",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "1430",
+          "path": ["api", "v1", "users", ":userId", "unfollow"],
+          "variable": [
+            { "key": "userId", "value": "64f7c2b5e4b0c2a5f8d9e1c7", "description": "User id to unfollow" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Unfollowed",
+          "status": "OK",
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Unfollowed successfully\"\n}"
+        }
+      ]
+    }
+  ]
+}
