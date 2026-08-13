@@ -2,7 +2,7 @@
 
 A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. Demonstrates clean architecture with repository pattern, JWT authentication with HTTP-only cookies, token refresh/rotation with Redis blacklist, RBAC + ABAC authorization, ownership-based access control, Zod request validation, idempotency, Redis-backed rate limiting, correlation IDs, structured logging, metrics, and asynchronous notifications via BullMQ. Backend-only by design — no UI.
 
-> Backend only. No UI by design. The API is consumed by clients built from the OpenAPI contract.
+> Backend only. Minimal UI by design. The API is consumed by clients built from the OpenAPI contract.
 
 <p align="center">
   <img src="assets/cover.svg" alt="TrustFeed API — Clean architecture, defense-in-depth security, stable API contract" width="100%">
