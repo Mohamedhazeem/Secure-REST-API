@@ -44,6 +44,16 @@ A production-grade, secure REST API built with Node.js, Express 5, and MongoDB. 
 - [License](#license)
 - [Author](#author)
 
+## App Screenshots
+
+[![Screenshot 1](assets/screenshots/TF_1_1.png)](assets/screenshots/TF_1.png)
+[![Screenshot 2](assets/screenshots/TF_2.png)](assets/screenshots/TF_2.png)
+[![Screenshot 3](assets/screenshots/TF_3.png)](assets/screenshots/TF_3.png)
+[![Screenshot 4](assets/screenshots/TF_4.png)](assets/screenshots/TF_4.png)
+[![Screenshot 5](assets/screenshots/TF_5.png)](assets/screenshots/TF_5.png)
+[![Screenshot 6](assets/screenshots/TF_6.png)](assets/screenshots/TF_6.png)
+[![Screenshot 7](assets/screenshots/TF_7.png)](assets/screenshots/TF_7.png)
+
 ---
 
 ## Why This Project Exists
@@ -63,7 +73,7 @@ This project does. It is structured so a technical evaluator can verify the arch
 
 ## Project Goals
 
- 1. **Clean Architecture & SOLID.** Domain logic is isolated from transport (Express), persistence (Mongoose), and external services (Redis, BullMQ). Dependencies point inward.
+1. **Clean Architecture & SOLID.** Domain logic is isolated from transport (Express), persistence (Mongoose), and external services (Redis, BullMQ). Dependencies point inward.
 2. **Extensibility without regression.** Adding a new resource means creating new files in a documented pattern. Existing handlers, services, and routes are not modified.
 3. **Defense-in-depth security.** JWT with HTTP-only cookies, rotating refresh tokens with a Redis-backed blacklist, bcrypt-hashed passwords, per-caller rate limiting, RBAC, and ownership checks on every mutating operation.
 4. **Stable, machine-readable API contract.** Every public endpoint is documented in a versioned OpenAPI YAML. The contract is the source of truth for integration.
@@ -92,7 +102,7 @@ This project does. It is structured so a technical evaluator can verify the arch
 | Slow APIs under load                           | Sub-second p95 target under 1000 concurrent authenticated requests; performance tests gate the build |
 | Browser clients blocked by CORS                | Environment-driven origin allowlist with credentials and preflight handling                          |
 | Lost notifications when queue backends fail    | Inline fallback preserves bounded retry and dead-letter semantics                                    |
-| No audit trail for security events            | Audit events are persisted via the AuditLog repository with correlation IDs                           |
+| No audit trail for security events             | Audit events are persisted via the AuditLog repository with correlation IDs                          |
 
 ---
 
@@ -355,23 +365,23 @@ All routes are prefixed with `/api/v1`.
 
 ### Auth
 
-| Method   | Path                     | Description                      |
-| -------- | ------------------------ | -------------------------------- |
-| `POST`   | `/auth/`                 | Register a new user              |
-| `POST`   | `/auth/login`            | Login (rate-limited)             |
-| `POST`   | `/auth/logout`           | Invalidate refresh token         |
-| `POST`   | `/auth/refresh`          | Rotate refresh token             |
-| `DELETE` | `/auth/me`               | Delete own account               |
-| `GET`    | `/auth/sessions`         | List own sessions                |
-| `DELETE` | `/auth/sessions/:id`     | Revoke a single session          |
+| Method   | Path                 | Description              |
+| -------- | -------------------- | ------------------------ |
+| `POST`   | `/auth/`             | Register a new user      |
+| `POST`   | `/auth/login`        | Login (rate-limited)     |
+| `POST`   | `/auth/logout`       | Invalidate refresh token |
+| `POST`   | `/auth/refresh`      | Rotate refresh token     |
+| `DELETE` | `/auth/me`           | Delete own account       |
+| `GET`    | `/auth/sessions`     | List own sessions        |
+| `DELETE` | `/auth/sessions/:id` | Revoke a single session  |
 
 ### Users
 
-| Method   | Path                  | Description                  |
-| -------- | --------------------- | ---------------------------- |
-| `GET`    | `/users/`             | List users (admin)           |
-| `GET`    | `/users/:id`          | Get user by ID (admin)       |
-| `POST`   | `/users/:id/roles`    | Assign roles to user (admin) |
+| Method | Path               | Description                  |
+| ------ | ------------------ | ---------------------------- |
+| `GET`  | `/users/`          | List users (admin)           |
+| `GET`  | `/users/:id`       | Get user by ID (admin)       |
+| `POST` | `/users/:id/roles` | Assign roles to user (admin) |
 
 ### Posts (authenticated)
 
@@ -385,60 +395,60 @@ All routes are prefixed with `/api/v1`.
 
 ### Comments (authenticated)
 
-| Method   | Path                          | Description              |
-| -------- | ---------------------------- | ------------------------ |
-| `POST`   | `/posts/:id/comments`        | Comment on a post        |
-| `GET`    | `/posts/:id/comments`        | List comments on a post  |
+| Method | Path                  | Description             |
+| ------ | --------------------- | ----------------------- |
+| `POST` | `/posts/:id/comments` | Comment on a post       |
+| `GET`  | `/posts/:id/comments` | List comments on a post |
 
 ### Follows (authenticated)
 
-| Method   | Path                  | Description          |
-| -------- | --------------------- | -------------------- |
-| `POST`   | `/users/:id/follow`   | Follow a user        |
-| `DELETE` | `/users/:id/unfollow` | Unfollow a user      |
+| Method   | Path                  | Description     |
+| -------- | --------------------- | --------------- |
+| `POST`   | `/users/:id/follow`   | Follow a user   |
+| `DELETE` | `/users/:id/unfollow` | Unfollow a user |
 
 ### Likes (authenticated)
 
-| Method   | Path                     | Description          |
-| -------- | ------------------------ | -------------------- |
-| `POST`   | `/posts/:id/likes`       | Like a post          |
-| `DELETE` | `/posts/:id/likes`       | Unlike a post        |
-| `GET`    | `/posts/:id/likes/me`    | Check if post liked  |
+| Method   | Path                  | Description         |
+| -------- | --------------------- | ------------------- |
+| `POST`   | `/posts/:id/likes`    | Like a post         |
+| `DELETE` | `/posts/:id/likes`    | Unlike a post       |
+| `GET`    | `/posts/:id/likes/me` | Check if post liked |
 
 ### Feed (authenticated)
 
-| Method | Path   | Description                          |
-| ------ | ------ | ------------------------------------ |
-| `GET`  | `/feed` | Cursor-paginated personalized feed   |
+| Method | Path    | Description                        |
+| ------ | ------- | ---------------------------------- |
+| `GET`  | `/feed` | Cursor-paginated personalized feed |
 
 ### Notifications (authenticated)
 
-| Method   | Path                    | Description                      |
-| -------- | ----------------------- | -------------------------------- |
-| `GET`    | `/notifications`        | List own notifications           |
-| `PATCH`  | `/notifications/:id/read` | Mark notification as read      |
+| Method  | Path                      | Description               |
+| ------- | ------------------------- | ------------------------- |
+| `GET`   | `/notifications`          | List own notifications    |
+| `PATCH` | `/notifications/:id/read` | Mark notification as read |
 
 ### Admin (authenticated, admin role required)
 
-| Method   | Path                        | Description                  |
-| -------- | --------------------------- | ---------------------------- |
-| `GET`    | `/admin/roles`              | List roles                   |
-| `GET`    | `/admin/roles/:id`          | Get role                     |
-| `POST`   | `/admin/roles`              | Create role                  |
-| `PATCH`  | `/admin/roles/:id`          | Update role                  |
-| `DELETE` | `/admin/roles/:id`          | Delete role                  |
-| `GET`    | `/admin/permissions`        | List permissions             |
-| `GET`    | `/admin/permissions/:id`    | Get permission               |
-| `POST`   | `/admin/permissions`        | Create permission            |
-| `PATCH`  | `/admin/permissions/:id`    | Update permission            |
-| `DELETE` | `/admin/permissions/:id`    | Delete permission            |
+| Method   | Path                     | Description       |
+| -------- | ------------------------ | ----------------- |
+| `GET`    | `/admin/roles`           | List roles        |
+| `GET`    | `/admin/roles/:id`       | Get role          |
+| `POST`   | `/admin/roles`           | Create role       |
+| `PATCH`  | `/admin/roles/:id`       | Update role       |
+| `DELETE` | `/admin/roles/:id`       | Delete role       |
+| `GET`    | `/admin/permissions`     | List permissions  |
+| `GET`    | `/admin/permissions/:id` | Get permission    |
+| `POST`   | `/admin/permissions`     | Create permission |
+| `PATCH`  | `/admin/permissions/:id` | Update permission |
+| `DELETE` | `/admin/permissions/:id` | Delete permission |
 
 ### Health (unprotected)
 
-| Method | Path             | Description                          |
-| ------ | ---------------- | ------------------------------------ |
-| `GET`  | `/health`        | Liveness probe                       |
-| `GET`  | `/health/ready`  | Readiness probe (Mongo + Redis)      |
+| Method | Path            | Description                     |
+| ------ | --------------- | ------------------------------- |
+| `GET`  | `/health`       | Liveness probe                  |
+| `GET`  | `/health/ready` | Readiness probe (Mongo + Redis) |
 
 The full contract — parameters, schemas, security schemes, error responses, and CORS — is published as a multi-file OpenAPI specification (canonical copy under `specs/002-trustfeed-social-api/contracts/`, published under `backend/src/docs/openapi/`, split by concern: `openapi.yaml`, `paths/`, and `components/` containing `schemas.yaml`, `responses.yaml`, `security.yaml`).
 
@@ -474,11 +484,11 @@ The full contract — parameters, schemas, security schemes, error responses, an
 
 Rate limits are enforced per caller using `express-rate-limit` with a Redis store. Defaults are overridable via environment variables.
 
-| Scope                      | Default      | Window | Key        |
-| -------------------------- | ------------ | ------ | ---------- |
+| Scope                      | Default      | Window | Key         |
+| -------------------------- | ------------ | ------ | ----------- |
 | Global API (authenticated) | 200 requests | 15 min | `user:<id>` |
-| Global API (public)        | 200 requests | 15 min | IP         |
-| Login (`POST /auth/login`) | 5 requests   | 5 min  | IP         |
+| Global API (public)        | 200 requests | 15 min | IP          |
+| Login (`POST /auth/login`) | 5 requests   | 5 min  | IP          |
 | Social mutations           | 60 requests  | 15 min | `user:<id>` |
 
 When a caller exceeds their limit, the API returns `429` with a `RATE_LIMITED` error code. Limiter state is shared across processes because the store is Redis, so the system stays correct behind a load balancer.
@@ -499,21 +509,21 @@ All error responses use a **flat envelope** with three fields:
 
 Stable codes (defined in `src/utils/errors.js`):
 
-| Code | HTTP | Meaning |
-|------|------|---------|
-| `VALIDATION_ERROR` | 400 | Request body or params failed validation |
-| `UNAUTHORIZED` | 401 | Authentication required |
-| `INVALID_CREDENTIALS` | 401 | Bad email or password |
-| `AUTH_REUSE_DETECTED` | 401 | Refresh token reuse detected |
-| `FORBIDDEN` | 403 | Permission denied |
-| `ROLE_DENIED` | 403 | Required role or permission missing |
-| `OWNERSHIP_REQUIRED` | 403 | Caller is not the resource owner |
-| `NOT_FOUND` | 404 | Resource does not exist |
-| `CONFLICT` | 409 | State conflict (e.g. duplicate) |
-| `IDEMPOTENCY_CONFLICT` | 409 | Concurrent request with same idempotency key |
-| `RATE_LIMITED` | 429 | Rate limit exceeded |
-| `DEPENDENCY_FAILURE` | 503 | External dependency is unavailable |
-| `INTERNAL_ERROR` | 500 | Unexpected error |
+| Code                   | HTTP | Meaning                                      |
+| ---------------------- | ---- | -------------------------------------------- |
+| `VALIDATION_ERROR`     | 400  | Request body or params failed validation     |
+| `UNAUTHORIZED`         | 401  | Authentication required                      |
+| `INVALID_CREDENTIALS`  | 401  | Bad email or password                        |
+| `AUTH_REUSE_DETECTED`  | 401  | Refresh token reuse detected                 |
+| `FORBIDDEN`            | 403  | Permission denied                            |
+| `ROLE_DENIED`          | 403  | Required role or permission missing          |
+| `OWNERSHIP_REQUIRED`   | 403  | Caller is not the resource owner             |
+| `NOT_FOUND`            | 404  | Resource does not exist                      |
+| `CONFLICT`             | 409  | State conflict (e.g. duplicate)              |
+| `IDEMPOTENCY_CONFLICT` | 409  | Concurrent request with same idempotency key |
+| `RATE_LIMITED`         | 429  | Rate limit exceeded                          |
+| `DEPENDENCY_FAILURE`   | 503  | External dependency is unavailable           |
+| `INTERNAL_ERROR`       | 500  | Unexpected error                             |
 
 There is **no category field, no retry guidance, no HTTP-text duplication**. Consumers look up the stable code in the contract and decide their own retry policy. When a dependency (MongoDB, Redis) fails, the API returns `DEPENDENCY_FAILURE` immediately — it does not retry or fall back at the application layer.
 
@@ -558,11 +568,11 @@ A memory implementation can be added at `repositories/implementations/memory/` f
 
 ## Testing Strategy
 
-| Layer | Tooling | Scope |
-|---|---|---|
+| Layer       | Tooling                                    | Scope                                                                                                      |
+| ----------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | Integration | Vitest + Supertest + mongodb-memory-server | API + DB: auth, RBAC, ownership, errors, CORS, contract, sessions, follow, like, notifications, rate limit |
-| Performance | Vitest | Feed cache hit rate, pagination throughput, rate-limit latency, load (p95 < 950ms) |
-| End-to-end | Vitest + Supertest | Auth flows, post CRUD, social flows |
+| Performance | Vitest                                     | Feed cache hit rate, pagination throughput, rate-limit latency, load (p95 < 950ms)                         |
+| End-to-end  | Vitest + Supertest                         | Auth flows, post CRUD, social flows                                                                        |
 
 The `tests/unit/` directory is reserved for future pure unit tests (services against in-memory repositories, validators, pure functions).
 
