@@ -79,6 +79,10 @@ app.get("/console", (req, res) => {
   res.sendFile(join(moduleDir, "docs", "console.html"));
 });
 
+app.get("/console.css", (req, res) => {
+  res.sendFile(join(moduleDir, "docs", "console.css"));
+});
+
 app.use(notFoundHandler);
 app.use(errorHandler);
 

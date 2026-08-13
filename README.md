@@ -260,6 +260,9 @@ backend/
 │   │   └── admin.controller.js     Role & permission CRUD
 │   ├── docs/
 │   │   ├── extension-pattern.md    How to add a new resource
+│   │   ├── console.html            Interactive Scalar-powered API console
+│   │   ├── console.css             Console theme and layout styles
+│   │   ├── resolve-openapi.js      Resolves multi-file contract to JSON at runtime
 │   │   └── openapi/
 │   │       └── contract-check.js   Validates implementation matches contract
 │   ├── middleware/
@@ -352,6 +355,7 @@ backend/
 │   ├── integration/                API + DB integration (auth, RBAC, ownership, errors, CORS, contract, sessions, follow, like, notifications, rate limit)
 │   ├── performance/                Feed cache, pagination, rate-limit latency, load (p95 < 950ms)
 │   └── e2e/                        End-to-end flows (auth flows, post CRUD, social flows)
+├── postman/                        Newman/Postman collections for E2E API validation
 ├── vitest.config.js
 ├── package.json
 └── .env                            (not committed)
@@ -467,7 +471,7 @@ The full contract — parameters, schemas, security schemes, error responses, an
 **Authorization** is RBAC + inline ABAC:
 
 - `Role` is a named collection of `Permission` codes (e.g. `posts:create`, `posts:delete`, `follows:create`, `likes:create`, `comments:create`, `feed:read`, `notifications:read`).
-- Permissions and roles are stored in the database, seeded on boot in development, and manageable at runtime via the `/admin` API.
+- Default seeded roles: `user` (`posts:read`, `posts:create`) and `admin` (all permissions). Roles and permissions are stored in the database, seeded on boot in development, and manageable at runtime via the `/admin` API.
 - **RBAC middleware**: `requirePermission("posts:delete")` checks `req.user.permissions`.
 - **Inline ABAC**: `requirePermission("posts:update", { attributes: ctx => ctx.user._id === ctx.params.id })` evaluates arbitrary predicates per request.
 - Adding a new role or permission does not require touching endpoint code.
@@ -550,6 +554,7 @@ After editing, sync and validate it:
 ```bash
 npm run contract:sync   # regenerate backend/src/docs/openapi from the canonical copy
 npm run contract:lint   # validate the published openapi.yaml
+npm run contract:check  # verify implementation matches the contract
 ```
 
 The implementation is checked against this contract.
@@ -572,7 +577,7 @@ A memory implementation can be added at `repositories/implementations/memory/` f
 | ----------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | Integration | Vitest + Supertest + mongodb-memory-server | API + DB: auth, RBAC, ownership, errors, CORS, contract, sessions, follow, like, notifications, rate limit |
 | Performance | Vitest                                     | Feed cache hit rate, pagination throughput, rate-limit latency, load (p95 < 950ms)                         |
-| End-to-end  | Vitest + Supertest                         | Auth flows, post CRUD, social flows                                                                        |
+| End-to-end  | Vitest + Supertest + Newman/Postman | Auth flows, post CRUD, social flows |
 
 The `tests/unit/` directory is reserved for future pure unit tests (services against in-memory repositories, validators, pure functions).
 
@@ -587,6 +592,9 @@ npm run test:watch
 
 # Coverage
 npm run test:coverage
+
+# E2E with Postman collections
+npm run e2e
 ```
 
 Coverage targets are tracked by the test suite itself; the full suite must pass before any change is merged.
@@ -595,10 +603,10 @@ Coverage targets are tracked by the test suite itself; the full suite must pass 
 
 ## API Console
 
-An interactive API Console is served at `/console` when the backend is running. It renders the published OpenAPI contract using Scalar, letting reviewers browse endpoints, inspect schemas, authenticate with their real TrustFeed cookie-based session, and execute requests without leaving the browser.
+An interactive API Console is served at `/console` when the backend is running. The root path `/` redirects to `/console`. It renders the published OpenAPI contract using Scalar, letting reviewers browse endpoints, inspect schemas, authenticate with their real TrustFeed cookie-based session, and execute requests without leaving the browser.
 
 - **URL**: `http://localhost:1430/console`
-- **OpenAPI source of truth**: `/console/openapi.json` (resolved from the canonical multi-file contract at runtime)
+- **OpenAPI source of truth**: `/console/openapi.json` (resolved from the canonical multi-file contract at runtime by `resolve-openapi.js`)
 - **Authentication**: Uses the same HTTP-only cookies as the API (`access_token`, `refresh_token`). No demo credentials or auth bypasses are provided.
 - **CORS**: Because the console is served from the same origin as the API, no cross-origin configuration is required for local development.
 
